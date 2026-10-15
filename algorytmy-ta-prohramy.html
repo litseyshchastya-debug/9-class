@@ -1,0 +1,452 @@
+<title>Списки в Python 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: two full-screen slides, text column on the left, live Three.js stage on the right; stacks on phones.
+   Single committed look: a dark "code editor" room lit in Python's blue and yellow. */
+:root {
+  --bg: #0e1524;
+  --panel: #151f33;
+  --line: #26344f;
+  --fg: #e7ecf5;
+  --muted: #94a2bb;
+  --blue: #4b8bbe;
+  --yellow: #ffd343;
+  --red: #ff7a6b;
+  --font-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  display: flex; flex-direction: column;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px;
+  box-sizing: border-box;
+}
+* { box-sizing: border-box; }
+header.deck {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding-bottom: 10px; border-bottom: 1px solid var(--line);
+}
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.eyebrow b { color: var(--yellow); font-weight: 600; }
+nav.pager { display: flex; align-items: center; gap: 8px; }
+nav.pager span { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); min-width: 3.5em; text-align: center; }
+button {
+  font: 600 14px/1 var(--font-body); color: var(--fg); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; cursor: pointer;
+}
+button:hover { border-color: var(--blue); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+button.primary { background: var(--yellow); color: #1b1d24; border-color: var(--yellow); }
+button:disabled { opacity: .45; cursor: default; }
+main { flex: 1; min-height: 0; position: relative; }
+section.slide {
+  height: 100%; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px;
+  padding-top: 18px;
+}
+section.slide[hidden] { display: none !important; }
+.text { min-width: 0; display: flex; flex-direction: column; gap: 14px; overflow: auto; padding-right: 4px; }
+h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(24px, 3.2vw, 40px);
+  line-height: 1.12; margin: 0; text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--yellow); }
+p { margin: 0; max-width: 62ch; }
+.facts { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.facts li { display: grid; grid-template-columns: 1.4em 1fr; gap: 6px; }
+.facts li::before { content: "›"; color: var(--blue); font-weight: 700; font-family: var(--font-mono); }
+code, .code { font-family: var(--font-mono); }
+code { color: var(--yellow); font-size: .92em; }
+.code {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 0; font-size: 14px; line-height: 1.6; overflow-x: auto; margin: 0;
+}
+.code div { padding: 0 14px; white-space: pre; border-left: 3px solid transparent; transition: background .15s; }
+.code div.on { background: rgba(255, 211, 67, .14); border-left-color: var(--yellow); }
+.kw { color: #c792ea; } .fn { color: #82aaff; } .num { color: #f78c6c; } .cm { color: #6b7a96; }
+.stage-wrap { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.stage {
+  flex: 1; min-height: 300px; position: relative; border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--line); background: radial-gradient(120% 90% at 50% 20%, #1a2742 0%, var(--bg) 70%);
+  cursor: grab; touch-action: pan-y;
+}
+.stage canvas { display: block; width: 100%; height: 100%; }
+.hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: var(--muted); pointer-events: none; }
+.console {
+  font-family: var(--font-mono); font-size: 14px; background: #0a0f1a; border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 14px; min-height: 2.9em; overflow-x: auto; white-space: pre;
+}
+.console .p { color: var(--blue); } .console .err { color: var(--red); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.idx { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); }
+.idx input {
+  width: 4.2em; font: 600 14px var(--font-mono); color: var(--fg); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 8px; text-align: center;
+}
+.stats { display: flex; gap: 18px; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.stats b { color: var(--fg); font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) {
+  html, body { height: auto; }
+  section.slide { grid-template-columns: 1fr; height: auto; }
+  .text { overflow: visible; }
+  .stage { min-height: 320px; flex: none; height: 52vh; }
+}
+@media (prefers-reduced-motion: reduce) { .code div { transition: none; } }
+</style>
+
+<header class="deck">
+  <div class="eyebrow">Інформатика 9 · <b>Тема 3. Алгоритми та програми</b> · Python</div>
+  <nav class="pager" aria-label="Слайди">
+    <button id="prev" aria-label="Попередній слайд">←</button>
+    <span id="pos">1 / 2</span>
+    <button id="next" aria-label="Наступний слайд">→</button>
+  </nav>
+</header>
+
+<main>
+  <!-- СЛАЙД 1 -->
+  <section class="slide" id="s1" aria-label="Слайд 1">
+    <div class="text">
+      <div class="eyebrow">Слайд 1 · Поняття одновимірного масиву</div>
+      <h1>Список — це ряд <em>пронумерованих</em> комірок</h1>
+      <p>Одновимірний масив зберігає кілька значень під одним іменем. У Python для цього використовують <b>список</b> (тип <code>list</code>). Кожен елемент має свій номер — <b>індекс</b>.</p>
+      <ul class="facts">
+        <li><span>Елементи записують у квадратних дужках через кому: <code>a = [5, 12, 3, 8, 1]</code>.</span></li>
+        <li><span>Індекси починаються з <b>0</b>: перший елемент — <code>a[0]</code>, останній — <code>a[len(a) - 1]</code>.</span></li>
+        <li><span>Від’ємний індекс рахує з кінця: <code>a[-1]</code> — останній елемент.</span></li>
+        <li><span><code>a.append(x)</code> додає елемент у кінець, <code>a.pop()</code> вилучає останній.</span></li>
+        <li><span>Звернення до неіснуючого індексу дає помилку <code>IndexError</code>.</span></li>
+      </ul>
+      <pre class="code" id="code1"><div><span class="cm"># створення і виведення списку</span></div><div>a = [<span class="num">5</span>, <span class="num">12</span>, <span class="num">3</span>, <span class="num">8</span>, <span class="num">1</span>]</div><div><span class="fn">print</span>(a[<span class="num">0</span>])      <span class="cm"># 5</span></div><div><span class="fn">print</span>(<span class="fn">len</span>(a))    <span class="cm"># 5</span></div><div>a.<span class="fn">append</span>(<span class="num">7</span>)</div></pre>
+    </div>
+    <div class="stage-wrap">
+      <div class="stage" id="stage1"><div class="hint">Натисни на кубик · тягни, щоб повернути</div></div>
+      <div class="controls">
+        <span class="idx">a[<input id="idx" type="number" value="2" aria-label="Індекс">]</span>
+        <button class="primary" id="get">Звернутися</button>
+        <button id="add">a.append()</button>
+        <button id="pop">a.pop()</button>
+      </div>
+      <div class="console" id="out1"><span class="p">&gt;&gt;&gt;</span> a = [5, 12, 3, 8, 1]</div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 2 -->
+  <section class="slide" id="s2" aria-label="Слайд 2" hidden>
+    <div class="text">
+      <div class="eyebrow">Слайд 2 · Сортування і пошук у списках</div>
+      <h1>Як комп’ютер <em>упорядковує</em> список</h1>
+      <p><b>Сортування бульбашкою</b>: порівнюємо сусідні елементи і міняємо їх місцями, якщо лівий більший. Після кожного проходу найбільший елемент «спливає» в кінець списку.</p>
+      <ul class="facts">
+        <li><span>Обмін двох значень у Python: <code>a[j], a[j+1] = a[j+1], a[j]</code>.</span></li>
+        <li><span>Готові засоби: <code>a.sort()</code> змінює список, <code>sorted(a)</code> створює новий; <code>reverse=True</code> — за спаданням.</span></li>
+        <li><span><b>Пошук максимуму</b>: перебираємо всі елементи і запам’ятовуємо найбільший. Готова функція — <code>max(a)</code>.</span></li>
+      </ul>
+      <pre class="code" id="code2"></pre>
+    </div>
+    <div class="stage-wrap">
+      <div class="stage" id="stage2"><div class="hint">Тягни, щоб повернути сцену</div></div>
+      <div class="controls">
+        <button class="primary" id="sort">Сортувати бульбашкою</button>
+        <button id="max">Знайти максимум</button>
+        <button id="shuffle">Перемішати</button>
+      </div>
+      <div class="stats"><span>порівнянь: <b id="cmp">0</b></span><span>обмінів: <b id="swp">0</b></span></div>
+      <div class="console" id="out2"><span class="p">&gt;&gt;&gt;</span> a = [ ... ]</div>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var EASE = reduce ? 1 : 0.14;
+  var BLUE = 0x4b8bbe, YELLOW = 0xffd343, RED = 0xff7a6b;
+
+  /* ---------- допоміжне: сцена Three.js у контейнері ---------- */
+  function makeStage(el, camPos) {
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    el.insertBefore(renderer.domElement, el.firstChild);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(camPos[0], camPos[1], camPos[2]);
+    camera.lookAt(0, camPos[3], 0);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    var sun = new THREE.DirectionalLight(0xffffff, 0.85); sun.position.set(4, 8, 6); scene.add(sun);
+    var rim = new THREE.DirectionalLight(0x4b8bbe, 0.5); rim.position.set(-6, 3, -4); scene.add(rim);
+    var grid = new THREE.GridHelper(30, 30, 0x2c3c5c, 0x1c2840); scene.add(grid);
+    var world = new THREE.Group(); scene.add(world);
+
+    // обертання перетягуванням
+    var drag = null, rot = 0, targetRot = -0.25;
+    el.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, r: targetRot, moved: false }; el.style.cursor = 'grabbing'; });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true;
+      targetRot = Math.max(-1.2, Math.min(1.2, drag.r + dx * 0.006));
+    });
+    window.addEventListener('pointerup', function () { if (drag) { el.style.cursor = ''; setTimeout(function () { drag = null; }, 0); } });
+
+    function resize() {
+      var w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
+      renderer.setSize(w, h, false); camera.aspect = w / h;
+      camera.fov = w / h < 1 ? 58 : 40; camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(el); resize();
+
+    var st = {
+      el: el, scene: scene, camera: camera, world: world, renderer: renderer, active: false, tick: null,
+      wasDrag: function () { return drag && drag.moved; },
+      frame: function (t) {
+        rot += (targetRot - rot) * EASE;
+        world.rotation.y = rot + (reduce ? 0 : Math.sin(t / 2600) * 0.04);
+        if (st.tick) st.tick(t);
+        renderer.render(scene, camera);
+      }
+    };
+    return st;
+  }
+
+  function texCanvas(text, bg, fg, size) {
+    var c = document.createElement('canvas'); c.width = c.height = 256;
+    var g = c.getContext('2d');
+    if (bg) { g.fillStyle = bg; g.fillRect(0, 0, 256, 256); g.strokeStyle = 'rgba(255,255,255,.25)'; g.lineWidth = 10; g.strokeRect(5, 5, 246, 246); }
+    g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '700 ' + (size || 120) + 'px "JetBrains Mono", Consolas, monospace';
+    g.fillText(text, 128, 136);
+    var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+  }
+  function label(text, color, scale) {
+    var m = new THREE.SpriteMaterial({ map: texCanvas(text, null, color, 92), transparent: true, depthWrite: false });
+    var s = new THREE.Sprite(m); s.scale.set(scale || 0.9, scale || 0.9, 1); return s;
+  }
+  function setLabel(s, text, color) { s.material.map.dispose(); s.material.map = texCanvas(text, null, color, 92); s.material.needsUpdate = true; }
+  function lerpTo(o) { o.position.lerp(o.userData.target, EASE); }
+
+  /* ================= СЛАЙД 1: список із кубиків ================= */
+  var s1 = makeStage(document.getElementById('stage1'), [0, 3.4, 9.5, 0.6]);
+  var list = [];        // { value, cube, idx }
+  var out1 = document.getElementById('out1');
+  var hot = -1, gone = [];
+
+  function cubeMats(v, on) {
+    var tex = texCanvas(String(v), on ? '#ffd343' : '#2f5f8a', on ? '#1b1d24' : '#ffffff', String(v).length > 1 ? 112 : 132);
+    return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.45, metalness: 0.1 });
+  }
+  function addCube(v, fromSky) {
+    var cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), cubeMats(v, false));
+    var idx = label('0', '#94a2bb', 0.75);
+    cube.userData.target = new THREE.Vector3(); idx.userData.target = new THREE.Vector3();
+    s1.world.add(cube); s1.world.add(idx);
+    var item = { value: v, cube: cube, idx: idx };
+    list.push(item); layout1();
+    cube.position.copy(cube.userData.target); idx.position.copy(idx.userData.target);
+    if (fromSky && !reduce) cube.position.y += 5;
+  }
+  function layout1() {
+    var n = list.length, gap = 1.3;
+    list.forEach(function (it, i) {
+      var x = (i - (n - 1) / 2) * gap;
+      it.cube.userData.target.set(x, i === hot ? 1.25 : 0.6, 0);
+      it.idx.userData.target.set(x, -0.25, 0.75);
+      setLabel(it.idx, String(i), i === hot ? '#ffd343' : '#94a2bb');
+    });
+  }
+  function highlight(i) {
+    if (hot >= 0 && list[hot]) list[hot].cube.material = cubeMats(list[hot].value, false);
+    hot = i;
+    if (i >= 0) list[i].cube.material = cubeMats(list[i].value, true);
+    layout1();
+  }
+  function say1(cmd, res, err) {
+    out1.innerHTML = '<span class="p">&gt;&gt;&gt;</span> ' + cmd + (res !== undefined ? '\n' + (err ? '<span class="err">' + res + '</span>' : res) : '');
+  }
+  function listStr() { return '[' + list.map(function (i) { return i.value; }).join(', ') + ']'; }
+
+  [5, 12, 3, 8, 1].forEach(function (v) { addCube(v, false); });
+
+  function access(i) {
+    var n = list.length, real = i < 0 ? n + i : i;
+    if (isNaN(i)) return;
+    if (real < 0 || real >= n) { highlight(-1); say1('a[' + i + ']', 'IndexError: list index out of range', true); return; }
+    highlight(real);
+    say1('a[' + i + ']', String(list[real].value) + (i < 0 ? '      # це той самий елемент, що й a[' + real + ']' : ''));
+  }
+  document.getElementById('get').onclick = function () { access(parseInt(document.getElementById('idx').value, 10)); };
+  document.getElementById('idx').addEventListener('keydown', function (e) { if (e.key === 'Enter') access(parseInt(this.value, 10)); });
+  document.getElementById('add').onclick = function () {
+    if (list.length >= 9) { say1('a.append(...)', '# досить для демонстрації: у списку вже 9 елементів'); return; }
+    var v = 1 + Math.floor(Math.random() * 20);
+    highlight(-1); addCube(v, true);
+    say1('a.append(' + v + ')\n<span class="p">&gt;&gt;&gt;</span> a', listStr() + '      # len(a) = ' + list.length);
+  };
+  document.getElementById('pop').onclick = function () {
+    if (!list.length) { say1('a.pop()', 'IndexError: pop from empty list', true); return; }
+    if (hot === list.length - 1) highlight(-1);
+    var it = list.pop(); gone.push(it);
+    it.cube.userData.target.y = 6; it.idx.visible = false;
+    layout1();
+    say1('a.pop()', it.value + '      # тепер a = ' + listStr());
+  };
+  // клік по кубику
+  var ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+  s1.el.addEventListener('click', function (e) {
+    if (s1.wasDrag()) return;
+    var r = s1.renderer.domElement.getBoundingClientRect();
+    mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(mouse, s1.camera);
+    var hit = ray.intersectObjects(list.map(function (i) { return i.cube; }));
+    if (hit.length) {
+      var i = list.findIndex(function (it) { return it.cube === hit[0].object; });
+      document.getElementById('idx').value = i; access(i);
+    }
+  });
+  s1.tick = function (t) {
+    list.forEach(function (it, i) {
+      lerpTo(it.cube); lerpTo(it.idx);
+      it.cube.rotation.y = i === hot && !reduce ? Math.sin(t / 400) * 0.25 : it.cube.rotation.y * 0.9;
+    });
+    gone = gone.filter(function (it) {
+      lerpTo(it.cube);
+      if (it.cube.position.y > 5.6 || reduce) { s1.world.remove(it.cube); s1.world.remove(it.idx); return false; }
+      return true;
+    });
+  };
+
+  /* ================= СЛАЙД 2: стовпчики, сортування, пошук ================= */
+  var s2 = makeStage(document.getElementById('stage2'), [0, 4.2, 11, 1.6]);
+  var bars = [], out2 = document.getElementById('out2'), code2 = document.getElementById('code2');
+  var cmpEl = document.getElementById('cmp'), swpEl = document.getElementById('swp');
+  var timer = null, H = 0.32;
+
+  var CODE = {
+    sort: [
+      '<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n - <span class="num">1</span>):',
+      '    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n - <span class="num">1</span> - i):',
+      '        <span class="kw">if</span> a[j] &gt; a[j + <span class="num">1</span>]:',
+      '            a[j], a[j + <span class="num">1</span>] = a[j + <span class="num">1</span>], a[j]'
+    ],
+    max: [
+      'm = a[<span class="num">0</span>]',
+      '<span class="kw">for</span> x <span class="kw">in</span> a:',
+      '    <span class="kw">if</span> x &gt; m:',
+      '        m = x',
+      '<span class="fn">print</span>(m)'
+    ]
+  };
+  function showCode(kind, on) {
+    code2.innerHTML = CODE[kind].map(function (l, i) { return '<div' + (i === on ? ' class="on"' : '') + '>' + l + '</div>'; }).join('');
+  }
+  function mark(i) { var d = code2.children; for (var k = 0; k < d.length; k++) d[k].classList.toggle('on', k === i); }
+
+  function makeBars(vals) {
+    bars.forEach(function (b) { s2.world.remove(b.mesh); s2.world.remove(b.lab); s2.world.remove(b.idx); });
+    bars = vals.map(function (v) {
+      var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1, 0.85), new THREE.MeshStandardMaterial({ color: BLUE, roughness: 0.4, metalness: 0.15 }));
+      var lab = label(String(v), '#e7ecf5', 0.8), idx = label('0', '#6b7a96', 0.6);
+      mesh.userData.target = new THREE.Vector3(); lab.userData.target = new THREE.Vector3(); idx.userData.target = new THREE.Vector3();
+      s2.world.add(mesh); s2.world.add(lab); s2.world.add(idx);
+      return { v: v, mesh: mesh, lab: lab, idx: idx, h: v * H };
+    });
+    layout2(true);
+  }
+  function layout2(snap) {
+    var n = bars.length;
+    bars.forEach(function (b, i) {
+      var x = (i - (n - 1) / 2) * 1.15;
+      b.mesh.scale.y = b.h;
+      b.mesh.userData.target.set(x, b.h / 2, 0);
+      b.lab.userData.target.set(x, b.h + 0.45, 0);
+      b.idx.userData.target.set(x, -0.2, 0.7);
+      setLabel(b.idx, String(i), '#6b7a96');
+      if (snap) { b.mesh.position.copy(b.mesh.userData.target); b.lab.position.copy(b.lab.userData.target); b.idx.position.copy(b.idx.userData.target); }
+    });
+  }
+  function paint(fn) { bars.forEach(function (b, i) { b.mesh.material.color.setHex(fn(i)); }); }
+  function vals() { return bars.map(function (b) { return b.v; }); }
+  function say2(cmd, res) { out2.innerHTML = '<span class="p">&gt;&gt;&gt;</span> ' + cmd + (res ? '\n' + res : ''); }
+  function stop() { clearInterval(timer); timer = null; setBusy(false); }
+  function setBusy(b) { ['sort', 'max'].forEach(function (id) { document.getElementById(id).disabled = b; }); }
+  function randomVals() { var a = []; for (var i = 0; i < 8; i++) a.push(2 + Math.floor(Math.random() * 14)); return a; }
+
+  function* bubble() {
+    var n = bars.length, sorted = n, c = 0, s = 0;
+    for (var i = 0; i < n - 1; i++) {
+      for (var j = 0; j < n - 1 - i; j++) {
+        c++; cmpEl.textContent = c;
+        paint(function (k) { return k === j || k === j + 1 ? YELLOW : (k >= sorted ? 0x3fae7a : BLUE); });
+        mark(2); say2('a[' + j + '] > a[' + (j + 1) + ']', bars[j].v + ' > ' + bars[j + 1].v + '  →  ' + (bars[j].v > bars[j + 1].v ? 'True, міняємо місцями' : 'False'));
+        yield;
+        if (bars[j].v > bars[j + 1].v) {
+          var t = bars[j]; bars[j] = bars[j + 1]; bars[j + 1] = t; s++; swpEl.textContent = s;
+          paint(function (k) { return k === j || k === j + 1 ? RED : (k >= sorted ? 0x3fae7a : BLUE); });
+          mark(3); layout2(false); yield;
+        }
+      }
+      sorted = n - 1 - i; mark(1);
+    }
+    paint(function () { return 0x3fae7a; }); mark(-1);
+    say2('a', '[' + vals().join(', ') + ']      # відсортовано: ' + c + ' порівнянь, ' + s + ' обмінів');
+  }
+  function* findMax() {
+    var m = 0, c = 0;
+    paint(function (k) { return k === 0 ? YELLOW : BLUE; }); mark(0);
+    say2('m = a[0]', String(bars[0].v)); yield;
+    for (var i = 0; i < bars.length; i++) {
+      c++; cmpEl.textContent = c;
+      paint(function (k) { return k === m ? YELLOW : (k === i ? 0x9fb7d6 : BLUE); });
+      mark(2); say2('x > m', bars[i].v + ' > ' + bars[m].v + '  →  ' + (bars[i].v > bars[m].v ? 'True' : 'False')); yield;
+      if (bars[i].v > bars[m].v) { m = i; mark(3); paint(function (k) { return k === m ? YELLOW : BLUE; }); say2('m = x', String(bars[m].v)); yield; }
+    }
+    mark(4); paint(function (k) { return k === m ? YELLOW : 0x2c4766; });
+    say2('print(m)', bars[m].v + '      # максимум має індекс ' + m + '; те саме дає max(a)');
+  }
+  function run(gen, kind, cmd) {
+    stop(); cmpEl.textContent = 0; swpEl.textContent = 0; showCode(kind, -1); setBusy(true);
+    say2(cmd);
+    var it = gen();
+    timer = setInterval(function () { if (it.next().done) stop(); }, reduce ? 250 : 520);
+  }
+  document.getElementById('sort').onclick = function () { run(bubble, 'sort', 'n = len(a)'); };
+  document.getElementById('max').onclick = function () { run(findMax, 'max', 'm = a[0]'); };
+  document.getElementById('shuffle').onclick = function () {
+    stop(); makeBars(randomVals()); cmpEl.textContent = 0; swpEl.textContent = 0;
+    bars.forEach(function (b) { if (!reduce) b.mesh.position.y -= 3; });
+    say2('a = [' + vals().join(', ') + ']'); showCode('sort', -1);
+  };
+
+  makeBars([9, 4, 13, 6, 2, 11, 7, 15]);
+  showCode('sort', -1); say2('a = [' + vals().join(', ') + ']');
+  s2.tick = function () { bars.forEach(function (b) { lerpTo(b.mesh); lerpTo(b.lab); lerpTo(b.idx); }); };
+
+  /* ---------- навігація між слайдами ---------- */
+  var slides = [document.getElementById('s1'), document.getElementById('s2')], stages = [s1, s2], cur = 0;
+  function go(i) {
+    cur = Math.max(0, Math.min(1, i));
+    slides.forEach(function (s, k) { s.hidden = k !== cur; });
+    document.getElementById('pos').textContent = (cur + 1) + ' / 2';
+    document.getElementById('prev').disabled = cur === 0;
+    document.getElementById('next').disabled = cur === 1;
+    window.dispatchEvent(new Event('resize'));
+  }
+  document.getElementById('prev').onclick = function () { go(cur - 1); };
+  document.getElementById('next').onclick = function () { go(cur + 1); };
+  document.addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') go(cur + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(cur - 1);
+  });
+  go(0);
+
+  (function loop(t) { stages[cur].frame(t || 0); requestAnimationFrame(loop); })();
+})();
+</script>
