@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 8. Цикли while і for. Вкладені цикли та візерунки</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Креативне програмування в Processing: Урок 8. Цикли while і for. Вкладені цикли та візерунки">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Макет: аркуш у клітинку (як папір для планування координат у Шиффмана); зліва — зміст курсу, справа — урок шириною ~70 знаків.
+   На телефоні зміст ховається у розгортуваний блок над уроком. */
+:root {
+  --paper: #fbfcfd;
+  --grid: #e3eaf2;
+  --ink: #15212c;
+  --muted: #5a6876;
+  --rule: #d5dde6;
+  --accent: #2242d6;
+  --accent-soft: #e8ecfd;
+  --mark: #d9480f;
+  --code-bg: #f1f4f8;
+  --code-ink: #1d2733;
+  --c-kw: #2242d6;
+  --c-type: #0b7a75;
+  --c-fn: #8a3ffc;
+  --c-num: #d9480f;
+  --c-str: #2b8a3e;
+  --c-com: #7b8794;
+  --panel: #ffffff;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.45rem;
+  --step-3: clamp(1.6rem, 4.6vw, 2.1rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+    --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+    --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+    --panel: #131b24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+  --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+  --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+  --panel: #131b24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Зміст ---------- */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.brand { display: grid; gap: 4px; margin-bottom: 20px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; line-height: 1.15; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.toc { display: grid; gap: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 14px; }
+.toc h4 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc a { display: grid; grid-template-columns: 2.4em 1fr; gap: 4px; padding: 6px 8px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.toc a .n { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--accent-soft); }
+.toc a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.toc a[aria-current="page"] .n { color: var(--accent); }
+.toc .solo a { grid-template-columns: 1fr; }
+.mobile-nav { display: none; }
+
+/* ---------- Основна частина ---------- */
+main { min-width: 0; }
+.crumbs { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; letter-spacing: 0.03em; }
+.crumbs a { color: var(--muted); }
+.hero { display: grid; gap: 14px; margin-bottom: 36px; }
+.hero h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.7rem, 4.2vw, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; color: var(--muted); font-size: var(--step-1); line-height: 1.5; }
+.stage { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 230px; touch-action: none; }
+.stage .readout { position: absolute; right: 10px; bottom: 8px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); background: var(--panel); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 600; }
+
+/* Картки уроків на головній */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.cards a { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; height: 100%; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.cards a:hover { border-color: var(--accent); }
+.cards .n { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.cards .t { font-weight: 600; line-height: 1.3; }
+.cards .m { font-size: 0.82rem; color: var(--muted); }
+.mod-title { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+article { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 44px); min-width: 0; }
+.doc { max-width: 72ch; }
+.doc > :first-child { margin-top: 0; }
+.doc h1 { font-family: var(--f-display); font-weight: 700; font-size: var(--step-3); line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 18px; }
+.doc h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; text-wrap: balance; margin: 2.2em 0 0.6em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.doc h3 { font-size: var(--step-1); font-weight: 600; margin: 1.6em 0 0.4em; text-wrap: balance; }
+.doc p, .doc li { max-width: 68ch; }
+.doc ul, .doc ol { padding-left: 1.3em; }
+.doc li + li { margin-top: 0.25em; }
+.doc blockquote { margin: 1em 0; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; }
+.doc blockquote p { margin: 0.2em 0; }
+.doc strong { font-weight: 600; }
+.doc code { font-family: var(--f-mono); font-size: 0.88em; background: var(--code-bg); color: var(--code-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+.doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+.tbl { overflow-x: auto; margin: 1em 0; -webkit-overflow-scrolling: touch; }
+.doc table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+.doc th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.doc td code { white-space: nowrap; }
+
+pre.code { position: relative; margin: 1em 0; background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--rule); border-radius: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; font-family: var(--f-mono); font-size: 0.84rem; line-height: 1.6; padding: 14px 16px; tab-size: 2; }
+pre.code code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.copy { position: sticky; float: right; left: 100%; top: 0; margin: -6px -8px 0 8px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.t-kw { color: var(--c-kw); font-weight: 600; }
+.t-type { color: var(--c-type); }
+.t-fn { color: var(--c-fn); }
+.t-num { color: var(--c-num); }
+.t-str { color: var(--c-str); }
+.t-com { color: var(--c-com); font-style: italic; }
+
+/* ---------- Скетчі уроку ---------- */
+.sketches { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 22px; }
+.sketches > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.sketches > p { margin: 0; color: var(--muted); max-width: 66ch; }
+.sk { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sk figure { margin: 0; }
+.sk img { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.sk figcaption { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+.sk h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+.sk details { margin-top: 4px; }
+.sk summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 4px 0; }
+.sk .files { min-width: 0; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+.pager a { display: grid; gap: 2px; text-decoration: none; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); min-width: 0; }
+.pager a:hover { border-color: var(--accent); }
+.pager small { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.pager .next { grid-column: 2; text-align: right; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .side { display: none; }
+  .mobile-nav { display: grid; gap: 10px; }
+  .mobile-nav .brand { margin: 0; }
+  .mobile-nav details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+  .mobile-nav summary { cursor: pointer; font-family: var(--f-mono); font-size: 0.85rem; padding: 12px 14px; list-style-position: inside; }
+  .mobile-nav details[open] summary { border-bottom: 1px solid var(--rule); }
+  .mobile-nav .toc { border: 0; border-radius: 0 0 6px 6px; }
+  .doc { font-size: 1.02rem; }
+  pre.code { font-size: 0.8rem; padding: 12px; }
+  .sk { grid-template-columns: minmax(0, 1fr); }
+  .sk figure { max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager .next { grid-column: 1; }
+  .doc th, .doc td { padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html" aria-current="page"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <main>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html" aria-current="page"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 8 з 17</p><article><div class="doc"><h1>Урок 8. Цикли while і for. Вкладені цикли та візерунки</h1>
+<blockquote>
+<p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 6 «Loops»; Reas &amp; Fry — розд. 8 «Repeat».</p>
+</blockquote>
+<h2>Мета уроку</h2>
+<ul>
+<li>використовувати цикли <code>while</code> і <code>for</code> для повторення малювання;</li>
+<li>будувати сітки за допомогою <strong>вкладених</strong> циклів;</li>
+<li>розуміти, чому <code>draw()</code> сам по собі вже цикл.</li>
+</ul>
+<h2>1. Навіщо цикли?</h2>
+<p>Без циклу 10 ніг для персонажа — це 10 рядків коду. З циклом — 3 рядки, і кількість ніг змінюється одним числом.</p>
+<h2>2. Цикл while</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">int</span> x = <span class="t-num">50</span>;
+<span class="t-kw">while</span> (x &lt;= <span class="t-num">350</span>) {
+  <span class="t-fn">line</span>(x, <span class="t-num">100</span>, x, <span class="t-num">200</span>);
+  x += <span class="t-num">20</span>;
+}</code></pre>
+<p>⚠️ <strong>Нескінченний цикл:</strong> якщо забути <code>x += 20</code>, програма «зависне» — <code>draw()</code> ніколи не завершить кадр.</p>
+<h2>3. Цикл for</h2>
+<p>Те саме компактніше:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">for</span> (<span class="t-type">int</span> x = <span class="t-num">50</span>; x &lt;= <span class="t-num">350</span>; x += <span class="t-num">20</span>) {
+  <span class="t-fn">line</span>(x, <span class="t-num">100</span>, x, <span class="t-num">200</span>);
+}</code></pre>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Частина</th>
+<th>Значення</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int x = 50</code></td>
+<td>ініціалізація (виконується один раз)</td>
+</tr>
+<tr>
+<td><code>x &lt;= 350</code></td>
+<td>умова продовження</td>
+</tr>
+<tr>
+<td><code>x += 20</code></td>
+<td>крок (після кожного повторення)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Порівняння з Python: <code>for x in range(50, 351, 20):</code></p>
+<h2>4. Цикл всередині draw()</h2>
+<p><code>draw()</code> повторюється щокадру, а цикл <code>for</code> повністю виконується <strong>за один кадр</strong>. Тому:
+- щоб намалювати 100 ліній <strong>одночасно</strong> — цикл <code>for</code>;
+- щоб лінії з'являлися <strong>по одній</strong> — змінна, яка зростає в <code>draw()</code>.</p>
+<p>Інтерактивний приклад — лінії, що підсвічуються біля курсора:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">for</span> (<span class="t-type">int</span> x = <span class="t-num">0</span>; x &lt; width; x += <span class="t-num">10</span>) {
+  <span class="t-type">float</span> d = <span class="t-fn">abs</span>(mouseX - x);
+  <span class="t-fn">stroke</span>(<span class="t-num">255</span> - d);
+  <span class="t-fn">line</span>(x, <span class="t-num">0</span>, x, height);
+}</code></pre>
+<h2>5. Вкладені цикли = сітка</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">for</span> (<span class="t-type">int</span> y = <span class="t-num">0</span>; y &lt; height; y += <span class="t-num">40</span>) {
+  <span class="t-kw">for</span> (<span class="t-type">int</span> x = <span class="t-num">0</span>; x &lt; width; x += <span class="t-num">40</span>) {
+    <span class="t-fn">fill</span>(x * <span class="t-num">255</span> / width, y * <span class="t-num">255</span> / height, <span class="t-num">150</span>);
+    <span class="t-fn">rect</span>(x, y, <span class="t-num">40</span>, <span class="t-num">40</span>);
+  }
+}</code></pre>
+<p>Зовнішній цикл перебирає <strong>рядки</strong>, внутрішній — <strong>стовпці</strong>. Так побудовано шахову дошку, таблицю, пікселі зображення (урок 14).</p>
+<h3>Шахова дошка: остача від ділення</h3>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">if</span> ((i + j) % <span class="t-num">2</span> == <span class="t-num">0</span>) <span class="t-fn">fill</span>(<span class="t-num">255</span>); <span class="t-kw">else</span> <span class="t-fn">fill</span>(<span class="t-num">0</span>);</code></pre>
+<h2>6. Генеративні візерунки</h2>
+<p>Цикли — основа <strong>генеративного мистецтва</strong> (Reas &amp; Fry розділ «Repeat» показує роботи, де з простих повторень виникають складні структури).</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">noFill</span>();
+<span class="t-kw">for</span> (<span class="t-type">int</span> d = <span class="t-num">400</span>; d &gt; <span class="t-num">0</span>; d -= <span class="t-num">20</span>) {
+  <span class="t-fn">ellipse</span>(width/<span class="t-num">2</span>, height/<span class="t-num">2</span>, d, d);    <span class="t-com">// концентричні кола</span>
+}</code></pre>
+<p>📁 Скетчі: <code>skechi/L08_Tsykly</code> (лінії, сітка, кола), <code>skechi/L08_Shakhy</code></p>
+<h2>Практика</h2>
+<p><strong>Рівень 1.</strong> Намалюйте 10 кіл в один рядок за допомогою <code>for</code>.</p>
+<p><strong>Рівень 2.</strong> Створіть шахову дошку 8×8.</p>
+<p><strong>Рівень 3 (творчий).</strong> Сітка кіл, діаметр кожного залежить від відстані до курсора (<code>dist()</code>), — «живий» візерунок.</p>
+<h2>Перевір себе</h2>
+<ol>
+<li>Скільки разів виконається тіло циклу <code>for (int i = 0; i &lt; 10; i += 2)</code>?</li>
+<li>Чому програма зависає, якщо в <code>while</code> не змінювати змінну умови?</li>
+<li>Що малює вкладений цикл?</li>
+<li>Як зробити, щоб лінії з'являлися поступово, а не всі одразу?</li>
+</ol></div><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L08_Shakhy" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L08_Shakhy</h3><details open><summary>L08_Shakhy.pde · 20 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 8. Шахова дошка 8×8 — вкладені цикли та остача від ділення</span>
+
+<span class="t-type">int</span> n = <span class="t-num">8</span>;
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">400</span>, <span class="t-num">400</span>);
+  <span class="t-fn">noStroke</span>();
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-type">float</span> cell = width / (<span class="t-type">float</span>) n;
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; n; i++) {        <span class="t-com">// рядки</span>
+    <span class="t-kw">for</span> (<span class="t-type">int</span> j = <span class="t-num">0</span>; j &lt; n; j++) {      <span class="t-com">// стовпці</span>
+      <span class="t-kw">if</span> ((i + j) % <span class="t-num">2</span> == <span class="t-num">0</span>) <span class="t-fn">fill</span>(<span class="t-num">240</span>, <span class="t-num">217</span>, <span class="t-num">181</span>);
+      <span class="t-kw">else</span>                  <span class="t-fn">fill</span>(<span class="t-num">181</span>, <span class="t-num">136</span>, <span class="t-num">99</span>);
+      <span class="t-fn">rect</span>(j * cell, i * cell, cell, cell);
+    }
+  }
+}</code></pre></details></div></div><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L08_Tsykly" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L08_Tsykly</h3><details open><summary>L08_Tsykly.pde · 53 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 8. Цикли: інтерактивні лінії, кольорова сітка, концентричні кола</span>
+<span class="t-com">// Клавіші 1, 2, 3 перемикають режим.</span>
+
+<span class="t-type">int</span> mode = <span class="t-num">1</span>;
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">400</span>, <span class="t-num">400</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-kw">if</span> (mode == <span class="t-num">1</span>) drawLines();
+  <span class="t-kw">else</span> <span class="t-kw">if</span> (mode == <span class="t-num">2</span>) drawGrid();
+  <span class="t-kw">else</span> drawCircles();
+}
+
+<span class="t-com">// Лінії, що світлішають, коли далеко від курсора</span>
+<span class="t-kw">void</span> drawLines() {
+  <span class="t-fn">strokeWeight</span>(<span class="t-num">3</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> x = <span class="t-num">0</span>; x &lt; width; x += <span class="t-num">10</span>) {
+    <span class="t-type">float</span> d = <span class="t-fn">abs</span>(mouseX - x);
+    <span class="t-fn">stroke</span>(<span class="t-fn">constrain</span>(d, <span class="t-num">0</span>, <span class="t-num">255</span>));
+    <span class="t-fn">line</span>(x, <span class="t-num">0</span>, x, height);
+  }
+}
+
+<span class="t-com">// Вкладені цикли: рядки × стовпці</span>
+<span class="t-kw">void</span> drawGrid() {
+  <span class="t-fn">stroke</span>(<span class="t-num">255</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> y = <span class="t-num">0</span>; y &lt; height; y += <span class="t-num">40</span>) {
+    <span class="t-kw">for</span> (<span class="t-type">int</span> x = <span class="t-num">0</span>; x &lt; width; x += <span class="t-num">40</span>) {
+      <span class="t-fn">fill</span>(x * <span class="t-num">255</span> / width, y * <span class="t-num">255</span> / height, <span class="t-num">150</span>);
+      <span class="t-fn">rect</span>(x, y, <span class="t-num">40</span>, <span class="t-num">40</span>);
+    }
+  }
+}
+
+<span class="t-com">// Концентричні кола, центр — у курсора</span>
+<span class="t-kw">void</span> drawCircles() {
+  <span class="t-fn">noFill</span>();
+  <span class="t-fn">stroke</span>(<span class="t-num">0</span>);
+  <span class="t-fn">strokeWeight</span>(<span class="t-num">1</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> d = <span class="t-num">600</span>; d &gt; <span class="t-num">0</span>; d -= <span class="t-num">20</span>) {
+    <span class="t-fn">ellipse</span>(mouseX, mouseY, d, d);
+  }
+}
+
+<span class="t-kw">void</span> <span class="t-fn">keyPressed</span>() {
+  <span class="t-kw">if</span> (key == <span class="t-str">'1'</span>) mode = <span class="t-num">1</span>;
+  <span class="t-kw">if</span> (key == <span class="t-str">'2'</span>) mode = <span class="t-num">2</span>;
+  <span class="t-kw">if</span> (key == <span class="t-str">'3'</span>) mode = <span class="t-num">3</span>;
+}</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-07.html"><small>← Урок 7</small>Умови: if / else, логічні оператори. Відскок м&#x27;яча</a><a class="next" href="urok-09.html"><small>Урок 9 →</small>Випадковість і шум Перліна. Генеративне мистецтво</a></nav>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.copy');
+  if (!b) return;
+  var code = b.parentNode.querySelector('code');
+  function done(t) { b.textContent = t; setTimeout(function () { b.textContent = 'Копіювати'; }, 1500); }
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
+  try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
+});
+
+</script>
+</body>
+</html>

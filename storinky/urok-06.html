@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 6. Взаємодія: миша і клавіатура</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Креативне програмування в Processing: Урок 6. Взаємодія: миша і клавіатура">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Макет: аркуш у клітинку (як папір для планування координат у Шиффмана); зліва — зміст курсу, справа — урок шириною ~70 знаків.
+   На телефоні зміст ховається у розгортуваний блок над уроком. */
+:root {
+  --paper: #fbfcfd;
+  --grid: #e3eaf2;
+  --ink: #15212c;
+  --muted: #5a6876;
+  --rule: #d5dde6;
+  --accent: #2242d6;
+  --accent-soft: #e8ecfd;
+  --mark: #d9480f;
+  --code-bg: #f1f4f8;
+  --code-ink: #1d2733;
+  --c-kw: #2242d6;
+  --c-type: #0b7a75;
+  --c-fn: #8a3ffc;
+  --c-num: #d9480f;
+  --c-str: #2b8a3e;
+  --c-com: #7b8794;
+  --panel: #ffffff;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.45rem;
+  --step-3: clamp(1.6rem, 4.6vw, 2.1rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+    --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+    --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+    --panel: #131b24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+  --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+  --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+  --panel: #131b24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Зміст ---------- */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.brand { display: grid; gap: 4px; margin-bottom: 20px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; line-height: 1.15; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.toc { display: grid; gap: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 14px; }
+.toc h4 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc a { display: grid; grid-template-columns: 2.4em 1fr; gap: 4px; padding: 6px 8px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.toc a .n { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--accent-soft); }
+.toc a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.toc a[aria-current="page"] .n { color: var(--accent); }
+.toc .solo a { grid-template-columns: 1fr; }
+.mobile-nav { display: none; }
+
+/* ---------- Основна частина ---------- */
+main { min-width: 0; }
+.crumbs { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; letter-spacing: 0.03em; }
+.crumbs a { color: var(--muted); }
+.hero { display: grid; gap: 14px; margin-bottom: 36px; }
+.hero h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.7rem, 4.2vw, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; color: var(--muted); font-size: var(--step-1); line-height: 1.5; }
+.stage { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 230px; touch-action: none; }
+.stage .readout { position: absolute; right: 10px; bottom: 8px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); background: var(--panel); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 600; }
+
+/* Картки уроків на головній */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.cards a { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; height: 100%; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.cards a:hover { border-color: var(--accent); }
+.cards .n { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.cards .t { font-weight: 600; line-height: 1.3; }
+.cards .m { font-size: 0.82rem; color: var(--muted); }
+.mod-title { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+article { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 44px); min-width: 0; }
+.doc { max-width: 72ch; }
+.doc > :first-child { margin-top: 0; }
+.doc h1 { font-family: var(--f-display); font-weight: 700; font-size: var(--step-3); line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 18px; }
+.doc h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; text-wrap: balance; margin: 2.2em 0 0.6em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.doc h3 { font-size: var(--step-1); font-weight: 600; margin: 1.6em 0 0.4em; text-wrap: balance; }
+.doc p, .doc li { max-width: 68ch; }
+.doc ul, .doc ol { padding-left: 1.3em; }
+.doc li + li { margin-top: 0.25em; }
+.doc blockquote { margin: 1em 0; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; }
+.doc blockquote p { margin: 0.2em 0; }
+.doc strong { font-weight: 600; }
+.doc code { font-family: var(--f-mono); font-size: 0.88em; background: var(--code-bg); color: var(--code-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+.doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+.tbl { overflow-x: auto; margin: 1em 0; -webkit-overflow-scrolling: touch; }
+.doc table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+.doc th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.doc td code { white-space: nowrap; }
+
+pre.code { position: relative; margin: 1em 0; background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--rule); border-radius: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; font-family: var(--f-mono); font-size: 0.84rem; line-height: 1.6; padding: 14px 16px; tab-size: 2; }
+pre.code code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.copy { position: sticky; float: right; left: 100%; top: 0; margin: -6px -8px 0 8px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.t-kw { color: var(--c-kw); font-weight: 600; }
+.t-type { color: var(--c-type); }
+.t-fn { color: var(--c-fn); }
+.t-num { color: var(--c-num); }
+.t-str { color: var(--c-str); }
+.t-com { color: var(--c-com); font-style: italic; }
+
+/* ---------- Скетчі уроку ---------- */
+.sketches { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 22px; }
+.sketches > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.sketches > p { margin: 0; color: var(--muted); max-width: 66ch; }
+.sk { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sk figure { margin: 0; }
+.sk img { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.sk figcaption { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+.sk h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+.sk details { margin-top: 4px; }
+.sk summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 4px 0; }
+.sk .files { min-width: 0; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+.pager a { display: grid; gap: 2px; text-decoration: none; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); min-width: 0; }
+.pager a:hover { border-color: var(--accent); }
+.pager small { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.pager .next { grid-column: 2; text-align: right; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .side { display: none; }
+  .mobile-nav { display: grid; gap: 10px; }
+  .mobile-nav .brand { margin: 0; }
+  .mobile-nav details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+  .mobile-nav summary { cursor: pointer; font-family: var(--f-mono); font-size: 0.85rem; padding: 12px 14px; list-style-position: inside; }
+  .mobile-nav details[open] summary { border-bottom: 1px solid var(--rule); }
+  .mobile-nav .toc { border: 0; border-radius: 0 0 6px 6px; }
+  .doc { font-size: 1.02rem; }
+  pre.code { font-size: 0.8rem; padding: 12px; }
+  .sk { grid-template-columns: minmax(0, 1fr); }
+  .sk figure { max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager .next { grid-column: 1; }
+  .doc th, .doc td { padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html" aria-current="page"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <main>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html" aria-current="page"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 6 з 17</p><article><div class="doc"><h1>Урок 6. Взаємодія: миша і клавіатура</h1>
+<blockquote>
+<p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 3 «Interaction» (Variation with the mouse, Mouse clicks and key presses); Reas &amp; Fry — розд. 7 «Interactivity».</p>
+</blockquote>
+<h2>Мета уроку</h2>
+<ul>
+<li>використовувати координати миші для керування малюнком;</li>
+<li>обробляти <strong>події</strong> миші й клавіатури;</li>
+<li>створити інтерактивну програму для малювання.</li>
+</ul>
+<h2>1. Координати миші</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Змінна</th>
+<th>Значення</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mouseX</code>, <code>mouseY</code></td>
+<td>поточне положення курсора</td>
+</tr>
+<tr>
+<td><code>pmouseX</code>, <code>pmouseY</code></td>
+<td>положення курсора в <strong>попередньому</strong> кадрі</td>
+</tr>
+<tr>
+<td><code>mousePressed</code></td>
+<td><code>true</code>, якщо кнопку затиснуто</td>
+</tr>
+<tr>
+<td><code>mouseButton</code></td>
+<td><code>LEFT</code>, <code>RIGHT</code> або <code>CENTER</code></td>
+</tr>
+</tbody>
+</table></div>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">400</span>, <span class="t-num">400</span>);
+}
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-fn">ellipse</span>(mouseX, mouseY, <span class="t-num">40</span>, <span class="t-num">40</span>);   <span class="t-com">// коло ходить за мишею</span>
+}</code></pre>
+<h3>Пензлик для малювання</h3>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">600</span>, <span class="t-num">400</span>);
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-fn">strokeWeight</span>(<span class="t-num">4</span>);
+}
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-com">// без background() — малюнок зберігається</span>
+  <span class="t-fn">line</span>(pmouseX, pmouseY, mouseX, mouseY);
+}</code></pre>
+<p>💡 Лінія від попередньої точки до поточної дає <strong>неперервний</strong> слід навіть при швидкому русі миші.</p>
+<h3>Миша як «регулятор»</h3>
+<p>Положення миші можна перетворити на будь-яку величину — колір, розмір, швидкість:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">background</span>(mouseX * <span class="t-num">255</span> / width);              <span class="t-com">// колір фону залежить від X</span>
+<span class="t-type">float</span> d = <span class="t-fn">map</span>(mouseY, <span class="t-num">0</span>, height, <span class="t-num">10</span>, <span class="t-num">200</span>);     <span class="t-com">// діаметр від 10 до 200</span></code></pre>
+<p><code>map(value, start1, stop1, start2, stop2)</code> — перераховує число з одного діапазону в інший. Одна з найкорисніших функцій Processing!</p>
+<h2>2. Події (events)</h2>
+<p>Функції подій викликаються <strong>автоматично</strong>, коли щось стається — один раз на подію:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">void</span> <span class="t-fn">mousePressed</span>() {   <span class="t-com">// клацання мишею</span>
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);      <span class="t-com">// очистити полотно</span>
+}
+
+<span class="t-kw">void</span> <span class="t-fn">keyPressed</span>() {     <span class="t-com">// натискання клавіші</span>
+  <span class="t-kw">if</span> (key == <span class="t-str">'s'</span>) {
+    <span class="t-fn">saveFrame</span>(<span class="t-str">"malyunok-####.png"</span>);   <span class="t-com">// зберегти малюнок у файл</span>
+  }
+}</code></pre>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Функція-подія</th>
+<th>Коли викликається</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mousePressed()</code></td>
+<td>кнопку миші натиснуто</td>
+</tr>
+<tr>
+<td><code>mouseReleased()</code></td>
+<td>кнопку відпущено</td>
+</tr>
+<tr>
+<td><code>mouseDragged()</code></td>
+<td>рух із затиснутою кнопкою</td>
+</tr>
+<tr>
+<td><code>mouseMoved()</code></td>
+<td>рух без натискання</td>
+</tr>
+<tr>
+<td><code>mouseWheel(MouseEvent e)</code></td>
+<td>прокручування колеса</td>
+</tr>
+<tr>
+<td><code>keyPressed()</code> / <code>keyReleased()</code></td>
+<td>клавішу натиснуто / відпущено</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Змінна vs подія</h3>
+<ul>
+<li><code>mousePressed</code> (змінна) — «кнопка <strong>затиснута</strong> зараз?» → перевіряється кожен кадр;</li>
+<li><code>mousePressed()</code> (функція) — «щойно <strong>відбулося</strong> клацання» → спрацьовує один раз.</li>
+</ul>
+<h2>3. Клавіатура</h2>
+<ul>
+<li><code>key</code> — символ натиснутої клавіші (<code>'a'</code>, <code>'1'</code>, <code>' '</code>);</li>
+<li><code>keyCode</code> — код спеціальних клавіш: <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>SHIFT</code>… (тоді <code>key == CODED</code>).</li>
+</ul>
+<h2>Приклад: інтерактивний редактор</h2>
+<p>📁 Скетч: <code>skechi/L06_Malyuvalka</code> — малювання мишею, товщина лінії залежить від швидкості руху, клавіші <code>1–3</code> змінюють колір, <code>c</code> — очищення, <code>s</code> — збереження PNG.</p>
+<h2>Практика</h2>
+<p><strong>Рівень 1.</strong> Персонаж із попередніх уроків слідує за мишею.</p>
+<p><strong>Рівень 2.</strong> Колір очей персонажа змінюється залежно від <code>mouseX</code>, а клацання мишею перефарбовує фон у випадковий колір.</p>
+<p><strong>Рівень 3 (творчий).</strong> Створіть «симетричну малювалку»: кожна лінія дзеркально повторюється відносно центру екрана (<code>width - mouseX</code>).</p>
+<h2>Перевір себе</h2>
+<ol>
+<li>Що зберігають <code>pmouseX</code> та <code>pmouseY</code>?</li>
+<li>Чим змінна <code>mousePressed</code> відрізняється від функції <code>mousePressed()</code>?</li>
+<li>Що поверне <code>map(50, 0, 100, 0, 255)</code>?</li>
+<li>Як зберегти малюнок у файл?</li>
+</ol></div><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/2Q==" alt="Результат роботи скетчу L06_Malyuvalka" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L06_Malyuvalka</h3><details open><summary>L06_Malyuvalka.pde · 40 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 6. Малювалка</span>
+<span class="t-com">// Мишею — малювати; 1, 2, 3 — колір; c — очистити; s — зберегти PNG.</span>
+
+<span class="t-type">color</span> brushColor;
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">800</span>, <span class="t-num">500</span>);
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  brushColor = <span class="t-type">color</span>(<span class="t-num">0</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-kw">if</span> (<span class="t-fn">mousePressed</span>) {
+    <span class="t-com">// чим швидше рухається миша, тим тонша лінія</span>
+    <span class="t-type">float</span> speed = <span class="t-fn">dist</span>(pmouseX, pmouseY, mouseX, mouseY);
+    <span class="t-type">float</span> w = <span class="t-fn">map</span>(speed, <span class="t-num">0</span>, <span class="t-num">50</span>, <span class="t-num">12</span>, <span class="t-num">1</span>);
+    <span class="t-fn">strokeWeight</span>(<span class="t-fn">constrain</span>(w, <span class="t-num">1</span>, <span class="t-num">12</span>));
+    <span class="t-fn">stroke</span>(brushColor);
+    <span class="t-fn">line</span>(pmouseX, pmouseY, mouseX, mouseY);
+  }
+  drawPalette();
+}
+
+<span class="t-com">// Підказка-палітра в лівому верхньому куті</span>
+<span class="t-kw">void</span> drawPalette() {
+  <span class="t-fn">noStroke</span>();
+  <span class="t-fn">fill</span>(<span class="t-num">0</span>);           <span class="t-fn">rect</span>(<span class="t-num">10</span>, <span class="t-num">10</span>, <span class="t-num">20</span>, <span class="t-num">20</span>);
+  <span class="t-fn">fill</span>(<span class="t-num">220</span>, <span class="t-num">30</span>, <span class="t-num">30</span>); <span class="t-fn">rect</span>(<span class="t-num">35</span>, <span class="t-num">10</span>, <span class="t-num">20</span>, <span class="t-num">20</span>);
+  <span class="t-fn">fill</span>(<span class="t-num">30</span>, <span class="t-num">90</span>, <span class="t-num">220</span>); <span class="t-fn">rect</span>(<span class="t-num">60</span>, <span class="t-num">10</span>, <span class="t-num">20</span>, <span class="t-num">20</span>);
+  <span class="t-fn">fill</span>(brushColor);  <span class="t-fn">rect</span>(<span class="t-num">90</span>, <span class="t-num">10</span>, <span class="t-num">20</span>, <span class="t-num">20</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">keyPressed</span>() {
+  <span class="t-kw">if</span> (key == <span class="t-str">'1'</span>) brushColor = <span class="t-type">color</span>(<span class="t-num">0</span>);
+  <span class="t-kw">if</span> (key == <span class="t-str">'2'</span>) brushColor = <span class="t-type">color</span>(<span class="t-num">220</span>, <span class="t-num">30</span>, <span class="t-num">30</span>);
+  <span class="t-kw">if</span> (key == <span class="t-str">'3'</span>) brushColor = <span class="t-type">color</span>(<span class="t-num">30</span>, <span class="t-num">90</span>, <span class="t-num">220</span>);
+  <span class="t-kw">if</span> (key == <span class="t-str">'c'</span>) <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-kw">if</span> (key == <span class="t-str">'s'</span>) <span class="t-fn">saveFrame</span>(<span class="t-str">"malyunok-####.png"</span>);
+}</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-05.html"><small>← Урок 5</small>Потік програми: setup() і draw(). Анімація</a><a class="next" href="urok-07.html"><small>Урок 7 →</small>Умови: if / else, логічні оператори. Відскок м&#x27;яча</a></nav>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.copy');
+  if (!b) return;
+  var code = b.parentNode.querySelector('code');
+  function done(t) { b.textContent = t; setTimeout(function () { b.textContent = 'Копіювати'; }, 1500); }
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
+  try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
+});
+
+</script>
+</body>
+</html>

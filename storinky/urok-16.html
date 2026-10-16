@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Уроки 16–17. Підсумковий творчий проєкт</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Креативне програмування в Processing: Уроки 16–17. Підсумковий творчий проєкт">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Макет: аркуш у клітинку (як папір для планування координат у Шиффмана); зліва — зміст курсу, справа — урок шириною ~70 знаків.
+   На телефоні зміст ховається у розгортуваний блок над уроком. */
+:root {
+  --paper: #fbfcfd;
+  --grid: #e3eaf2;
+  --ink: #15212c;
+  --muted: #5a6876;
+  --rule: #d5dde6;
+  --accent: #2242d6;
+  --accent-soft: #e8ecfd;
+  --mark: #d9480f;
+  --code-bg: #f1f4f8;
+  --code-ink: #1d2733;
+  --c-kw: #2242d6;
+  --c-type: #0b7a75;
+  --c-fn: #8a3ffc;
+  --c-num: #d9480f;
+  --c-str: #2b8a3e;
+  --c-com: #7b8794;
+  --panel: #ffffff;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.45rem;
+  --step-3: clamp(1.6rem, 4.6vw, 2.1rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+    --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+    --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+    --panel: #131b24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+  --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+  --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+  --panel: #131b24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Зміст ---------- */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.brand { display: grid; gap: 4px; margin-bottom: 20px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; line-height: 1.15; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.toc { display: grid; gap: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 14px; }
+.toc h4 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc a { display: grid; grid-template-columns: 2.4em 1fr; gap: 4px; padding: 6px 8px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.toc a .n { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--accent-soft); }
+.toc a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.toc a[aria-current="page"] .n { color: var(--accent); }
+.toc .solo a { grid-template-columns: 1fr; }
+.mobile-nav { display: none; }
+
+/* ---------- Основна частина ---------- */
+main { min-width: 0; }
+.crumbs { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; letter-spacing: 0.03em; }
+.crumbs a { color: var(--muted); }
+.hero { display: grid; gap: 14px; margin-bottom: 36px; }
+.hero h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.7rem, 4.2vw, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; color: var(--muted); font-size: var(--step-1); line-height: 1.5; }
+.stage { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 230px; touch-action: none; }
+.stage .readout { position: absolute; right: 10px; bottom: 8px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); background: var(--panel); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 600; }
+
+/* Картки уроків на головній */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.cards a { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; height: 100%; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.cards a:hover { border-color: var(--accent); }
+.cards .n { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.cards .t { font-weight: 600; line-height: 1.3; }
+.cards .m { font-size: 0.82rem; color: var(--muted); }
+.mod-title { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+article { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 44px); min-width: 0; }
+.doc { max-width: 72ch; }
+.doc > :first-child { margin-top: 0; }
+.doc h1 { font-family: var(--f-display); font-weight: 700; font-size: var(--step-3); line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 18px; }
+.doc h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; text-wrap: balance; margin: 2.2em 0 0.6em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.doc h3 { font-size: var(--step-1); font-weight: 600; margin: 1.6em 0 0.4em; text-wrap: balance; }
+.doc p, .doc li { max-width: 68ch; }
+.doc ul, .doc ol { padding-left: 1.3em; }
+.doc li + li { margin-top: 0.25em; }
+.doc blockquote { margin: 1em 0; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; }
+.doc blockquote p { margin: 0.2em 0; }
+.doc strong { font-weight: 600; }
+.doc code { font-family: var(--f-mono); font-size: 0.88em; background: var(--code-bg); color: var(--code-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+.doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+.tbl { overflow-x: auto; margin: 1em 0; -webkit-overflow-scrolling: touch; }
+.doc table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+.doc th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.doc td code { white-space: nowrap; }
+
+pre.code { position: relative; margin: 1em 0; background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--rule); border-radius: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; font-family: var(--f-mono); font-size: 0.84rem; line-height: 1.6; padding: 14px 16px; tab-size: 2; }
+pre.code code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.copy { position: sticky; float: right; left: 100%; top: 0; margin: -6px -8px 0 8px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.t-kw { color: var(--c-kw); font-weight: 600; }
+.t-type { color: var(--c-type); }
+.t-fn { color: var(--c-fn); }
+.t-num { color: var(--c-num); }
+.t-str { color: var(--c-str); }
+.t-com { color: var(--c-com); font-style: italic; }
+
+/* ---------- Скетчі уроку ---------- */
+.sketches { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 22px; }
+.sketches > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.sketches > p { margin: 0; color: var(--muted); max-width: 66ch; }
+.sk { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sk figure { margin: 0; }
+.sk img { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.sk figcaption { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+.sk h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+.sk details { margin-top: 4px; }
+.sk summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 4px 0; }
+.sk .files { min-width: 0; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+.pager a { display: grid; gap: 2px; text-decoration: none; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); min-width: 0; }
+.pager a:hover { border-color: var(--accent); }
+.pager small { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.pager .next { grid-column: 2; text-align: right; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .side { display: none; }
+  .mobile-nav { display: grid; gap: 10px; }
+  .mobile-nav .brand { margin: 0; }
+  .mobile-nav details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+  .mobile-nav summary { cursor: pointer; font-family: var(--f-mono); font-size: 0.85rem; padding: 12px 14px; list-style-position: inside; }
+  .mobile-nav details[open] summary { border-bottom: 1px solid var(--rule); }
+  .mobile-nav .toc { border: 0; border-radius: 0 0 6px 6px; }
+  .doc { font-size: 1.02rem; }
+  pre.code { font-size: 0.8rem; padding: 12px; }
+  .sk { grid-template-columns: minmax(0, 1fr); }
+  .sk figure { max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager .next { grid-column: 1; }
+  .doc th, .doc td { padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html" aria-current="page"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <main>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html" aria-current="page"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Уроки 16–17 з 17</p><article><div class="doc"><h1>Уроки 16–17. Підсумковий творчий проєкт</h1>
+<blockquote>
+<p><strong>Джерела:</strong> Reas &amp; Fry — розділи «Synthesis» та інтерв'ю з художниками й дизайнерами (Image, Interaction, Motion, Environment); Shiffman, <em>Learning Processing</em> — розд. 10 «Algorithms», 21 «Exporting».</p>
+</blockquote>
+<h2>Мета</h2>
+<p>Застосувати всі вивчені теми у власному завершеному проєкті та презентувати його.</p>
+<h2>Варіанти проєктів (оберіть один)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>№</th>
+<th>Тип</th>
+<th>Опис</th>
+<th>Обов'язкові елементи</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>🎮 <strong>Міні-гра</strong></td>
+<td>аркада, раннер, «ловець», «пінг-понг», «змійка»</td>
+<td>стани гри, рахунок, клас + масив/ArrayList, взаємодія</td>
+</tr>
+<tr>
+<td>2</td>
+<td>🎨 <strong>Генеративний постер</strong></td>
+<td>серія з 3–5 унікальних постерів на тему (наприклад, «Моє місто», «Космос», «Українська вишивка»)</td>
+<td>цикли, <code>random()</code>/<code>noise()</code>, власні функції, збереження PNG</td>
+</tr>
+<tr>
+<td>3</td>
+<td>🖌 <strong>Інтерактивний інструмент</strong></td>
+<td>програма для малювання з кількома пензлями та палітрою</td>
+<td>події миші/клавіатури, кнопки-перемикачі, функції, збереження</td>
+</tr>
+<tr>
+<td>4</td>
+<td>🌌 <strong>Симуляція</strong></td>
+<td>сонячна система, акваріум, зграя птахів, феєрверк, дощ</td>
+<td>класи, масив об'єктів, тригонометрія / трансформації</td>
+</tr>
+<tr>
+<td>5</td>
+<td>✍️ <strong>Кінетична типографіка / листівка</strong></td>
+<td>анімована листівка до свята з текстом</td>
+<td>текст, анімація, трансформації, взаємодія</td>
+</tr>
+</tbody>
+</table></div>
+<p>💡 Цікава ідея для варіанту 2: <strong>генеративний орнамент</strong> на основі української вишивки — вкладені цикли + симетрія + обмежена палітра (червоний, чорний, білий).</p>
+<h2>Етапи роботи</h2>
+<ol>
+<li><strong>Ідея та ескіз</strong> (урок 16, 10 хв): опис задуму 3–5 реченнями + малюнок на папері.</li>
+<li><strong>Декомпозиція</strong>: список частин програми (які класи, функції, змінні).</li>
+<li><strong>Розробка</strong> (урок 16 + вдома): по кроках, із частим запуском.</li>
+<li><strong>Тестування</strong>: попросіть однокласника «зламати» вашу програму.</li>
+<li><strong>Експорт</strong>: <em>File → Export Application</em> або збереження кадрів <code>saveFrame()</code> / відео з кадрів (<em>Tools → Movie Maker</em>).</li>
+<li><strong>Презентація</strong> (урок 17, 3 хв): що задумали, як працює, що було найскладніше, що б додали.</li>
+</ol>
+<h2>Технічні вимоги</h2>
+<ul>
+<li>щонайменше <strong>80 рядків</strong> власного коду з коментарями українською;</li>
+<li>щонайменше <strong>одна власна функція</strong> з параметрами;</li>
+<li>щонайменше <strong>один клас</strong>;</li>
+<li>використання <strong>циклу</strong> та <strong>умов</strong>;</li>
+<li><strong>взаємодія</strong> (миша або клавіатура) або <strong>анімація</strong>;</li>
+<li>осмислені назви змінних.</li>
+</ul>
+<h2>Критерії оцінювання (12 балів)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Критерій</th>
+<th>Бали</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Програма запускається без помилок і працює відповідно до задуму</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Використано обов'язкові конструкції (функції, клас, цикли, умови, масиви)</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Якість коду: структура, коментарі, назви змінних</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Оригінальність і художня/ігрова цінність</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Презентація та відповіді на запитання</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Разом</strong></td>
+<td><strong>12</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2>Самоперевірка перед здачею</h2>
+<ul>
+<li>[ ] Скетч відкривається й запускається на іншому комп'ютері (усі файли — у папці <code>data</code>).</li>
+<li>[ ] У коді немає «чарівних чисел» там, де можна використати <code>width</code>/<code>height</code> чи змінну.</li>
+<li>[ ] Кожна функція та клас мають коментар «що робить».</li>
+<li>[ ] Є скриншот або GIF результату.</li>
+</ul>
+<h2>Куди рухатися далі</h2>
+<ul>
+<li><strong>p5.js</strong> — Processing для браузера на JavaScript (editor.p5js.org): ваші скетчі можна показати друзям за посиланням;</li>
+<li><strong>Processing Python Mode / py5</strong> — та сама бібліотека мовою Python;</li>
+<li><strong>Daniel Shiffman, «The Nature of Code»</strong> — фізика, генетичні алгоритми, нейромережі в Processing;</li>
+<li><strong>The Coding Train</strong> (YouTube) — відеоуроки Шиффмана;</li>
+<li><strong>Arduino</strong> — мова Arduino має спільне коріння з Processing: від екрана до реальних світлодіодів і датчиків.</li>
+</ul></div></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-15.html"><small>← Урок 15</small>Від ідеї до програми: алгоритм гри, час і налагодження</a><a class="next" href="../test/processing_test.html" target="_blank" rel="noopener"><small>Далі →</small>Підсумковий тест</a></nav>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.copy');
+  if (!b) return;
+  var code = b.parentNode.querySelector('code');
+  function done(t) { b.textContent = t; setTimeout(function () { b.textContent = 'Копіювати'; }, 1500); }
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
+  try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
+});
+
+</script>
+</body>
+</html>

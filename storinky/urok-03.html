@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 3. Колір: відтінки сірого, RGB, прозорість, HSB</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Креативне програмування в Processing: Урок 3. Колір: відтінки сірого, RGB, прозорість, HSB">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Макет: аркуш у клітинку (як папір для планування координат у Шиффмана); зліва — зміст курсу, справа — урок шириною ~70 знаків.
+   На телефоні зміст ховається у розгортуваний блок над уроком. */
+:root {
+  --paper: #fbfcfd;
+  --grid: #e3eaf2;
+  --ink: #15212c;
+  --muted: #5a6876;
+  --rule: #d5dde6;
+  --accent: #2242d6;
+  --accent-soft: #e8ecfd;
+  --mark: #d9480f;
+  --code-bg: #f1f4f8;
+  --code-ink: #1d2733;
+  --c-kw: #2242d6;
+  --c-type: #0b7a75;
+  --c-fn: #8a3ffc;
+  --c-num: #d9480f;
+  --c-str: #2b8a3e;
+  --c-com: #7b8794;
+  --panel: #ffffff;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.45rem;
+  --step-3: clamp(1.6rem, 4.6vw, 2.1rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+    --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+    --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+    --panel: #131b24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+  --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+  --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+  --panel: #131b24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Зміст ---------- */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.brand { display: grid; gap: 4px; margin-bottom: 20px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; line-height: 1.15; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.toc { display: grid; gap: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 14px; }
+.toc h4 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc a { display: grid; grid-template-columns: 2.4em 1fr; gap: 4px; padding: 6px 8px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.toc a .n { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--accent-soft); }
+.toc a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.toc a[aria-current="page"] .n { color: var(--accent); }
+.toc .solo a { grid-template-columns: 1fr; }
+.mobile-nav { display: none; }
+
+/* ---------- Основна частина ---------- */
+main { min-width: 0; }
+.crumbs { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; letter-spacing: 0.03em; }
+.crumbs a { color: var(--muted); }
+.hero { display: grid; gap: 14px; margin-bottom: 36px; }
+.hero h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.7rem, 4.2vw, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; color: var(--muted); font-size: var(--step-1); line-height: 1.5; }
+.stage { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 230px; touch-action: none; }
+.stage .readout { position: absolute; right: 10px; bottom: 8px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); background: var(--panel); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 600; }
+
+/* Картки уроків на головній */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.cards a { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; height: 100%; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.cards a:hover { border-color: var(--accent); }
+.cards .n { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.cards .t { font-weight: 600; line-height: 1.3; }
+.cards .m { font-size: 0.82rem; color: var(--muted); }
+.mod-title { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+article { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 44px); min-width: 0; }
+.doc { max-width: 72ch; }
+.doc > :first-child { margin-top: 0; }
+.doc h1 { font-family: var(--f-display); font-weight: 700; font-size: var(--step-3); line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 18px; }
+.doc h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; text-wrap: balance; margin: 2.2em 0 0.6em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.doc h3 { font-size: var(--step-1); font-weight: 600; margin: 1.6em 0 0.4em; text-wrap: balance; }
+.doc p, .doc li { max-width: 68ch; }
+.doc ul, .doc ol { padding-left: 1.3em; }
+.doc li + li { margin-top: 0.25em; }
+.doc blockquote { margin: 1em 0; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; }
+.doc blockquote p { margin: 0.2em 0; }
+.doc strong { font-weight: 600; }
+.doc code { font-family: var(--f-mono); font-size: 0.88em; background: var(--code-bg); color: var(--code-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+.doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+.tbl { overflow-x: auto; margin: 1em 0; -webkit-overflow-scrolling: touch; }
+.doc table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+.doc th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.doc td code { white-space: nowrap; }
+
+pre.code { position: relative; margin: 1em 0; background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--rule); border-radius: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; font-family: var(--f-mono); font-size: 0.84rem; line-height: 1.6; padding: 14px 16px; tab-size: 2; }
+pre.code code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.copy { position: sticky; float: right; left: 100%; top: 0; margin: -6px -8px 0 8px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.t-kw { color: var(--c-kw); font-weight: 600; }
+.t-type { color: var(--c-type); }
+.t-fn { color: var(--c-fn); }
+.t-num { color: var(--c-num); }
+.t-str { color: var(--c-str); }
+.t-com { color: var(--c-com); font-style: italic; }
+
+/* ---------- Скетчі уроку ---------- */
+.sketches { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 22px; }
+.sketches > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.sketches > p { margin: 0; color: var(--muted); max-width: 66ch; }
+.sk { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sk figure { margin: 0; }
+.sk img { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.sk figcaption { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+.sk h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+.sk details { margin-top: 4px; }
+.sk summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 4px 0; }
+.sk .files { min-width: 0; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+.pager a { display: grid; gap: 2px; text-decoration: none; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); min-width: 0; }
+.pager a:hover { border-color: var(--accent); }
+.pager small { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.pager .next { grid-column: 2; text-align: right; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .side { display: none; }
+  .mobile-nav { display: grid; gap: 10px; }
+  .mobile-nav .brand { margin: 0; }
+  .mobile-nav details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+  .mobile-nav summary { cursor: pointer; font-family: var(--f-mono); font-size: 0.85rem; padding: 12px 14px; list-style-position: inside; }
+  .mobile-nav details[open] summary { border-bottom: 1px solid var(--rule); }
+  .mobile-nav .toc { border: 0; border-radius: 0 0 6px 6px; }
+  .doc { font-size: 1.02rem; }
+  pre.code { font-size: 0.8rem; padding: 12px; }
+  .sk { grid-template-columns: minmax(0, 1fr); }
+  .sk figure { max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager .next { grid-column: 1; }
+  .doc th, .doc td { padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html" aria-current="page"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <main>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html" aria-current="page"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 3 з 17</p><article><div class="doc"><h1>Урок 3. Колір: відтінки сірого, RGB, прозорість, HSB</h1>
+<blockquote>
+<p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 1 (Grayscale Color, RGB Color, Color Transparency, Custom Color Ranges); Reas &amp; Fry — розд. 4 «Color».</p>
+</blockquote>
+<h2>Мета уроку</h2>
+<ul>
+<li>зрозуміти, як комп'ютер кодує колір;</li>
+<li>використовувати моделі <strong>RGB</strong> та <strong>HSB</strong> і прозорість (альфа-канал);</li>
+<li>користуватися інструментом <em>Tools → Color Selector</em>.</li>
+</ul>
+<h2>1. Відтінки сірого</h2>
+<p>Одне число від <strong>0</strong> (чорний) до <strong>255</strong> (білий):</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">background</span>(<span class="t-num">0</span>);     <span class="t-com">// чорний</span>
+<span class="t-fn">fill</span>(<span class="t-num">127</span>);         <span class="t-com">// середньо-сірий</span>
+<span class="t-fn">stroke</span>(<span class="t-num">255</span>);       <span class="t-com">// білий</span></code></pre>
+<p>❓ Чому саме 255? Бо на один канал кольору відводиться <strong>1 байт = 8 біт</strong>, а 2⁸ = 256 значень (0…255). Це ви вже знаєте з теми «Кодування даних».</p>
+<h2>2. Модель RGB</h2>
+<p>Екран змішує <strong>світло</strong> трьох кольорів: червоного (Red), зеленого (Green) і синього (Blue). Це <strong>адитивне</strong> змішування — зовсім не так, як фарби!</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">0</span>, <span class="t-num">0</span>);      <span class="t-com">// червоний</span>
+<span class="t-fn">fill</span>(<span class="t-num">0</span>, <span class="t-num">255</span>, <span class="t-num">0</span>);      <span class="t-com">// зелений</span>
+<span class="t-fn">fill</span>(<span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">255</span>);      <span class="t-com">// синій</span>
+<span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">255</span>, <span class="t-num">0</span>);    <span class="t-com">// червоний + зелений = жовтий</span>
+<span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">255</span>, <span class="t-num">255</span>);  <span class="t-com">// усі разом = білий</span></code></pre>
+<p>Кольори також можна записати шістнадцятковим кодом, як у веб-дизайні: <code>fill(#FF8800);</code></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Колір</th>
+<th>R</th>
+<th>G</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>жовтий</td>
+<td>255</td>
+<td>255</td>
+<td>0</td>
+</tr>
+<tr>
+<td>бірюзовий</td>
+<td>0</td>
+<td>255</td>
+<td>255</td>
+</tr>
+<tr>
+<td>пурпуровий</td>
+<td>255</td>
+<td>0</td>
+<td>255</td>
+</tr>
+<tr>
+<td>помаранчевий</td>
+<td>255</td>
+<td>136</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<h2>3. Прозорість (альфа-канал)</h2>
+<p>Четвертий аргумент — <strong>альфа</strong>: 0 — повністю прозорий, 255 — непрозорий.</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">background</span>(<span class="t-num">255</span>);
+<span class="t-fn">noStroke</span>();
+<span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">120</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">80</span>, <span class="t-num">100</span>, <span class="t-num">120</span>, <span class="t-num">120</span>);
+<span class="t-fn">fill</span>(<span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">255</span>, <span class="t-num">120</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">140</span>, <span class="t-num">100</span>, <span class="t-num">120</span>, <span class="t-num">120</span>);</code></pre>
+<p>Там, де кола перетинаються, кольори змішуються.</p>
+<h2>4. Модель HSB</h2>
+<p>Іноді зручніше думати не «скільки червоного», а «<strong>який відтінок, наскільки насичений, наскільки яскравий</strong>»:
+- <strong>H</strong>ue — відтінок (колір на колі кольорів);
+- <strong>S</strong>aturation — насиченість (від сірого до чистого кольору);
+- <strong>B</strong>rightness — яскравість (від чорного до повного світла).</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">colorMode</span>(<span class="t-fn">HSB</span>, <span class="t-num">360</span>, <span class="t-num">100</span>, <span class="t-num">100</span>);  <span class="t-com">// H: 0–360°, S і B: 0–100%</span>
+<span class="t-fn">fill</span>(<span class="t-num">0</span>, <span class="t-num">100</span>, <span class="t-num">100</span>);    <span class="t-com">// червоний</span>
+<span class="t-fn">fill</span>(<span class="t-num">120</span>, <span class="t-num">100</span>, <span class="t-num">100</span>);  <span class="t-com">// зелений</span>
+<span class="t-fn">fill</span>(<span class="t-num">210</span>, <span class="t-num">40</span>, <span class="t-num">100</span>);   <span class="t-com">// блідо-блакитний</span></code></pre>
+<p><code>colorMode(RGB, 1.0)</code> — дозволяє задавати RGB дробами від 0 до 1. Це те, що Шиффман називає <em>Custom Color Ranges</em>.</p>
+<h2>5. Тип даних color</h2>
+<p>Колір можна зберегти в змінній (детальніше про змінні — на наступному уроці):</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">color</span> sky = <span class="t-type">color</span>(<span class="t-num">135</span>, <span class="t-num">206</span>, <span class="t-num">235</span>);
+<span class="t-fn">background</span>(sky);</code></pre>
+<p>Функції <code>red(c)</code>, <code>green(c)</code>, <code>blue(c)</code>, <code>hue(c)</code>, <code>brightness(c)</code> повертають складові кольору.</p>
+<h2>Приклад: «Колірна палітра»</h2>
+<p>📁 Скетч: <code>skechi/L03_Kolir</code> — сім смужок веселки в HSB та накладання прозорих кіл RGB.</p>
+<h2>Практика</h2>
+<p><strong>Рівень 1.</strong> Розфарбуйте робота з уроку 2 у кольори RGB.</p>
+<p><strong>Рівень 2.</strong> Відтворіть «діаграму Венна» з трьох прозорих кіл (червоне, зелене, синє). Поясніть, які кольори утворилися в перетинах.</p>
+<p><strong>Рівень 3 (творчий).</strong> Створіть композицію в стилі <strong>Марка Ротко</strong> або <strong>Піта Мондріана</strong>: великі кольорові площини. Використайте <em>Tools → Color Selector</em> для підбору кольорів.</p>
+<h2>Перевір себе</h2>
+<ol>
+<li>Який колір дасть <code>fill(0, 0, 0)</code>? А <code>fill(255, 255, 255)</code>?</li>
+<li>Чим відрізняється змішування кольорів на екрані від змішування фарб?</li>
+<li>Що означає четвертий аргумент у <code>fill(255, 0, 0, 50)</code>?</li>
+<li>Коли зручніше використовувати модель HSB?</li>
+</ol></div><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L03_Kolir" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L03_Kolir</h3><details open><summary>L03_Kolir.pde · 26 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 3. Колір: HSB-веселка та змішування RGB з прозорістю</span>
+
+<span class="t-fn">size</span>(<span class="t-num">600</span>, <span class="t-num">400</span>);
+<span class="t-fn">background</span>(<span class="t-num">255</span>);
+<span class="t-fn">noStroke</span>();
+
+<span class="t-com">// Веселка в моделі HSB: змінюється лише відтінок (Hue)</span>
+<span class="t-fn">colorMode</span>(<span class="t-fn">HSB</span>, <span class="t-num">360</span>, <span class="t-num">100</span>, <span class="t-num">100</span>);
+<span class="t-type">float</span> stripeW = width / <span class="t-num">7.0</span>;
+<span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; <span class="t-num">7</span>; i++) {
+  <span class="t-fn">fill</span>(i * <span class="t-num">45</span>, <span class="t-num">90</span>, <span class="t-num">100</span>);          <span class="t-com">// відтінок 0°, 45°, 90°, ...</span>
+  <span class="t-fn">rect</span>(i * stripeW, <span class="t-num">0</span>, stripeW, <span class="t-num">150</span>);
+}
+
+<span class="t-com">// Змішування світла RGB з альфа-каналом</span>
+<span class="t-fn">colorMode</span>(<span class="t-fn">RGB</span>, <span class="t-num">255</span>);
+<span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">130</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">250</span>, <span class="t-num">260</span>, <span class="t-num">160</span>, <span class="t-num">160</span>);
+<span class="t-fn">fill</span>(<span class="t-num">0</span>, <span class="t-num">255</span>, <span class="t-num">0</span>, <span class="t-num">130</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">350</span>, <span class="t-num">260</span>, <span class="t-num">160</span>, <span class="t-num">160</span>);
+<span class="t-fn">fill</span>(<span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">255</span>, <span class="t-num">130</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">300</span>, <span class="t-num">330</span>, <span class="t-num">160</span>, <span class="t-num">160</span>);
+
+<span class="t-com">// Колір у змінній та шістнадцятковий запис</span>
+<span class="t-type">color</span> orange = <span class="t-num">#FF8800</span>;
+<span class="t-fn">fill</span>(orange);
+<span class="t-fn">rect</span>(<span class="t-num">500</span>, <span class="t-num">330</span>, <span class="t-num">60</span>, <span class="t-num">40</span>);
+<span class="t-fn">println</span>(<span class="t-str">"Червона складова: "</span> + <span class="t-fn">red</span>(orange) + <span class="t-str">", зелена: "</span> + <span class="t-fn">green</span>(orange));</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-02.html"><small>← Урок 2</small>Геометричні фігури та атрибути малювання</a><a class="next" href="urok-04.html"><small>Урок 4 →</small>Змінні та типи даних. Арифметика</a></nav>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.copy');
+  if (!b) return;
+  var code = b.parentNode.querySelector('code');
+  function done(t) { b.textContent = t; setTimeout(function () { b.textContent = 'Копіювати'; }, 1500); }
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
+  try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
+});
+
+</script>
+</body>
+</html>

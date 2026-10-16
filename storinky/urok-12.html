@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 12. Масиви та масиви об&#x27;єктів. Системи частинок</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Креативне програмування в Processing: Урок 12. Масиви та масиви об&#x27;єктів. Системи частинок">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Макет: аркуш у клітинку (як папір для планування координат у Шиффмана); зліва — зміст курсу, справа — урок шириною ~70 знаків.
+   На телефоні зміст ховається у розгортуваний блок над уроком. */
+:root {
+  --paper: #fbfcfd;
+  --grid: #e3eaf2;
+  --ink: #15212c;
+  --muted: #5a6876;
+  --rule: #d5dde6;
+  --accent: #2242d6;
+  --accent-soft: #e8ecfd;
+  --mark: #d9480f;
+  --code-bg: #f1f4f8;
+  --code-ink: #1d2733;
+  --c-kw: #2242d6;
+  --c-type: #0b7a75;
+  --c-fn: #8a3ffc;
+  --c-num: #d9480f;
+  --c-str: #2b8a3e;
+  --c-com: #7b8794;
+  --panel: #ffffff;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.45rem;
+  --step-3: clamp(1.6rem, 4.6vw, 2.1rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+    --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+    --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+    --panel: #131b24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+  --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+  --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+  --panel: #131b24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Зміст ---------- */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.brand { display: grid; gap: 4px; margin-bottom: 20px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; line-height: 1.15; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.toc { display: grid; gap: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 14px; }
+.toc h4 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc a { display: grid; grid-template-columns: 2.4em 1fr; gap: 4px; padding: 6px 8px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.toc a .n { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--accent-soft); }
+.toc a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.toc a[aria-current="page"] .n { color: var(--accent); }
+.toc .solo a { grid-template-columns: 1fr; }
+.mobile-nav { display: none; }
+
+/* ---------- Основна частина ---------- */
+main { min-width: 0; }
+.crumbs { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; letter-spacing: 0.03em; }
+.crumbs a { color: var(--muted); }
+.hero { display: grid; gap: 14px; margin-bottom: 36px; }
+.hero h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.7rem, 4.2vw, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; color: var(--muted); font-size: var(--step-1); line-height: 1.5; }
+.stage { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 230px; touch-action: none; }
+.stage .readout { position: absolute; right: 10px; bottom: 8px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); background: var(--panel); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 600; }
+
+/* Картки уроків на головній */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.cards a { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; height: 100%; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.cards a:hover { border-color: var(--accent); }
+.cards .n { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.cards .t { font-weight: 600; line-height: 1.3; }
+.cards .m { font-size: 0.82rem; color: var(--muted); }
+.mod-title { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+article { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 44px); min-width: 0; }
+.doc { max-width: 72ch; }
+.doc > :first-child { margin-top: 0; }
+.doc h1 { font-family: var(--f-display); font-weight: 700; font-size: var(--step-3); line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 18px; }
+.doc h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; text-wrap: balance; margin: 2.2em 0 0.6em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.doc h3 { font-size: var(--step-1); font-weight: 600; margin: 1.6em 0 0.4em; text-wrap: balance; }
+.doc p, .doc li { max-width: 68ch; }
+.doc ul, .doc ol { padding-left: 1.3em; }
+.doc li + li { margin-top: 0.25em; }
+.doc blockquote { margin: 1em 0; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; }
+.doc blockquote p { margin: 0.2em 0; }
+.doc strong { font-weight: 600; }
+.doc code { font-family: var(--f-mono); font-size: 0.88em; background: var(--code-bg); color: var(--code-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+.doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+.tbl { overflow-x: auto; margin: 1em 0; -webkit-overflow-scrolling: touch; }
+.doc table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+.doc th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.doc td code { white-space: nowrap; }
+
+pre.code { position: relative; margin: 1em 0; background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--rule); border-radius: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; font-family: var(--f-mono); font-size: 0.84rem; line-height: 1.6; padding: 14px 16px; tab-size: 2; }
+pre.code code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.copy { position: sticky; float: right; left: 100%; top: 0; margin: -6px -8px 0 8px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.t-kw { color: var(--c-kw); font-weight: 600; }
+.t-type { color: var(--c-type); }
+.t-fn { color: var(--c-fn); }
+.t-num { color: var(--c-num); }
+.t-str { color: var(--c-str); }
+.t-com { color: var(--c-com); font-style: italic; }
+
+/* ---------- Скетчі уроку ---------- */
+.sketches { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 22px; }
+.sketches > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.sketches > p { margin: 0; color: var(--muted); max-width: 66ch; }
+.sk { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sk figure { margin: 0; }
+.sk img { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.sk figcaption { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+.sk h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+.sk details { margin-top: 4px; }
+.sk summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 4px 0; }
+.sk .files { min-width: 0; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+.pager a { display: grid; gap: 2px; text-decoration: none; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); min-width: 0; }
+.pager a:hover { border-color: var(--accent); }
+.pager small { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.pager .next { grid-column: 2; text-align: right; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .side { display: none; }
+  .mobile-nav { display: grid; gap: 10px; }
+  .mobile-nav .brand { margin: 0; }
+  .mobile-nav details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+  .mobile-nav summary { cursor: pointer; font-family: var(--f-mono); font-size: 0.85rem; padding: 12px 14px; list-style-position: inside; }
+  .mobile-nav details[open] summary { border-bottom: 1px solid var(--rule); }
+  .mobile-nav .toc { border: 0; border-radius: 0 0 6px 6px; }
+  .doc { font-size: 1.02rem; }
+  pre.code { font-size: 0.8rem; padding: 12px; }
+  .sk { grid-template-columns: minmax(0, 1fr); }
+  .sk figure { max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager .next { grid-column: 1; }
+  .doc th, .doc td { padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html" aria-current="page"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <main>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html" aria-current="page"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 12 з 17</p><article><div class="doc"><h1>Урок 12. Масиви та масиви об'єктів. Системи частинок</h1>
+<blockquote>
+<p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 9 «Arrays» (Declaration and creation, Array operations, Arrays of objects, Interactive objects, ArrayList); Reas &amp; Fry — розд. 28 «Arrays», 31 «Simulate».</p>
+</blockquote>
+<h2>Мета уроку</h2>
+<ul>
+<li>оголошувати, створювати та обробляти масиви в Processing;</li>
+<li>поєднувати масиви з циклами;</li>
+<li>створити масив об'єктів і систему частинок з <code>ArrayList</code>.</li>
+</ul>
+<h2>1. Масив — це список однотипних значень</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">int</span>[] numbers = {<span class="t-num">5</span>, <span class="t-num">12</span>, <span class="t-num">7</span>, <span class="t-num">3</span>};       <span class="t-com">// оголошення зі значеннями</span>
+<span class="t-type">float</span>[] xs = <span class="t-kw">new</span> <span class="t-type">float</span>[<span class="t-num">100</span>];          <span class="t-com">// масив із 100 нулів</span></code></pre>
+<ul>
+<li>індекси починаються з <strong>0</strong>: <code>numbers[0]</code> = 5, <code>numbers[3]</code> = 3;</li>
+<li>довжина — <code>numbers.length</code> (без дужок!);</li>
+<li>розмір масиву <strong>фіксований</strong> після створення.</li>
+</ul>
+<p>⚠️ <code>ArrayIndexOutOfBoundsException</code> — звернення до неіснуючого індексу (наприклад, <code>numbers[4]</code>).</p>
+<p>Порівняння з Python: список <code>[5, 12, 7, 3]</code> ↔ масив <code>int[] a = {5, 12, 7, 3};</code>, <code>len(a)</code> ↔ <code>a.length</code>.</p>
+<h2>2. Масиви + цикли</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">float</span>[] ys = <span class="t-kw">new</span> <span class="t-type">float</span>[<span class="t-num">50</span>];
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">500</span>, <span class="t-num">300</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; ys.length; i++) {
+    ys[i] = <span class="t-fn">random</span>(height);              <span class="t-com">// заповнення</span>
+  }
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; ys.length; i++) {
+    <span class="t-fn">ellipse</span>(i * <span class="t-num">10</span> + <span class="t-num">5</span>, ys[i], <span class="t-num">8</span>, <span class="t-num">8</span>);   <span class="t-com">// малювання</span>
+    ys[i] += <span class="t-num">1</span>;                           <span class="t-com">// зміна</span>
+    <span class="t-kw">if</span> (ys[i] &gt; height) ys[i] = <span class="t-num">0</span>;
+  }
+}</code></pre>
+<h3>Слід миші (зсув масиву)</h3>
+<p>Зберігаємо останні 50 положень миші: щокадру зсуваємо всі елементи на одну позицію і записуємо нове значення в кінець. Див. скетч <code>L12_Slid</code>.</p>
+<h2>3. Масив об'єктів</h2>
+<p>Справжня сила — у поєднанні з класами (урок 11):</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code>Ball[] balls = <span class="t-kw">new</span> Ball[<span class="t-num">20</span>];          <span class="t-com">// 1) масив «порожніх полиць»</span>
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">400</span>, <span class="t-num">400</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; balls.length; i++) {
+    balls[i] = <span class="t-kw">new</span> Ball(<span class="t-fn">random</span>(width), <span class="t-fn">random</span>(height));   <span class="t-com">// 2) створюємо кожен об'єкт</span>
+  }
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; balls.length; i++) {
+    balls[i].move();                  <span class="t-com">// 3) кожен об'єкт працює сам</span>
+    balls[i].display();
+  }
+}</code></pre>
+<p>Зміна <code>20</code> на <code>2000</code> — і на екрані дві тисячі м'ячів!</p>
+<h3>Скорочений цикл for-each</h3>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">for</span> (Ball b : balls) {
+  b.move();
+  b.display();
+}</code></pre>
+<h2>4. ArrayList — масив змінного розміру</h2>
+<p>Коли кількість об'єктів змінюється (постріли, частинки, сніжинки):</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">ArrayList</span>&lt;Particle&gt; particles = <span class="t-kw">new</span> <span class="t-type">ArrayList</span>&lt;Particle&gt;();
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">0</span>);
+  particles.add(<span class="t-kw">new</span> Particle(mouseX, mouseY));    <span class="t-com">// додати</span>
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = particles.<span class="t-fn">size</span>() - <span class="t-num">1</span>; i &gt;= <span class="t-num">0</span>; i--) {
+    Particle p = particles.<span class="t-fn">get</span>(i);                <span class="t-com">// отримати</span>
+    p.update();
+    p.display();
+    <span class="t-kw">if</span> (p.isDead()) particles.remove(i);          <span class="t-com">// видалити</span>
+  }
+}</code></pre>
+<p>💡 Видаляємо, рухаючись <strong>з кінця</strong>, щоб не пропустити елементи.</p>
+<h2>5. Системи частинок</h2>
+<p>Система частинок — набір простих об'єктів, які разом імітують складні явища: вогонь, дим, феєрверк, водоспад. Кожна частинка має положення, швидкість і «тривалість життя» (поступово стає прозорою).</p>
+<p>📁 Скетчі: <code>skechi/L12_Slid</code>, <code>skechi/L12_Chastynky</code> (фонтан частинок з ArrayList)</p>
+<h2>Практика</h2>
+<p><strong>Рівень 1.</strong> Масив із 10 чисел — висоти стовпчиків. Намалюйте стовпчикову діаграму.</p>
+<p><strong>Рівень 2.</strong> Снігопад: масив зі 100 об'єктів <code>Snowflake</code>, кожна сніжинка падає з власною швидкістю і повертається нагору.</p>
+<p><strong>Рівень 3 (творчий).</strong> Феєрверк: при клацанні мишею в точці кліку «вибухає» 100 частинок, які розлітаються, падають під дією гравітації та згасають.</p>
+<h2>Перевір себе</h2>
+<ol>
+<li>Який індекс має останній елемент масиву довжиною 25?</li>
+<li>Що відбувається в рядку <code>Ball[] balls = new Ball[20];</code> — створюються м'ячі чи ні?</li>
+<li>Чим <code>ArrayList</code> відрізняється від звичайного масиву?</li>
+<li>Чому елементи з <code>ArrayList</code> зручніше видаляти, перебираючи список з кінця?</li>
+</ol></div><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L12_Chastynky" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L12_Chastynky</h3><details open><summary>L12_Chastynky.pde · 69 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 12. Система частинок з ArrayList: фонтан за курсором</span>
+<span class="t-com">// Клацання — «вибух» із 100 частинок.</span>
+
+<span class="t-type">ArrayList</span>&lt;Particle&gt; particles = <span class="t-kw">new</span> <span class="t-type">ArrayList</span>&lt;Particle&gt;();
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">600</span>, <span class="t-num">400</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">20</span>);
+  <span class="t-com">// Щокадру додаємо дві нові частинки</span>
+  particles.add(<span class="t-kw">new</span> Particle(mouseX, mouseY));
+  particles.add(<span class="t-kw">new</span> Particle(mouseX, mouseY));
+
+  <span class="t-com">// Перебираємо з кінця, щоб безпечно видаляти</span>
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = particles.<span class="t-fn">size</span>() - <span class="t-num">1</span>; i &gt;= <span class="t-num">0</span>; i--) {
+    Particle p = particles.<span class="t-fn">get</span>(i);
+    p.update();
+    p.display();
+    <span class="t-kw">if</span> (p.isDead()) {
+      particles.remove(i);
+    }
+  }
+
+  <span class="t-fn">fill</span>(<span class="t-num">255</span>);
+  <span class="t-fn">text</span>(<span class="t-str">"Частинок: "</span> + particles.<span class="t-fn">size</span>(), <span class="t-num">10</span>, <span class="t-num">20</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">mousePressed</span>() {
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; <span class="t-num">100</span>; i++) {
+    particles.add(<span class="t-kw">new</span> Particle(mouseX, mouseY));
+  }
+}
+
+<span class="t-kw">class</span> Particle {
+  <span class="t-type">float</span> x, y;
+  <span class="t-type">float</span> vx, vy;
+  <span class="t-type">float</span> life = <span class="t-num">255</span>;     <span class="t-com">// «тривалість життя» = прозорість</span>
+  <span class="t-type">color</span> c;
+
+  Particle(<span class="t-type">float</span> startX, <span class="t-type">float</span> startY) {
+    x = startX;
+    y = startY;
+    <span class="t-type">float</span> angle = <span class="t-fn">random</span>(<span class="t-fn">TWO_PI</span>);
+    <span class="t-type">float</span> speed = <span class="t-fn">random</span>(<span class="t-num">1</span>, <span class="t-num">4</span>);
+    vx = <span class="t-fn">cos</span>(angle) * speed;
+    vy = <span class="t-fn">sin</span>(angle) * speed - <span class="t-num">2</span>;
+    c = <span class="t-type">color</span>(<span class="t-fn">random</span>(<span class="t-num">200</span>, <span class="t-num">255</span>), <span class="t-fn">random</span>(<span class="t-num">80</span>, <span class="t-num">200</span>), <span class="t-fn">random</span>(<span class="t-num">50</span>));
+  }
+
+  <span class="t-kw">void</span> update() {
+    vy += <span class="t-num">0.1</span>;          <span class="t-com">// гравітація</span>
+    x += vx;
+    y += vy;
+    life -= <span class="t-num">3</span>;
+  }
+
+  <span class="t-kw">void</span> display() {
+    <span class="t-fn">noStroke</span>();
+    <span class="t-fn">fill</span>(c, life);
+    <span class="t-fn">ellipse</span>(x, y, <span class="t-num">8</span>, <span class="t-num">8</span>);
+  }
+
+  <span class="t-type">boolean</span> isDead() {
+    <span class="t-kw">return</span> life &lt;= <span class="t-num">0</span>;
+  }
+}</code></pre></details></div></div><div class="sk"><figure><img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAANa5p+FcufcuYmPXX+VVqmZ+dmyJiqY5ImInmxTTFNMU0xERHdEMghIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9k=" alt="Результат роботи скетчу L12_Slid" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L12_Slid</h3><details open><summary>L12_Slid.pde · 30 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 12. Масиви: слід миші з 50 останніх положень</span>
+
+<span class="t-type">int</span> num = <span class="t-num">50</span>;
+<span class="t-type">int</span>[] xs = <span class="t-kw">new</span> <span class="t-type">int</span>[num];
+<span class="t-type">int</span>[] ys = <span class="t-kw">new</span> <span class="t-type">int</span>[num];
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">500</span>, <span class="t-num">400</span>);
+  <span class="t-fn">noStroke</span>();
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+
+  <span class="t-com">// Зсуваємо всі значення на одну позицію вліво</span>
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; num - <span class="t-num">1</span>; i++) {
+    xs[i] = xs[i + <span class="t-num">1</span>];
+    ys[i] = ys[i + <span class="t-num">1</span>];
+  }
+  <span class="t-com">// Нове положення миші — в кінець масиву</span>
+  xs[num - <span class="t-num">1</span>] = mouseX;
+  ys[num - <span class="t-num">1</span>] = mouseY;
+
+  <span class="t-com">// Малюємо: старіші точки — менші та світліші</span>
+  <span class="t-kw">for</span> (<span class="t-type">int</span> i = <span class="t-num">0</span>; i &lt; num; i++) {
+    <span class="t-fn">fill</span>(<span class="t-num">255</span> - i * <span class="t-num">5</span>, <span class="t-num">100</span>, i * <span class="t-num">5</span>);
+    <span class="t-fn">ellipse</span>(xs[i], ys[i], i, i);
+  }
+}</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-11.html"><small>← Урок 11</small>Об&#x27;єкти та класи</a><a class="next" href="urok-13.html"><small>Урок 13 →</small>Тригонометрія і трансформації: translate, rotate, scale</a></nav>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.copy');
+  if (!b) return;
+  var code = b.parentNode.querySelector('code');
+  function done(t) { b.textContent = t; setTimeout(function () { b.textContent = 'Копіювати'; }, 1500); }
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
+  try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
+});
+
+</script>
+</body>
+</html>

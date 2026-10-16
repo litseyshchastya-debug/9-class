@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Урок 7. Умови: if / else, логічні оператори. Відскок м&#x27;яча</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Креативне програмування в Processing: Урок 7. Умови: if / else, логічні оператори. Відскок м&#x27;яча">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Макет: аркуш у клітинку (як папір для планування координат у Шиффмана); зліва — зміст курсу, справа — урок шириною ~70 знаків.
+   На телефоні зміст ховається у розгортуваний блок над уроком. */
+:root {
+  --paper: #fbfcfd;
+  --grid: #e3eaf2;
+  --ink: #15212c;
+  --muted: #5a6876;
+  --rule: #d5dde6;
+  --accent: #2242d6;
+  --accent-soft: #e8ecfd;
+  --mark: #d9480f;
+  --code-bg: #f1f4f8;
+  --code-ink: #1d2733;
+  --c-kw: #2242d6;
+  --c-type: #0b7a75;
+  --c-fn: #8a3ffc;
+  --c-num: #d9480f;
+  --c-str: #2b8a3e;
+  --c-com: #7b8794;
+  --panel: #ffffff;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.45rem;
+  --step-3: clamp(1.6rem, 4.6vw, 2.1rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+    --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+    --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+    --panel: #131b24; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151c; --grid: #18222d; --ink: #e3e9ef; --muted: #98a6b4; --rule: #273442;
+  --accent: #8197ff; --accent-soft: #1b2447; --mark: #ff8a4c; --code-bg: #151e28; --code-ink: #dce4ec;
+  --c-kw: #8fa2ff; --c-type: #4fd1c5; --c-fn: #c4a1ff; --c-num: #ff9b5e; --c-str: #8ce99a; --c-com: #6f7f8f;
+  --panel: #131b24; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; border-radius: 3px; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Зміст ---------- */
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; max-height: calc(100vh - 40px); overflow-y: auto; }
+.brand { display: grid; gap: 4px; margin-bottom: 20px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.01em; line-height: 1.15; }
+.brand span { font-size: var(--step--1); color: var(--muted); }
+.toc { display: grid; gap: 18px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 14px; }
+.toc h4 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc a { display: grid; grid-template-columns: 2.4em 1fr; gap: 4px; padding: 6px 8px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.toc a .n { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); padding-top: 1px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--accent-soft); }
+.toc a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.toc a[aria-current="page"] .n { color: var(--accent); }
+.toc .solo a { grid-template-columns: 1fr; }
+.mobile-nav { display: none; }
+
+/* ---------- Основна частина ---------- */
+main { min-width: 0; }
+.crumbs { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; letter-spacing: 0.03em; }
+.crumbs a { color: var(--muted); }
+.hero { display: grid; gap: 14px; margin-bottom: 36px; }
+.hero h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.7rem, 4.2vw, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; color: var(--muted); font-size: var(--step-1); line-height: 1.5; }
+.stage { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 230px; touch-action: none; }
+.stage .readout { position: absolute; right: 10px; bottom: 8px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); background: var(--panel); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 600; }
+
+/* Картки уроків на головній */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 36px; padding: 0; list-style: none; }
+.cards a { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; height: 100%; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.cards a:hover { border-color: var(--accent); }
+.cards .n { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.cards .t { font-weight: 600; line-height: 1.3; }
+.cards .m { font-size: 0.82rem; color: var(--muted); }
+.mod-title { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+article { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 44px); min-width: 0; }
+.doc { max-width: 72ch; }
+.doc > :first-child { margin-top: 0; }
+.doc h1 { font-family: var(--f-display); font-weight: 700; font-size: var(--step-3); line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 18px; }
+.doc h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); line-height: 1.25; text-wrap: balance; margin: 2.2em 0 0.6em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.doc h3 { font-size: var(--step-1); font-weight: 600; margin: 1.6em 0 0.4em; text-wrap: balance; }
+.doc p, .doc li { max-width: 68ch; }
+.doc ul, .doc ol { padding-left: 1.3em; }
+.doc li + li { margin-top: 0.25em; }
+.doc blockquote { margin: 1em 0; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 4px 4px 0; }
+.doc blockquote p { margin: 0.2em 0; }
+.doc strong { font-weight: 600; }
+.doc code { font-family: var(--f-mono); font-size: 0.88em; background: var(--code-bg); color: var(--code-ink); padding: 0.1em 0.35em; border-radius: 3px; }
+.doc hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+.tbl { overflow-x: auto; margin: 1em 0; -webkit-overflow-scrolling: touch; }
+.doc table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+.doc th { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.doc td code { white-space: nowrap; }
+
+pre.code { position: relative; margin: 1em 0; background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--rule); border-radius: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; font-family: var(--f-mono); font-size: 0.84rem; line-height: 1.6; padding: 14px 16px; tab-size: 2; }
+pre.code code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+.copy { position: sticky; float: right; left: 100%; top: 0; margin: -6px -8px 0 8px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; cursor: pointer; }
+.copy:hover { color: var(--accent); border-color: var(--accent); }
+.t-kw { color: var(--c-kw); font-weight: 600; }
+.t-type { color: var(--c-type); }
+.t-fn { color: var(--c-fn); }
+.t-num { color: var(--c-num); }
+.t-str { color: var(--c-str); }
+.t-com { color: var(--c-com); font-style: italic; }
+
+/* ---------- Скетчі уроку ---------- */
+.sketches { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 22px; }
+.sketches > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.sketches > p { margin: 0; color: var(--muted); max-width: 66ch; }
+.sk { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sk figure { margin: 0; }
+.sk img { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+.sk figcaption { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+.sk h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+.sk details { margin-top: 4px; }
+.sk summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; padding: 4px 0; }
+.sk .files { min-width: 0; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+.pager a { display: grid; gap: 2px; text-decoration: none; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 5px; background: var(--panel); color: var(--ink); min-width: 0; }
+.pager a:hover { border-color: var(--accent); }
+.pager small { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.pager .next { grid-column: 2; text-align: right; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 14px 48px; }
+  .side { display: none; }
+  .mobile-nav { display: grid; gap: 10px; }
+  .mobile-nav .brand { margin: 0; }
+  .mobile-nav details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+  .mobile-nav summary { cursor: pointer; font-family: var(--f-mono); font-size: 0.85rem; padding: 12px 14px; list-style-position: inside; }
+  .mobile-nav details[open] summary { border-bottom: 1px solid var(--rule); }
+  .mobile-nav .toc { border: 0; border-radius: 0 0 6px 6px; }
+  .doc { font-size: 1.02rem; }
+  pre.code { font-size: 0.8rem; padding: 12px; }
+  .sk { grid-template-columns: minmax(0, 1fr); }
+  .sk figure { max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager .next { grid-column: 1; }
+  .doc th, .doc td { padding: 6px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html" aria-current="page"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <main>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html" aria-current="page"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 7 з 17</p><article><div class="doc"><h1>Урок 7. Умови: if / else, логічні оператори. Відскок м'яча</h1>
+<blockquote>
+<p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 5 «Conditionals» (Boolean expressions, Logical operators, Bouncing ball, Rollovers, Physics 101); Reas &amp; Fry — розд. 6 «Flow».</p>
+</blockquote>
+<h2>Мета уроку</h2>
+<ul>
+<li>записувати умови в синтаксисі Java;</li>
+<li>комбінувати умови логічними операторами;</li>
+<li>створити м'яч, що відбивається від стінок, та «кнопку», що реагує на мишу.</li>
+</ul>
+<h2>1. Синтаксис умови</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">if</span> (умова) {
+  <span class="t-com">// якщо true</span>
+} <span class="t-kw">else</span> <span class="t-kw">if</span> (інша умова) {
+  <span class="t-com">// якщо перша false, а друга true</span>
+} <span class="t-kw">else</span> {
+  <span class="t-com">// в усіх інших випадках</span>
+}</code></pre>
+<p>Порівняння з Python:
+| Python | Processing (Java) |
+|---|---|
+| <code>if x &gt; 5:</code> | <code>if (x &gt; 5) {</code> |
+| <code>elif</code> | <code>else if</code> |
+| <code>and</code>, <code>or</code>, <code>not</code> | <code>&amp;&amp;</code>, <code>||</code>, <code>!</code> |
+| відступи | фігурні дужки <code>{ }</code> |</p>
+<p>Оператори порівняння: <code>&gt;  &lt;  &gt;=  &lt;=  ==  !=</code>.
+⚠️ <code>=</code> — присвоєння, <code>==</code> — порівняння!</p>
+<h2>2. Приклад: фон залежно від положення миші</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-kw">if</span> (mouseX &lt; width/<span class="t-num">3</span>) {
+    <span class="t-fn">background</span>(<span class="t-num">255</span>, <span class="t-num">0</span>, <span class="t-num">0</span>);
+  } <span class="t-kw">else</span> <span class="t-kw">if</span> (mouseX &lt; <span class="t-num">2</span>*width/<span class="t-num">3</span>) {
+    <span class="t-fn">background</span>(<span class="t-num">0</span>, <span class="t-num">255</span>, <span class="t-num">0</span>);
+  } <span class="t-kw">else</span> {
+    <span class="t-fn">background</span>(<span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">255</span>);
+  }
+}</code></pre>
+<h2>3. Логічні оператори та «наведення» (rollover)</h2>
+<p>Чи знаходиться миша всередині прямокутника?</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">if</span> (mouseX &gt; x &amp;&amp; mouseX &lt; x + w &amp;&amp; mouseY &gt; y &amp;&amp; mouseY &lt; y + h) {
+  <span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">200</span>, <span class="t-num">0</span>);   <span class="t-com">// підсвічування</span>
+} <span class="t-kw">else</span> {
+  <span class="t-fn">fill</span>(<span class="t-num">200</span>);
+}
+<span class="t-fn">rect</span>(x, y, w, h);</code></pre>
+<p>Чи знаходиться миша всередині <strong>кола</strong>? — відстань до центру менша за радіус:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-kw">if</span> (<span class="t-fn">dist</span>(mouseX, mouseY, cx, cy) &lt; r) { ... }</code></pre>
+<h2>4. Змінна-перемикач (boolean)</h2>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">boolean</span> isOn = <span class="t-kw">false</span>;
+
+<span class="t-kw">void</span> <span class="t-fn">mousePressed</span>() {
+  isOn = !isOn;     <span class="t-com">// перемикаємо: true ↔ false</span>
+}
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-kw">if</span> (isOn) <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  <span class="t-kw">else</span>      <span class="t-fn">background</span>(<span class="t-num">0</span>);
+}</code></pre>
+<h2>5. М'яч, що відскакує</h2>
+<p>Ключова ідея — <strong>швидкість</strong> як окрема змінна, яка може змінювати знак:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-type">float</span> x = <span class="t-num">100</span>, y = <span class="t-num">100</span>;
+<span class="t-type">float</span> xSpeed = <span class="t-num">3</span>, ySpeed = <span class="t-num">2</span>;
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">400</span>, <span class="t-num">300</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+  x += xSpeed;
+  y += ySpeed;
+  <span class="t-kw">if</span> (x &gt; width || x &lt; <span class="t-num">0</span>)  xSpeed *= -<span class="t-num">1</span>;   <span class="t-com">// відскок від бічних стінок</span>
+  <span class="t-kw">if</span> (y &gt; height || y &lt; <span class="t-num">0</span>) ySpeed *= -<span class="t-num">1</span>;   <span class="t-com">// відскок від верху та низу</span>
+  <span class="t-fn">ellipse</span>(x, y, <span class="t-num">30</span>, <span class="t-num">30</span>);
+}</code></pre>
+<h3>Трохи фізики (Physics 101)</h3>
+<p>Гравітація — це прискорення, яке щокадру збільшує швидкість:</p>
+<pre class="code"><button class="copy" type="button">Копіювати</button><code>ySpeed += gravity;        <span class="t-com">// gravity = 0.2</span>
+y += ySpeed;
+<span class="t-kw">if</span> (y &gt; height) {
+  ySpeed *= -<span class="t-num">0.9</span>;         <span class="t-com">// відскок із втратою енергії</span>
+  y = height;
+}</code></pre>
+<p>📁 Скетчі: <code>skechi/L07_Vidskok</code> (відскок + гравітація), <code>skechi/L07_Knopka</code> (кнопка-перемикач)</p>
+<h2>Практика</h2>
+<p><strong>Рівень 1.</strong> Екран поділено на 4 квадрати; квадрат, над яким курсор, стає чорним.</p>
+<p><strong>Рівень 2.</strong> М'яч відскакує від стінок і змінює колір <strong>при кожному</strong> відскоку.</p>
+<p><strong>Рівень 3 (творчий).</strong> Міні-гра: ракетка внизу керується мишею, м'яч відбивається від неї; якщо м'яч падає вниз — напис «Гру закінчено».</p>
+<h2>Перевір себе</h2>
+<ol>
+<li>Чим відрізняються <code>=</code> і <code>==</code>?</li>
+<li>Запишіть умову: «x від 10 до 50 включно».</li>
+<li>Навіщо множити швидкість на −1?</li>
+<li>Як перевірити, що курсор усередині кола?</li>
+</ol></div><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L07_Knopka" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L07_Knopka</h3><details open><summary>L07_Knopka.pde · 33 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 7. Кнопка-перемикач і підсвічування при наведенні</span>
+
+<span class="t-type">int</span> bx = <span class="t-num">150</span>, by = <span class="t-num">120</span>, bw = <span class="t-num">200</span>, bh = <span class="t-num">80</span>;
+<span class="t-type">boolean</span> isOn = <span class="t-kw">false</span>;
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">500</span>, <span class="t-num">320</span>);
+  <span class="t-fn">textAlign</span>(<span class="t-fn">CENTER</span>, <span class="t-fn">CENTER</span>);
+  <span class="t-fn">textSize</span>(<span class="t-num">24</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-kw">if</span> (isOn) <span class="t-fn">background</span>(<span class="t-num">255</span>, <span class="t-num">240</span>, <span class="t-num">150</span>);
+  <span class="t-kw">else</span>      <span class="t-fn">background</span>(<span class="t-num">40</span>);
+
+  <span class="t-type">boolean</span> over = mouseX &gt; bx &amp;&amp; mouseX &lt; bx + bw &amp;&amp; mouseY &gt; by &amp;&amp; mouseY &lt; by + bh;
+
+  <span class="t-kw">if</span> (over) <span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">160</span>, <span class="t-num">0</span>);   <span class="t-com">// наведення</span>
+  <span class="t-kw">else</span>      <span class="t-fn">fill</span>(<span class="t-num">200</span>);
+  <span class="t-fn">stroke</span>(<span class="t-num">0</span>);
+  <span class="t-fn">rect</span>(bx, by, bw, bh, <span class="t-num">12</span>);
+
+  <span class="t-fn">fill</span>(<span class="t-num">0</span>);
+  <span class="t-kw">if</span> (isOn) <span class="t-fn">text</span>(<span class="t-str">"ВИМКНУТИ"</span>, bx + bw/<span class="t-num">2</span>, by + bh/<span class="t-num">2</span>);
+  <span class="t-kw">else</span>      <span class="t-fn">text</span>(<span class="t-str">"УВІМКНУТИ"</span>, bx + bw/<span class="t-num">2</span>, by + bh/<span class="t-num">2</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">mousePressed</span>() {
+  <span class="t-kw">if</span> (mouseX &gt; bx &amp;&amp; mouseX &lt; bx + bw &amp;&amp; mouseY &gt; by &amp;&amp; mouseY &lt; by + bh) {
+    isOn = !isOn;
+  }
+}</code></pre></details></div></div><div class="sk"><figure><img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/Z" alt="Результат роботи скетчу L07_Vidskok" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L07_Vidskok</h3><details open><summary>L07_Vidskok.pde · 39 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 7. М'яч відскакує від стінок і падає під дією гравітації</span>
+
+<span class="t-type">float</span> x = <span class="t-num">100</span>, y = <span class="t-num">50</span>;
+<span class="t-type">float</span> xSpeed = <span class="t-num">3</span>, ySpeed = <span class="t-num">0</span>;
+<span class="t-type">float</span> gravity = <span class="t-num">0.3</span>;
+<span class="t-type">float</span> d = <span class="t-num">40</span>;
+
+<span class="t-kw">void</span> <span class="t-fn">setup</span>() {
+  <span class="t-fn">size</span>(<span class="t-num">500</span>, <span class="t-num">400</span>);
+}
+
+<span class="t-kw">void</span> <span class="t-fn">draw</span>() {
+  <span class="t-fn">background</span>(<span class="t-num">255</span>);
+
+  ySpeed += gravity;     <span class="t-com">// гравітація збільшує швидкість падіння</span>
+  x += xSpeed;
+  y += ySpeed;
+
+  <span class="t-com">// відскок від бічних стінок</span>
+  <span class="t-kw">if</span> (x &gt; width - d/<span class="t-num">2</span> || x &lt; d/<span class="t-num">2</span>) {
+    xSpeed *= -<span class="t-num">1</span>;
+  }
+  <span class="t-com">// відскок від підлоги з втратою енергії</span>
+  <span class="t-kw">if</span> (y &gt; height - d/<span class="t-num">2</span>) {
+    y = height - d/<span class="t-num">2</span>;
+    ySpeed *= -<span class="t-num">0.85</span>;
+  }
+
+  <span class="t-fn">fill</span>(<span class="t-num">255</span>, <span class="t-num">120</span>, <span class="t-num">0</span>);
+  <span class="t-fn">ellipse</span>(x, y, d, d);
+}
+
+<span class="t-com">// Клацання — підкинути м'яч заново</span>
+<span class="t-kw">void</span> <span class="t-fn">mousePressed</span>() {
+  x = mouseX;
+  y = mouseY;
+  ySpeed = -<span class="t-num">8</span>;
+}</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-06.html"><small>← Урок 6</small>Взаємодія: миша і клавіатура</a><a class="next" href="urok-08.html"><small>Урок 8 →</small>Цикли while і for. Вкладені цикли та візерунки</a></nav>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('.copy');
+  if (!b) return;
+  var code = b.parentNode.querySelector('code');
+  function done(t) { b.textContent = t; setTimeout(function () { b.textContent = 'Копіювати'; }, 1500); }
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
+  try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
+});
+
+</script>
+</body>
+</html>
