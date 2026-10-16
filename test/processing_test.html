@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тест: Processing (9 клас)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <!-- Babel Compiler -->
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    @keyframes pulse-warning {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .timer-warning { animation: pulse-warning 0.8s infinite; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-center items-center p-3 md:p-6">
+
+  <div id="root" class="w-full max-w-3xl"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // 25 Comprehensive Questions Covering Required Topics
+    const QUESTIONS = [
+      {
+        id: 1,
+        topic: "Середовище Processing",
+        question: "Де розташована точка з координатами (0, 0) у вікні Processing?",
+        options: ["У центрі вікна", "У лівому нижньому куті", "У лівому верхньому куті", "У правому верхньому куті"],
+        correct: 2,
+        explanation: "Початок координат — лівий верхній кут; X зростає праворуч, а Y — донизу."
+      },
+      {
+        id: 2,
+        topic: "Система координат",
+        question: "Які координати має правий нижній піксель вікна size(300, 200)?",
+        options: ["(300, 200)", "(299, 199)", "(200, 300)", "(0, 200)"],
+        correct: 1,
+        explanation: "Нумерація пікселів починається з 0, тож останній піксель має координати (ширина − 1, висота − 1)."
+      },
+      {
+        id: 3,
+        topic: "Фігури",
+        question: "Що означають перші два аргументи функції ellipse(x, y, w, h) за замовчуванням?",
+        options: ["Лівий верхній кут", "Ширину і висоту", "Правий нижній кут", "Центр еліпса"],
+        correct: 3,
+        explanation: "За замовчуванням ellipseMode(CENTER): x і y задають центр еліпса."
+      },
+      {
+        id: 4,
+        topic: "Фігури",
+        question: "Яка команда змусить rect() вважати свої x і y центром прямокутника?",
+        options: ["rectMode(CENTER)", "rectMode(CORNER)", "ellipseMode(CENTER)", "center(rect)"],
+        correct: 0,
+        explanation: "rectMode(CENTER) перемикає режим, і перші два аргументи rect() стають координатами центру."
+      },
+      {
+        id: 5,
+        topic: "Порядок малювання",
+        question: "Спочатку в коді викликано rect(), потім ellipse() у тому самому місці. Що буде видно зверху?",
+        options: ["Прямокутник", "Коло", "Те, що має темніший колір", "Обидві фігури зникнуть"],
+        correct: 1,
+        explanation: "Фігури малюються в порядку рядків коду: кожна наступна лягає поверх попередньої."
+      },
+      {
+        id: 6,
+        topic: "Колір",
+        question: "Який колір дасть команда fill(255, 255, 0)?",
+        options: ["Білий", "Бірюзовий", "Жовтий", "Пурпуровий"],
+        correct: 2,
+        explanation: "На екрані світло змішується адитивно: червоний + зелений = жовтий."
+      },
+      {
+        id: 7,
+        topic: "Колір",
+        question: "Що задає четвертий аргумент у fill(255, 0, 0, 100)?",
+        options: ["Прозорість (альфа-канал)", "Товщину контуру", "Яскравість", "Насиченість"],
+        correct: 0,
+        explanation: "Четвертий аргумент — альфа: 0 — повністю прозорий, 255 — непрозорий."
+      },
+      {
+        id: 8,
+        topic: "Колір",
+        question: "Чому значення каналу кольору лежать у діапазоні від 0 до 255?",
+        options: ["Так вирішили автори Processing", "Монітор має 255 рівнів яскравості", "Це обмеження мови Java", "На один канал відводиться 1 байт (8 біт = 256 значень)"],
+        correct: 3,
+        explanation: "8 біт дають 2⁸ = 256 різних значень: від 0 до 255."
+      },
+      {
+        id: 9,
+        topic: "Змінні",
+        question: "Що виведе команда println(7 / 2);?",
+        options: ["3.5", "3", "4", "Помилку"],
+        correct: 1,
+        explanation: "Обидва числа цілі (int), тому ділення цілочисельне — дробова частина відкидається."
+      },
+      {
+        id: 10,
+        topic: "Змінні",
+        question: "Яке оголошення змінної в Processing записане правильно?",
+        options: ["int x = 10;", "x = 10", "var x := 10;", "int 10 = x;"],
+        correct: 0,
+        explanation: "У Processing (Java) спочатку вказують тип, потім назву, знак = і значення; рядок закінчується крапкою з комою."
+      },
+      {
+        id: 11,
+        topic: "setup() і draw()",
+        question: "Скільки разів виконується функція setup()?",
+        options: ["60 разів за секунду", "Після кожного клацання миші", "Один раз на початку програми", "Жодного разу, якщо є draw()"],
+        correct: 2,
+        explanation: "setup() виконується один раз під час запуску, а draw() повторюється безперервно."
+      },
+      {
+        id: 12,
+        topic: "Анімація",
+        question: "Коло не рухається, хоча в draw() є рядок x = x + 2;. Яка найімовірніша причина?",
+        options: ["Забули викликати background()", "Потрібно викликати frameRate()", "Коло не може рухатися праворуч", "Змінну float x = 0; оголошено всередині draw()"],
+        correct: 3,
+        explanation: "Локальна змінна в draw() створюється заново в кожному кадрі, тому x щоразу знову дорівнює 0."
+      },
+      {
+        id: 13,
+        topic: "Анімація",
+        question: "Що станеться, якщо прибрати background() з draw() в анімації рухомого кола?",
+        options: ["Коло залишатиме слід", "Програма не запуститься", "Коло зникне", "Фон стане чорним"],
+        correct: 0,
+        explanation: "Попередні кадри не стираються, тому кожне нове положення кола малюється поверх старих."
+      },
+      {
+        id: 14,
+        topic: "Взаємодія",
+        question: "Що зберігають системні змінні pmouseX і pmouseY?",
+        options: ["Координати миші під час останнього клацання", "Координати миші в попередньому кадрі", "Координати центру вікна", "Швидкість руху миші"],
+        correct: 1,
+        explanation: "pmouseX і pmouseY — положення курсора в попередньому кадрі; зручно для малювання неперервних ліній."
+      },
+      {
+        id: 15,
+        topic: "Взаємодія",
+        question: "Що поверне вираз map(50, 0, 100, 0, 255)?",
+        options: ["50", "127.5", "255", "100"],
+        correct: 1,
+        explanation: "50 — це середина діапазону 0…100, тож результат — середина діапазону 0…255, тобто 127.5."
+      },
+      {
+        id: 16,
+        topic: "Умови",
+        question: "Яким оператором у Processing записують логічне «І»?",
+        options: ["and", "&", "&&", "||"],
+        correct: 2,
+        explanation: "&& — логічне «І», || — логічне «АБО», ! — заперечення."
+      },
+      {
+        id: 17,
+        topic: "Умови",
+        question: "Як перевірити, що курсор знаходиться всередині кола з центром (cx, cy) і радіусом r?",
+        options: ["if (dist(mouseX, mouseY, cx, cy) < r)", "if (mouseX == cx && mouseY == cy)", "if (mouseX < r)", "if (mousePressed)"],
+        correct: 0,
+        explanation: "Точка всередині кола, якщо відстань від неї до центру менша за радіус."
+      },
+      {
+        id: 18,
+        topic: "Умови",
+        question: "Навіщо в програмі з м'ячем, що відскакує, виконують xSpeed = xSpeed * -1?",
+        options: ["Щоб зупинити м'яч", "Щоб пришвидшити м'яч удвічі", "Щоб змінити колір м'яча", "Щоб змінити напрямок руху на протилежний"],
+        correct: 3,
+        explanation: "Множення на −1 змінює знак швидкості, і м'яч починає рухатися в протилежному напрямку."
+      },
+      {
+        id: 19,
+        topic: "Цикли",
+        question: "Скільки разів виконається тіло циклу for (int i = 0; i < 10; i += 2)?",
+        options: ["10", "5", "6", "4"],
+        correct: 1,
+        explanation: "i набуває значень 0, 2, 4, 6, 8 — разом 5 повторень."
+      },
+      {
+        id: 20,
+        topic: "Випадковість",
+        question: "Чим функція noise() відрізняється від random()?",
+        options: ["noise() працює швидше", "noise() повертає лише цілі числа", "noise() дає плавну послідовність, у якій сусідні значення близькі", "Нічим не відрізняється"],
+        correct: 2,
+        explanation: "Шум Перліна змінюється плавно — ним імітують гори, хмари, природний рух; random() дає незалежні «стрибки»."
+      },
+      {
+        id: 21,
+        topic: "Функції",
+        question: "Що означає слово void перед назвою функції?",
+        options: ["Функція не повертає значення", "Функція порожня", "Функція не має параметрів", "Функцію не можна викликати"],
+        correct: 0,
+        explanation: "void означає, що функція лише виконує дії і нічого не повертає через return."
+      },
+      {
+        id: 22,
+        topic: "Об'єкти",
+        question: "Яке твердження про клас і об'єкт правильне?",
+        options: ["Клас — це екземпляр об'єкта", "Об'єкт і клас — одне й те саме", "Один клас може мати лише один об'єкт", "Клас — шаблон (формочка), а об'єкт — конкретний екземпляр, створений за ним"],
+        correct: 3,
+        explanation: "Клас описує поля й методи, а за допомогою new створюється скільки завгодно об'єктів цього класу."
+      },
+      {
+        id: 23,
+        topic: "Масиви",
+        question: "Який індекс має останній елемент масиву int[] a = new int[25];?",
+        options: ["25", "24", "26", "0"],
+        correct: 1,
+        explanation: "Індекси починаються з 0, тому останній — a.length − 1 = 24."
+      },
+      {
+        id: 24,
+        topic: "Трансформації",
+        question: "Для чого потрібні pushMatrix() і popMatrix()?",
+        options: ["Для створення масивів", "Щоб запам'ятати і відновити поточну систему координат", "Для завантаження зображень", "Щоб зупинити анімацію"],
+        correct: 1,
+        explanation: "pushMatrix() зберігає стан трансформацій, а popMatrix() повертає до нього — так трансформації не впливають на інші фігури."
+      },
+      {
+        id: 25,
+        topic: "Зображення",
+        question: "Як обчислити індекс пікселя з координатами (x, y) в одновимірному масиві pixels[] зображення img?",
+        options: ["x * y", "y + x * img.height", "x + y", "x + y * img.width"],
+        correct: 3,
+        explanation: "Пікселі записані рядок за рядком: пропускаємо y повних рядків (y * width) і додаємо x."
+      }
+    ];
+
+    const TIMER_DEFAULT = 40; // 40 seconds
+    const MAX_ATTEMPTS = 2;
+    const STORAGE_KEY = 'processing_9grade_quiz_attempts_v1';
+
+    function App() {
+      // Load stored attempt history
+      const [attempts, setAttempts] = useState(() => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      const [gameState, setGameState] = useState('welcome'); // 'welcome', 'quiz', 'results', 'locked'
+      const [currentQIndex, setCurrentQIndex] = useState(0);
+      const [userAnswers, setUserAnswers] = useState({});
+      const [timeLeft, setTimeLeft] = useState(TIMER_DEFAULT);
+      const [selectedOption, setSelectedOption] = useState(null);
+      const timerRef = useRef(null);
+
+      // Sound feedback synthesizer
+      const playBeep = (freq = 440, duration = 0.1) => {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.value = 0.08;
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + duration);
+        } catch(e){}
+      };
+
+      // Lockout check on startup
+      useEffect(() => {
+        if (attempts.length >= MAX_ATTEMPTS) {
+          setGameState('locked');
+        }
+      }, [attempts]);
+
+      useEffect(() => {
+        if (gameState === 'quiz') {
+          setTimeLeft(TIMER_DEFAULT);
+          setSelectedOption(null);
+
+          timerRef.current = setInterval(() => {
+            setTimeLeft((prev) => {
+              if (prev <= 1) {
+                clearInterval(timerRef.current);
+                handleTimeOut();
+                return 0;
+              }
+              if (prev <= 5) {
+                playBeep(650, 0.05);
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        }
+
+        return () => clearInterval(timerRef.current);
+      }, [currentQIndex, gameState]);
+
+      const handleTimeOut = () => {
+        playBeep(220, 0.3);
+        saveAnswer(null);
+      };
+
+      const saveAnswer = (optIndex) => {
+        clearInterval(timerRef.current);
+        const q = QUESTIONS[currentQIndex];
+        
+        const newAnswers = {
+          ...userAnswers,
+          [q.id]: {
+            selected: optIndex,
+            isCorrect: optIndex === q.correct,
+            timeSpent: TIMER_DEFAULT - timeLeft
+          }
+        };
+        setUserAnswers(newAnswers);
+
+        if (currentQIndex + 1 < QUESTIONS.length) {
+          setCurrentQIndex(currentQIndex + 1);
+        } else {
+          finishQuiz(newAnswers);
+        }
+      };
+
+      const handleOptionClick = (optIndex) => {
+        setSelectedOption(optIndex);
+      };
+
+      const handleNextClick = () => {
+        saveAnswer(selectedOption);
+      };
+
+      const finishQuiz = (finalAnswers) => {
+        playBeep(880, 0.3);
+        let correctCount = 0;
+        QUESTIONS.forEach(q => {
+          if (finalAnswers[q.id] && finalAnswers[q.id].isCorrect) {
+            correctCount++;
+          }
+        });
+
+        // 12-point grading scale
+        const percentage = Math.round((correctCount / QUESTIONS.length) * 100);
+        const grade12 = Math.max(1, Math.round((correctCount / QUESTIONS.length) * 12));
+
+        const newAttempt = {
+          date: new Date().toLocaleString('uk-UA'),
+          score: correctCount,
+          total: QUESTIONS.length,
+          percentage,
+          grade12,
+          answers: finalAnswers
+        };
+
+        const updatedAttempts = [...attempts, newAttempt];
+        setAttempts(updatedAttempts);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAttempts));
+
+        setGameState('results');
+      };
+
+      const startTest = () => {
+        if (attempts.length >= MAX_ATTEMPTS) {
+          setGameState('locked');
+          return;
+        }
+        setCurrentQIndex(0);
+        setUserAnswers({});
+        setGameState('quiz');
+      };
+
+      if (gameState === 'locked') {
+        return (
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xl text-center space-y-6">
+            <div className="inline-flex p-4 bg-rose-50 text-rose-600 rounded-full mb-2 border border-rose-100">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m10-7V6a2 2 0 00-2-2H6a2 2 0 00-2 2v6m16 0a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2m16 0H4"></path>
+              </svg>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">Використано всі спроби</h1>
+            <p className="text-slate-600 max-w-lg mx-auto">
+              Ви повністю використали дозволений ліміт у <span className="font-bold text-slate-900">2 спроби</span>. Повторне складання тесту заблоковано.
+            </p>
+
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+              <h3 className="font-semibold text-slate-700">Історія Ваших результатів:</h3>
+              <div className="space-y-2">
+                {attempts.map((att, idx) => (
+                  <div key={idx} className="flex justify-between items-center bg-white px-4 py-3 rounded-lg text-sm border border-slate-200 shadow-sm">
+                    <div>
+                      <span className="font-bold text-indigo-600">Спроба #{idx + 1}</span>
+                      <span className="text-slate-400 text-xs block">{att.date}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-emerald-600">{att.grade12} / 12 балів</span>
+                      <span className="text-slate-500 text-xs block">({att.score} з {att.total} відповідей, {att.percentage}%)</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-400">
+              Результати збережені у локальному сховищі браузера.
+            </div>
+          </div>
+        );
+      }
+
+      if (gameState === 'welcome') {
+        return (
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
+            <div className="text-center space-y-2">
+              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase">
+                Інформатика • 9 клас • Processing
+              </span>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                Підсумковий тест «Креативне програмування в Processing»
+              </h1>
+              <p className="text-slate-600 text-sm md:text-base max-w-xl mx-auto">
+                Теми: система координат, фігури, колір, змінні, setup()/draw(), взаємодія, умови, цикли, випадковість, функції, об'єкти, масиви, трансформації та зображення.
+              </p>
+            </div>
+
+            {/* Test Rules Banner */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center space-x-3">
+                <div className="p-2.5 bg-amber-100 text-amber-700 rounded-lg">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">Час на питання</div>
+                  <div className="text-sm font-bold text-slate-800">40 секунд</div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center space-x-3">
+                <div className="p-2.5 bg-indigo-100 text-indigo-700 rounded-lg">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">Кількість питань</div>
+                  <div className="text-sm font-bold text-slate-800">25 питань</div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center space-x-3">
+                <div className="p-2.5 bg-rose-100 text-rose-700 rounded-lg">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m10-7V6a2 2 0 00-2-2H6a2 2 0 00-2 2v6m16 0a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2m16 0H4"></path></svg>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">Ліміт спроб</div>
+                  <div className="text-sm font-bold text-rose-600">{attempts.length} з 2 використано</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Attempt history banner if 1 attempt done */}
+            {attempts.length > 0 && (
+              <div className="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4">
+                <div className="text-xs font-bold uppercase text-indigo-700 tracking-wider mb-1">Ваша перша спроба:</div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-600">{attempts[0].date}</span>
+                  <span className="font-black text-emerald-700">{attempts[0].grade12} балів ({attempts[0].percentage}%)</span>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-2">
+              <button
+                onClick={startTest}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-md shadow-indigo-200 flex justify-center items-center space-x-2"
+              >
+                <span>Розпочати спробу #{attempts.length + 1} з 2</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      if (gameState === 'quiz') {
+        const q = QUESTIONS[currentQIndex];
+        const timerPercent = (timeLeft / TIMER_DEFAULT) * 100;
+        const isTimerLow = timeLeft <= 5;
+
+        return (
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 md:p-8 shadow-xl space-y-6 relative overflow-hidden">
+            
+            {/* Header & Overall Test Progress */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-xs md:text-sm">
+                <span className="font-semibold text-slate-500">
+                  Питання <strong className="text-indigo-600">{currentQIndex + 1}</strong> з {QUESTIONS.length}
+                </span>
+                <span className="bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-md text-xs font-semibold">
+                  {q.topic}
+                </span>
+              </div>
+
+              {/* Progress bar across test */}
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+                <div 
+                  className="bg-indigo-600 h-full transition-all duration-300"
+                  style={{ width: `${((currentQIndex + 1) / QUESTIONS.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Timer Display & Countdown Bar */}
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center space-x-4">
+              <div className={`text-xl font-black font-mono px-3 py-1.5 rounded-lg border ${
+                isTimerLow 
+                  ? 'bg-rose-100 border-rose-300 text-rose-700 timer-warning' 
+                  : 'bg-amber-100 border-amber-300 text-amber-800'
+              }`}>
+                {timeLeft < 10 ? `0${timeLeft}` : timeLeft}с
+              </div>
+              <div className="flex-1">
+                <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full transition-all duration-1000 linear ${isTimerLow ? 'bg-rose-500' : 'bg-amber-500'}`}
+                    style={{ width: `${timerPercent}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Question Heading */}
+            <div className="space-y-2">
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 leading-snug">
+                {q.question}
+              </h2>
+            </div>
+
+            {/* Options List */}
+            <div className="space-y-2.5">
+              {q.options.map((opt, idx) => {
+                const isSelected = selectedOption === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleOptionClick(idx)}
+                    className={`w-full text-left p-4 rounded-xl border transition-all duration-150 flex items-start space-x-3 ${
+                      isSelected 
+                        ? 'bg-indigo-50 border-indigo-600 text-indigo-950 shadow-sm font-medium' 
+                        : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
+                    }`}
+                  >
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                      isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {String.fromCharCode(65 + idx)}
+                    </span>
+                    <span className="text-sm md:text-base leading-relaxed">{opt}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Submit / Next Button */}
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={handleNextClick}
+                disabled={selectedOption === null}
+                className={`py-3 px-6 rounded-xl font-bold transition duration-200 flex items-center space-x-2 ${
+                  selectedOption !== null 
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200' 
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                }`}
+              >
+                <span>{currentQIndex + 1 === QUESTIONS.length ? 'Завершити тест' : 'Наступне питання'}</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </button>
+            </div>
+
+          </div>
+        );
+      }
+
+      if (gameState === 'results') {
+        const lastAttempt = attempts[attempts.length - 1];
+        const isLockedNow = attempts.length >= MAX_ATTEMPTS;
+
+        return (
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
+            
+            {/* Header */}
+            <div className="text-center space-y-3 border-b border-slate-200 pb-6">
+              <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase">
+                Тестування завершено
+              </span>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-900">
+                Результат спроби #{attempts.length}
+              </h1>
+              <p className="text-slate-500 text-xs">
+                Дата та час: {lastAttempt.date}
+              </p>
+
+              {/* Score Display Card */}
+              <div className="pt-2 flex justify-center items-center">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center shadow-sm min-w-[260px]">
+                  <div className="text-slate-500 text-xs uppercase font-bold tracking-wider">Оцінка за 12-бальною шкалою</div>
+                  <div className="text-5xl font-black text-emerald-600 my-2">{lastAttempt.grade12} <span className="text-2xl text-slate-400 font-normal">/ 12</span></div>
+                  <div className="text-sm font-medium text-slate-700">
+                    Правильних відповідей: <strong className="text-slate-900">{lastAttempt.score}</strong> з {lastAttempt.total} ({lastAttempt.percentage}%)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Lock Status / Retake Banner */}
+            {isLockedNow ? (
+              <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl text-rose-800 text-sm flex items-center space-x-3">
+                <svg className="w-6 h-6 shrink-0 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <span>Ви використали максимально дозволену кількість спроб (2 з 2). Тест закрито.</span>
+              </div>
+            ) : (
+              <div className="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-indigo-900 text-sm flex items-between items-center justify-between">
+                <span>У вас залишилась ще <strong className="text-indigo-950">1 спроба</strong> для покращення результату.</span>
+                <button 
+                  onClick={startTest} 
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition shrink-0 ml-3 shadow-sm"
+                >
+                  Пройти знову (Спроба 2)
+                </button>
+              </div>
+            )}
+
+            {/* Detailed Answer Review */}
+            <div className="space-y-4 pt-2">
+              <h3 className="text-lg font-bold text-slate-900 border-b border-slate-200 pb-2">
+                Аналіз відповідей за поточну спробу:
+              </h3>
+
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                {QUESTIONS.map((q, idx) => {
+                  const ans = lastAttempt.answers[q.id];
+                  const userSel = ans ? ans.selected : null;
+                  const isCorrect = ans ? ans.isCorrect : false;
+
+                  return (
+                    <div 
+                      key={q.id} 
+                      className={`p-4 rounded-xl border text-sm space-y-2 ${
+                        isCorrect 
+                          ? 'bg-emerald-50/60 border-emerald-200' 
+                          : 'bg-rose-50/60 border-rose-200'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="font-bold text-slate-900">
+                          {idx + 1}. {q.question}
+                        </span>
+                        <span className={`px-2.5 py-0.5 rounded text-xs font-bold shrink-0 ml-2 ${
+                          isCorrect ? 'bg-emerald-200 text-emerald-900' : 'bg-rose-200 text-rose-900'
+                        }`}>
+                          {isCorrect ? 'Вірно' : 'Помилка'}
+                        </span>
+                      </div>
+
+                      <div className="text-xs space-y-1 pt-1">
+                        <div className="text-slate-600">
+                          Ваша відповідь: <span className={isCorrect ? 'text-emerald-800 font-semibold' : 'text-rose-800 font-semibold'}>
+                            {userSel !== null ? q.options[userSel] : 'Час вичерпано (немає відповіді)'}
+                          </span>
+                        </div>
+                        {!isCorrect && (
+                          <div className="text-slate-700">
+                            Правильна відповідь: <span className="text-emerald-700 font-bold">{q.options[q.correct]}</span>
+                          </div>
+                        )}
+                        <div className="text-slate-500 italic pt-1 border-t border-slate-200 mt-1">
+                          💡 {q.explanation}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
+        );
+      }
+
+      return null;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
