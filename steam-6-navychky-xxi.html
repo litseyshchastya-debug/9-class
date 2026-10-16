@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Навички XXI століття · STEAM 6</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a "quest map" — sticky XP bar, then a single reading column of stages; every info block is a light card with a dark-violet outline and a soft lifted shadow. */
+:root{
+  --bg:#f5f3fb;
+  --card:#ffffff;
+  --tint:#f1ecfc;
+  --ink:#22183a;
+  --muted:#5f5578;
+  --line:#3b1670;
+  --line-soft:#d8cdef;
+  --accent:#f26b0f;
+  --accent-soft:#fff1e6;
+  --mint:#138a5a;
+  --mint-soft:#e5f6ee;
+  --blue:#2a56d6;
+  --blue-soft:#e8eefd;
+  --bad:#c62c4a;
+  --bad-soft:#fde8ec;
+  --shadow:0 4px 0 rgba(59,22,112,.16),0 14px 30px -10px rgba(59,22,112,.35);
+  --shadow-sm:0 3px 0 rgba(59,22,112,.14),0 8px 18px -10px rgba(59,22,112,.3);
+  --f-display:"Unbounded","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --r:18px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px;
+  background-image:radial-gradient(circle at 1px 1px,rgba(59,22,112,.07) 1px,transparent 0);background-size:22px 22px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0;color:var(--ink)}
+h1{font-size:clamp(1.65rem,5.4vw,2.6rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(1.25rem,4.2vw,1.75rem);font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+b,strong{font-weight:800}
+a{color:var(--blue)}
+.wrap{max-width:860px;margin:0 auto}
+.mono{font-family:var(--f-mono)}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:1.08rem;color:var(--muted);max-width:62ch}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.grid2>*{min-width:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* buttons & inputs */
+.btn{font:800 1rem/1 var(--f-body);border:2px solid var(--line);background:var(--mint);color:#fff;padding:13px 20px;border-radius:999px;cursor:pointer;box-shadow:0 4px 0 var(--line);transition:transform .1s,box-shadow .1s;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.ghost{background:var(--card);color:var(--line)}
+.btn.orange{background:var(--accent)}
+.btn.small{padding:9px 14px;min-height:38px;font-size:.9rem}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+label{font-weight:700}
+input[type=text],select,textarea{font:600 1rem var(--f-body);color:var(--ink);background:var(--card);border:2px solid var(--line-soft);border-radius:12px;padding:12px 14px;width:100%;min-height:48px}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--line);outline:none;box-shadow:0 0 0 4px rgba(59,22,112,.12)}
+textarea{min-height:90px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--line);height:30px}
+.field{display:flex;flex-direction:column;gap:6px}
+.err{color:var(--bad);font-weight:700;font-size:.92rem;min-height:1.2em}
+
+/* header */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px))) 0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));background:rgba(245,243,251,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--line)}
+.topbar .wrap{display:flex;flex-direction:column;gap:8px}
+.tb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:800;font-size:.85rem;color:var(--line);letter-spacing:.02em}
+.who{margin-left:auto;display:flex;align-items:center;gap:8px;font-weight:800;font-size:.9rem;min-width:0}
+.who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.linkbtn{background:none;border:0;color:var(--blue);font:700 .82rem var(--f-body);cursor:pointer;text-decoration:underline;padding:4px}
+.xp{display:flex;align-items:center;gap:10px;width:100%}
+.xp-lvl{font-family:var(--f-mono);font-size:.74rem;font-weight:700;white-space:nowrap;color:var(--line)}
+.xp-bar{flex:1;height:12px;border:2px solid var(--line);border-radius:99px;background:var(--card);overflow:hidden}
+.xp-bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(-45deg,var(--accent) 0 8px,#ff9a4d 8px 16px);transition:width .5s}
+.xp-num{font-family:var(--f-mono);font-size:.78rem;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;font:700 .8rem var(--f-body);color:var(--line);text-decoration:none;border:1.5px solid var(--line-soft);background:var(--card);border-radius:99px;padding:5px 11px}
+.nav a.on{border-color:var(--line);background:var(--line);color:#fff}
+
+/* hero / login */
+.hero{padding-top:28px;display:grid;gap:22px}
+.hero-top{display:flex;flex-direction:column;gap:12px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:700 .78rem var(--f-mono);border:1.5px solid var(--line);border-radius:99px;padding:4px 10px;background:var(--card);color:var(--line)}
+.goal{padding:18px 20px;display:grid;gap:10px}
+.goal ul{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.loading{font-family:var(--f-mono);font-size:.72rem;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:8px}
+.loading i{width:110px;height:8px;border-radius:9px;border:1.5px solid var(--blue);background:linear-gradient(90deg,var(--blue) 99%,transparent 0);display:block}
+.login{padding:20px;display:grid;gap:14px}
+.login .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.welcome{padding:16px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+
+/* stages */
+.stage{padding-top:44px;display:flex;flex-direction:column;gap:16px;scroll-margin-top:120px}
+.stage-head{display:flex;flex-direction:column;gap:6px}
+
+/* expandable blocks */
+details.info{background:var(--card);border:2px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;transition:box-shadow .2s}
+details.info[open]{box-shadow:var(--shadow)}
+details.info>summary{list-style:none;cursor:pointer;padding:16px 52px 16px 18px;position:relative;display:flex;gap:14px;align-items:center;min-height:64px}
+details.info>summary::-webkit-details-marker{display:none}
+details.info>summary::after{content:"";position:absolute;right:16px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%;border:2px solid var(--line);background:var(--tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' fill='none' stroke='%233b1670' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px no-repeat;transition:transform .25s}
+details.info[open]>summary::after{transform:rotate(180deg)}
+details.info>summary:hover{background:var(--tint)}
+.sum-ic{flex:none;width:44px;height:44px;border-radius:12px;border:2px solid var(--line);display:grid;place-items:center;background:var(--tint)}
+.sum-ic svg{width:26px;height:26px}
+.sum-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sum-t small{color:var(--muted);font-weight:600;font-size:.92rem;line-height:1.35}
+.info-body{padding:4px 18px 18px;display:grid;gap:10px;border-top:2px dashed var(--line-soft);margin:0 14px;padding-inline:4px;padding-top:14px}
+.info-body ul{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.tip{background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:12px;padding:10px 12px;font-weight:600}
+.tip.mint{background:var(--mint-soft);border-color:var(--mint)}
+.tip.blue{background:var(--blue-soft);border-color:var(--blue)}
+.c-orange .sum-ic{background:var(--accent-soft);border-color:var(--accent)}
+.c-blue .sum-ic{background:var(--blue-soft);border-color:var(--blue)}
+.c-mint .sum-ic{background:var(--mint-soft);border-color:var(--mint)}
+
+/* hard vs soft */
+.hs{padding:18px;display:grid;gap:10px}
+.hs .tag{align-self:start;justify-self:start}
+.tag{font:700 .72rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;border-radius:8px;padding:4px 8px;border:1.5px solid}
+.tag.hard{color:var(--blue);border-color:var(--blue);background:var(--blue-soft)}
+.tag.soft{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-weight:700;font-size:.88rem;border-radius:99px;padding:3px 10px;background:var(--tint);border:1.5px solid var(--line-soft)}
+
+/* sorter */
+.game{padding:18px;display:grid;gap:14px}
+.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.skill-card{border:2px dashed var(--line);border-radius:16px;padding:22px 14px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:clamp(1.1rem,4.5vw,1.45rem);background:var(--tint)}
+.feedback{font-weight:700;min-height:1.5em}
+.feedback.ok{color:var(--mint)}
+.feedback.no{color:var(--bad)}
+.sort-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sort-btns .btn{width:100%}
+.btn.hard{background:var(--blue)}
+.btn.soft{background:var(--accent)}
+
+/* then / now */
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+.vs .card{padding:18px;display:grid;gap:8px}
+.vs .old{border-style:dashed}
+
+/* professions sim */
+.sim{padding:14px;display:grid;gap:14px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tab{border:2px solid var(--line-soft);background:var(--card);border-radius:14px;padding:8px 4px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font:800 .74rem/1.15 var(--f-body);color:var(--ink);text-align:center;min-height:92px}
+.tab svg{width:38px;height:38px}
+.tab .lk{font:700 .6rem var(--f-mono);color:var(--muted);letter-spacing:.06em}
+.tab[aria-selected=true]{border-color:var(--line);background:var(--tint);box-shadow:inset 0 -4px 0 var(--accent)}
+.tab.done .lk{color:var(--mint)}
+.prof{display:grid;gap:10px}
+.prof-sub{color:var(--muted);font-weight:700}
+.prof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.mini{border:2px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--card);box-shadow:var(--shadow-sm);display:grid;gap:4px}
+.mini.blue{border-color:var(--blue)}
+.mini.orange{border-color:var(--accent)}
+.mini.mint{border-color:var(--mint);background:var(--mint-soft)}
+.mini h4{margin:0;font:800 .8rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase}
+.stage3d{position:relative;width:100%;aspect-ratio:1/1;max-height:min(480px,68vh);border:2px solid var(--line);border-radius:16px;overflow:hidden;background:#eef0fb;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+@media (min-width:700px){.stage3d{aspect-ratio:16/9}}
+@media (max-width:520px){.hud .m{font-size:.74rem;padding:5px 8px}.viewbtns button{width:36px;height:36px}}
+#simCanvas{position:absolute;inset:0}
+#stage3d{scroll-margin-top:130px}
+#simCanvas canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
+.hud{position:absolute;left:10px;top:10px;right:60px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.hud .m{align-self:flex-start;background:rgba(255,255,255,.92);border:2px solid var(--line);border-radius:12px;padding:6px 10px;font-weight:800;font-size:.82rem;line-height:1.3;max-width:100%}
+.hud .m.done{border-color:var(--mint);color:var(--mint)}
+.viewbtns{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.viewbtns button{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:rgba(255,255,255,.95);font:800 1.1rem var(--f-body);color:var(--line);cursor:pointer}
+.hint{position:absolute;left:10px;bottom:10px;font:700 .7rem var(--f-mono);color:var(--line);background:rgba(255,255,255,.85);border-radius:8px;padding:3px 8px;pointer-events:none}
+.sim-fallback{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;font-weight:700;color:var(--muted)}
+.controls{display:grid;gap:12px}
+.ctl{display:grid;gap:2px}
+.ctl label{display:flex;justify-content:space-between;gap:10px;font-size:.95rem}
+.ctl label b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--line)}
+.ctl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px 18px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{border:2px solid var(--line-soft);background:var(--card);border-radius:12px;padding:6px 10px;display:flex;align-items:center;gap:6px;font:700 .85rem var(--f-body);cursor:pointer;min-height:40px;color:var(--ink)}
+.sw i{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);display:block}
+.sw[aria-pressed=true]{border-color:var(--line);background:var(--tint);box-shadow:inset 0 -3px 0 var(--accent)}
+.toggle{display:flex;align-items:center;gap:10px;font-weight:700;cursor:pointer;min-height:40px}
+.toggle input{width:22px;height:22px;accent-color:var(--line)}
+.status{font-weight:800;border-radius:12px;padding:10px 12px;border:2px solid var(--line-soft);background:var(--tint)}
+.status.ok{border-color:var(--mint);background:var(--mint-soft);color:var(--mint)}
+.status.no{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.status.warn{border-color:var(--accent);background:var(--accent-soft);color:#a3460a}
+.meter{display:grid;gap:6px}
+.meter-row{display:grid;grid-template-columns:110px 1fr 74px;gap:8px;align-items:center;font-weight:700;font-size:.88rem}
+.meter-row .bar{height:14px;border:2px solid var(--line);border-radius:99px;background:var(--card);overflow:hidden}
+.meter-row .bar i{display:block;height:100%;transition:width .3s}
+.meter-row span:last-child{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{font:700 .82rem var(--f-body);border-radius:99px;padding:4px 10px;border:1.5px solid var(--line-soft);background:var(--card)}
+.check.on{border-color:var(--mint);background:var(--mint-soft);color:var(--mint)}
+
+/* matrix */
+.tbl-wrap{overflow-x:auto;border:2px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.93rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1.5px solid var(--line-soft);vertical-align:top}
+th{font:700 .72rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--line);background:var(--tint)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:800}
+
+/* resume */
+.resume{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;align-items:start}
+.resume>*{min-width:0}
+.rform{padding:18px;display:grid;gap:12px}
+.player{padding:0;overflow:hidden}
+.player-head{display:flex;gap:14px;align-items:center;padding:16px;border-bottom:2px solid var(--line);background:var(--tint)}
+.avatar{flex:none;width:68px;height:68px;border-radius:16px;border:2px solid var(--line);display:grid;place-items:center;font:800 1.5rem var(--f-display);color:#fff;background:var(--blue)}
+.player-head .nm{font-family:var(--f-display);font-weight:700;font-size:1.05rem;overflow-wrap:anywhere}
+.player-head small{display:block;font:700 .74rem var(--f-mono);color:var(--muted);margin-top:4px}
+.player-body{padding:16px;display:grid;gap:12px}
+.player-body h4{margin:0 0 4px;font:800 .74rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--line)}
+.pbar{display:grid;grid-template-columns:1fr 46px;gap:8px;align-items:center;margin-bottom:6px}
+.pbar .t{position:relative;height:24px;border:2px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.pbar .t i{position:absolute;inset:0 auto 0 0;display:block}
+.pbar .t span{position:relative;font-weight:800;font-size:.8rem;padding-left:8px;line-height:20px;color:var(--ink)}
+.pbar b{font-family:var(--f-mono);font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums}
+.quests{white-space:pre-wrap;overflow-wrap:anywhere}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.step{padding:14px;display:grid;gap:6px;align-content:start}
+.step .n{font:800 2rem/1 var(--f-display);color:var(--accent)}
+.step:nth-child(2) .n{color:var(--blue)}
+.step:nth-child(3) .n{color:var(--mint)}
+
+/* quiz */
+.q{padding:16px;display:grid;gap:10px}
+.q-n{font:700 .72rem var(--f-mono);color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;font:700 .98rem var(--f-body);color:var(--ink);background:var(--card);border:2px solid var(--line-soft);border-radius:12px;padding:11px 14px;cursor:pointer;min-height:46px}
+.opt:hover:not([disabled]){border-color:var(--line)}
+.opt.right{border-color:var(--mint);background:var(--mint-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt[disabled]{cursor:default}
+.expl{font-weight:600;color:var(--muted)}
+
+/* final */
+.final{padding:20px;display:grid;gap:14px}
+.sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px}
+.stat{border:2px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--card)}
+.stat small{display:block;font:700 .68rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat b{font:800 1.25rem var(--f-display);font-variant-numeric:tabular-nums}
+.choice{display:flex;flex-wrap:wrap;gap:8px}
+.choice button{font:700 .9rem var(--f-body);border:2px solid var(--line-soft);background:var(--card);border-radius:99px;padding:8px 14px;cursor:pointer;color:var(--ink);min-height:40px}
+.choice button[aria-pressed=true]{border-color:var(--line);background:var(--line);color:#fff}
+.copybox{width:100%;min-height:150px;font:500 .85rem var(--f-mono)}
+footer{padding-top:40px;text-align:center;color:var(--muted);font-size:.85rem}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--line);color:#fff;font:800 .95rem var(--f-body);padding:10px 18px;border-radius:99px;box-shadow:var(--shadow);z-index:50;transition:transform .3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.show{transform:translate(-50%,0)}
+@media (max-width:420px){
+  body{font-size:16px}
+  .tab{font-size:.66rem;min-height:84px}
+  .tab svg{width:32px;height:32px}
+  .meter-row{grid-template-columns:92px 1fr 66px;font-size:.8rem}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<!-- ===== Шапка з досвідом ===== -->
+<header class="topbar" id="topbar" hidden>
+  <div class="wrap">
+    <div class="tb-row">
+      <span class="brand">STEAM · 6 клас</span>
+      <div class="who"><span id="whoName"></span><button class="linkbtn" id="logout" type="button">Змінити</button></div>
+    </div>
+    <div class="xp">
+      <span class="xp-lvl" id="lvlName">Рівень 1 · Новачок</span>
+      <div class="xp-bar" aria-hidden="true"><i id="xpFill"></i></div>
+      <span class="xp-num" id="xpNum">0 XP</span>
+    </div>
+    <nav class="nav" id="nav" aria-label="Етапи уроку">
+      <a href="#s1">Світ</a><a href="#s2">Hard &amp; Soft</a><a href="#s3">4К</a><a href="#s4">Боси</a><a href="#s5">Професії 3D</a><a href="#s6">Матриця</a><a href="#s7">Мови</a><a href="#s8">Резюме</a><a href="#s9">Тест</a><a href="#s10">Фініш</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ===== Перша сторінка: тема, мета, вхід ===== -->
+<section class="hero" id="start">
+  <div class="hero-top">
+    <div class="loading"><span>LOADING SYSTEM: 99%</span><i></i></div>
+    <span class="eyebrow">STEAM · 6 клас · Модуль «Людина – людина»</span>
+    <h1>Навички XXI століття</h1>
+    <p class="lead">Твоя дорожня карта до професій майбутнього: які навички потрібні людині сьогодні й завтра, що таке Hard skills і Soft skills, і як скласти своє перше резюме.</p>
+    <div class="badge-row"><span class="chip">Урок 8</span><span class="chip">Hard skills</span><span class="chip">Soft skills</span><span class="chip">4К</span><span class="chip">Моє перше резюме</span></div>
+  </div>
+
+  <div class="card goal">
+    <h2>Мета уроку</h2>
+    <p>Дізнатися, які навички потрібні людині XXI століття і як вони пов’язані з професіями сьогодення та майбутнього.</p>
+    <ul>
+      <li>розрізняти <b>Hard skills</b> (жорсткі навички) і <b>Soft skills</b> (м’які навички);</li>
+      <li>знати 4К-компетентності: критичне мислення, креативність, комунікацію, командну роботу;</li>
+      <li>познайомитися з чотирма STEM-професіями майбутнього та «приміряти» їх у 3D-симуляторах;</li>
+      <li>оцінити власні навички й створити своє перше резюме — «картку гравця».</li>
+    </ul>
+  </div>
+
+  <form class="card login" id="loginForm" novalidate>
+    <div>
+      <h2>Вхід у гру</h2>
+      <p class="lead">Введи свої дані, щоб зберігати досвід (XP) і в кінці показати результат учителю.</p>
+    </div>
+    <div class="row">
+      <div class="field"><label for="fName">Ім’я</label><input type="text" id="fName" autocomplete="given-name" placeholder="Наприклад, Олена" maxlength="30"></div>
+      <div class="field"><label for="fSurname">Прізвище</label><input type="text" id="fSurname" autocomplete="family-name" placeholder="Наприклад, Коваль" maxlength="30"></div>
+      <div class="field"><label for="fClass">Клас</label><input type="text" id="fClass" list="classList" placeholder="6-А" maxlength="6" autocomplete="off">
+        <datalist id="classList"><option value="6-А"><option value="6-Б"><option value="6-В"><option value="6-Г"><option value="6-Д"></datalist></div>
+    </div>
+    <p class="err" id="loginErr" role="alert"></p>
+    <div class="btn-row"><button class="btn" type="submit">Почати гру</button></div>
+  </form>
+
+  <div class="card welcome" id="welcome" hidden>
+    <div><span class="eyebrow">Гравця завантажено</span><h2 id="welcomeText">Вітаємо!</h2></div>
+    <a class="btn" href="#s1">До першого етапу</a>
+  </div>
+</section>
+
+<div id="lesson" hidden>
+
+<!-- ===== Етап 1 ===== -->
+<section class="stage" id="s1">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 1 · Розминка</span>
+    <h2>Світ оновлюється швидше за твої улюблені додатки</h2>
+    <p class="lead">Технології змінюють усе навколо щодня. Незабаром люди житимуть у розумних містах, носитимуть цифровий одяг і працюватимуть у віртуальних світах. Хто створюватиме цю нову реальність? Ти! Натискай на блоки, щоб розгорнути.</p>
+  </div>
+  <div class="stack">
+    <details class="info c-blue" data-xp="s1a">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linejoin="round"><path d="M3 21V10l5-3v14M8 21V4l7 3v14M15 21V11l6 2v8M2 21h20"/></svg></span><span class="sum-t"><h3>Розумне місто</h3><small>Місто, яке «думає» разом із людьми</small></span></summary>
+      <div class="info-body">
+        <p>Уяви: світлофор сам бачить затор і довше вмикає зелене світло. Ліхтар загоряється тільки тоді, коли поруч хтось іде. Додаток показує, через скільки хвилин приїде тролейбус, а сміттєвий бак сам повідомляє, що він повний.</p>
+        <p>Усе це працює завдяки <b>датчикам</b>, <b>інтернету речей</b> і <b>програмам</b>, які аналізують дані.</p>
+        <p class="tip blue">Хто це створює? Програмісти, інженери, урбаністи (фахівці з планування міст), аналітики даних.</p>
+      </div>
+    </details>
+    <details class="info c-orange" data-xp="s1b">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#f26b0f" stroke-width="2" stroke-linejoin="round"><path d="M8 3l-5 4 3 4 2-1v11h8V10l2 1 3-4-5-4c-1 2-5 2-8 0z"/></svg></span><span class="sum-t"><h3>Цифровий і розумний одяг</h3><small>Куртка, яка гріє сама</small></span></summary>
+      <div class="info-body">
+        <p>Вже існують куртки з підігрівом, які керуються через смартфон, кросівки, що рахують кроки, і футболки, які вимірюють пульс спортсмена.</p>
+        <p>А ще є <b>цифровий одяг</b> — вбрання для аватарів в іграх і соцмережах. Його малюють дизайнери, а люди купують його за справжні гроші!</p>
+        <p class="tip">Цікаво: у такому одязі поєднуються хімія (нові тканини), фізика (електрика, тепло) і мистецтво (стиль).</p>
+      </div>
+    </details>
+    <details class="info c-mint" data-xp="s1c">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#138a5a" stroke-width="2" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="4"/><circle cx="8" cy="12" r="2.2"/><circle cx="16" cy="12" r="2.2"/></svg></span><span class="sum-t"><h3>Робота у віртуальних світах</h3><small>Окуляри VR — це вже не тільки ігри</small></span></summary>
+      <div class="info-body">
+        <p>Лікарі тренуються робити операції у віртуальній реальності. Архітектори «гуляють» будинком ще до того, як його збудують. Пілоти вчаться на тренажерах, а школярі відвідують музеї світу, не виходячи з класу.</p>
+        <p class="tip mint">Багато сьогоднішніх школярів працюватимуть за професіями, яких ще навіть не існує. Тому важливо не лише знати факти, а й уміти вчитися новому.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Етап 2 ===== -->
+<section class="stage" id="s2">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 2 · Анатомія навичок</span>
+    <h2>З чого складається твій персонаж?</h2>
+    <p class="lead">Уяви, що ти — робот. У кожного робота є «залізо» і «операційна система». У людини так само: є жорсткі навички і м’які навички.</p>
+  </div>
+  <div class="grid2">
+    <div class="card hs">
+      <span class="tag hard">Hard skills · жорсткі навички</span>
+      <h3>Твоє «залізо»</h3>
+      <p>Те, що можна чітко виміряти, вивчити за підручником і перевірити на іспиті.</p>
+      <div class="pills"><span class="pill">Математика</span><span class="pill">Програмування</span><span class="pill">Фізика</span><span class="pill">Шиття</span><span class="pill">Креслення</span></div>
+    </div>
+    <div class="card hs">
+      <span class="tag soft">Soft skills · м’які навички</span>
+      <h3>Твоя «операційна система»</h3>
+      <p>Те, як ти взаємодієш з іншими та орієнтуєшся у світі. Без неї навіть найкраще «залізо» не працює.</p>
+      <div class="pills"><span class="pill">Вміння дружити</span><span class="pill">Вирішувати конфлікти</span><span class="pill">Домовлятися</span><span class="pill">Адаптуватися</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <details class="info c-blue" data-xp="s2a">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span><span class="sum-t"><h3>Як відрізнити Hard від Soft?</h3><small>Простий тест із двох питань</small></span></summary>
+      <div class="info-body">
+        <p><b>Питання 1.</b> Чи можна поставити за цю навичку оцінку після контрольної? Якщо так — це, найімовірніше, <b>Hard skill</b>. Наприклад, розв’язати рівняння або написати програму.</p>
+        <p><b>Питання 2.</b> Чи видно цю навичку лише тоді, коли ти поруч з іншими людьми? Тоді це <b>Soft skill</b>. Наприклад, вислухати друга, помиритися після сварки, підтримати команду.</p>
+        <p class="tip blue">Hard skills відповідають на питання «Що я вмію робити?», а Soft skills — «Як я це роблю разом з іншими?»</p>
+      </div>
+    </details>
+    <details class="info c-orange" data-xp="s2b">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#f26b0f" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/></svg></span><span class="sum-t"><h3>Чому потрібні обидві?</h3><small>Історія про геніального програміста</small></span></summary>
+      <div class="info-body">
+        <p>Максим — найкращий програміст у школі. Він написав чудову гру, але не зміг пояснити команді, як вона працює, посварився з дизайнеркою і не встиг до дедлайну. Гру так ніхто й не побачив.</p>
+        <p>Соня програмує трохи гірше, зате вміє слухати, домовлятися і розподіляти завдання. Її команда випустила гру вчасно, і вона перемогла на конкурсі.</p>
+        <p class="tip">Висновок: Hard skills відкривають двері в професію, а Soft skills допомагають у ній досягти успіху. Найсильніші герої прокачують обидва види.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="card game" id="sorter">
+    <div class="game-top"><h3>Міні-гра «Сортувальник навичок»</h3><span class="chip" id="sortProg">1 / 12</span></div>
+    <p>Визнач, до якого виду належить навичка. За кожну правильну відповідь отримаєш +5 XP.</p>
+    <div class="skill-card" id="sortSkill" aria-live="polite">Програмування</div>
+    <div class="sort-btns"><button class="btn hard" type="button" data-ans="H">Hard skill</button><button class="btn soft" type="button" data-ans="S">Soft skill</button></div>
+    <p class="feedback" id="sortFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- ===== Етап 3 ===== -->
+<section class="stage" id="s3">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 3 · Суперсили</span>
+    <h2>Магія 4К-компетентностей</h2>
+    <p class="lead">Учені та вчителі з усього світу називають чотири головні навички XXI століття. Вони починаються на літеру «К», тому їх і називають 4К. Відкрий кожну суперсилу.</p>
+  </div>
+  <div class="stack">
+    <details class="info c-orange" data-xp="s3a">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#f26b0f" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg></span><span class="sum-t"><h3>Критичне мислення</h3><small>Фільтруй інформацію, відсіюй фейки, шукай справжню причину проблеми</small></span></summary>
+      <div class="info-body">
+        <p>Критичне мислення — це вміння не вірити всьому одразу, а перевіряти. Як детектив: шукаєш докази і робиш висновки.</p>
+        <p><b>Приклад.</b> У відео пишуть: «Вчені довели: хто їсть шоколад, той розумніший!» Критичний мислитель питає: «Які саме вчені? Де дослідження? Хто зняв це відео і навіщо?»</p>
+        <ul><li>Питай: «Звідки це відомо?»</li><li>Шукай щонайменше два незалежні джерела.</li><li>Відрізняй факт («вода кипить при 100 °C») від думки («літо — найкраща пора року»).</li></ul>
+        <p class="tip">Де знадобиться: журналіст, лікар, науковець, аналітик даних, кібер-детектив.</p>
+      </div>
+    </details>
+    <details class="info c-blue" data-xp="s3b">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span><span class="sum-t"><h3>Креативність</h3><small>Вигадуй те, чого ще не існує. Створюй нові світи та нестандартні рішення</small></span></summary>
+      <div class="info-body">
+        <p>Креативність — це не тільки малювання. Це вміння знайти незвичайний вихід із будь-якої ситуації: у математиці, у грі, у науці.</p>
+        <p><b>Спробуй.</b> Назви за 1 хвилину 10 способів використати звичайну канцелярську скріпку. Перші 3–4 ідеї прийдуть легко, а найцікавіші з’являються саме після них!</p>
+        <ul><li>Став питання «А що, якби…?»</li><li>Поєднуй непоєднуване: «рюкзак + сонячна батарея = ?»</li><li>Не бійся «дивних» ідей: з них народжуються винаходи.</li></ul>
+        <p class="tip blue">Де знадобиться: дизайнер, інженер-винахідник, розробник ігор, архітектор.</p>
+      </div>
+    </details>
+    <details class="info c-mint" data-xp="s3c">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#138a5a" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span><span class="sum-t"><h3>Комунікація</h3><small>Чітко передавай свої ідеї так, щоб інші тебе зрозуміли і захотіли слухати</small></span></summary>
+      <div class="info-body">
+        <p>Комунікація — це вміння говорити, писати і, що дуже важливо, <b>слухати</b>. Навіть найкраща ідея нічого не варта, якщо ніхто її не зрозумів.</p>
+        <p><b>Тренування.</b> Поясни молодшому братові чи сестрі правила своєї улюбленої гри за 1 хвилину. Чи зрозумів(-ла) він(вона) з першого разу?</p>
+        <ul><li>Говори коротко і по суті.</li><li>Дивись на співрозмовника, не перебивай.</li><li>Перепитуй: «Я правильно тебе зрозумів?»</li></ul>
+        <p class="tip mint">Де знадобиться: психолог, вчитель, менеджер проєктів, блогер, лікар.</p>
+      </div>
+    </details>
+    <details class="info c-blue" data-xp="s3d">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M12 20c0-3 2-5 4-5s6 2 6 5"/></svg></span><span class="sum-t"><h3>Командна робота</h3><small>Об’єднуй зусилля: жоден великий проєкт майбутнього не створити наодинці</small></span></summary>
+      <div class="info-body">
+        <p>Космічну ракету будують тисячі людей, а мобільну гру — десятки. Кожен робить свою частину, і всі разом досягають мети.</p>
+        <p><b>Ролі в команді:</b></p>
+        <ul><li><b>Генератор ідей</b> — придумує нове;</li><li><b>Організатор</b> — стежить за планом і часом;</li><li><b>Виконавець</b> — перетворює ідеї на результат;</li><li><b>Критик-перевіряльник</b> — шукає помилки, щоб їх виправити вчасно.</li></ul>
+        <p class="tip blue">Подумай: яку роль ти найчастіше виконуєш у груповій роботі на уроках?</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Етап 4 ===== -->
+<section class="stage" id="s4">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 4 · Ринок праці</span>
+    <h2>Чого хочуть сучасні боси?</h2>
+  </div>
+  <div class="vs">
+    <div class="card old"><span class="tag hard">Раніше</span><h3>Тільки Hard skills</h3><p>Роботодавцям потрібні були «живі калькулятори» — люди, які просто виконують інструкцію від А до Я.</p></div>
+    <div class="card"><span class="tag soft">Тепер</span><h3>Адаптація та ідеї</h3><p>Для рутини є справжні роботи. Потрібні ті, хто вміє мислити, домовлятися, помилятися, робити висновки і створювати нове.</p></div>
+  </div>
+  <div class="stack">
+    <details class="info c-blue" data-xp="s4a">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9 16h6"/></svg></span><span class="sum-t"><h3>Що вже вміють роботи і програми?</h3><small>Рутина переходить до машин</small></span></summary>
+      <div class="info-body">
+        <ul><li>сортувати мільйони посилок на складах;</li><li>рахувати швидше за будь-яку людину;</li><li>перекладати тексти і розпізнавати голос;</li><li>збирати автомобілі на конвеєрі.</li></ul>
+        <p>Усе, що можна описати чіткою інструкцією, машина зробить швидко і без втоми.</p>
+      </div>
+    </details>
+    <details class="info c-orange" data-xp="s4b">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#f26b0f" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg></span><span class="sum-t"><h3>Чого машини поки не вміють?</h3><small>Тут потрібна саме людина</small></span></summary>
+      <div class="info-body">
+        <ul><li>щиро співчувати і підтримувати;</li><li>придумувати те, чого ще ніколи не було;</li><li>домовлятися з людьми, у яких різні думки;</li><li>відповідати за свої рішення.</li></ul>
+        <p class="tip">Саме тому Soft skills стають такими цінними: їх найважче замінити.</p>
+      </div>
+    </details>
+    <details class="info c-mint" data-xp="s4c">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#138a5a" stroke-width="2" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-5l2-2v6h-6l2-2a5 5 0 1 0 1 6"/></svg></span><span class="sum-t"><h3>Слово дня: адаптивність</h3><small>Як герой гри на новому рівні</small></span></summary>
+      <div class="info-body">
+        <p><b>Адаптивність</b> — це вміння швидко пристосовуватися до змін. Коли в грі відкривається новий рівень, правила трохи змінюються, і ти вчишся заново. У житті так само: з’являються нові програми, гаджети і професії.</p>
+        <p class="tip mint">Головна навичка майбутнього — <b>вміння вчитися</b>. Хто вміє вчитися, той завжди знайде своє місце.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Етап 5: 3D-симулятори ===== -->
+<section class="stage" id="s5">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 5 · Професії майбутнього</span>
+    <h2>Обери свій клас у світі STEM</h2>
+    <p class="lead">Де ти застосуєш свої навички (Science, Technology, Engineering, Arts, Mathematics)? Розблокуй чотири професії майбутнього і виконай місію в 3D-симуляторі кожної. За місію +30 XP.</p>
+  </div>
+  <div class="card sim">
+    <div class="tabs" role="tablist" aria-label="Професії">
+      <button class="tab" role="tab" type="button" data-sim="arm" aria-selected="true">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#3b1670" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 30h12l4-4h6l5-5M22 26l3 5h7M28 21l4-6M24 21l2-7"/><circle cx="18" cy="30" r="2"/></svg>
+        Біомедичний інженер<span class="lk" data-lk="arm">МІСІЯ</span></button>
+      <button class="tab" role="tab" type="button" data-sim="vr" aria-selected="false">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#3b1670" stroke-width="2.2" stroke-linejoin="round"><path d="M20 6l12 7v14l-12 7-12-7V13z"/><path d="M8 13l12 7 12-7M20 20v14"/></svg>
+        VR-розробник<span class="lk" data-lk="vr">МІСІЯ</span></button>
+      <button class="tab" role="tab" type="button" data-sim="eco" aria-selected="false">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#3b1670" stroke-width="2.2" stroke-linejoin="round"><path d="M10 34V14l10-6 10 6v20zM15 18h4M21 18h4M15 24h4M21 24h4M17 34v-5h6v5"/><path d="M30 8l4-2M32 12h4"/></svg>
+        Еко-архітектор<span class="lk" data-lk="eco">МІСІЯ</span></button>
+      <button class="tab" role="tab" type="button" data-sim="fashion" aria-selected="false">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#3b1670" stroke-width="2.2" stroke-linejoin="round"><path d="M14 6l-8 6 3 6 3-2v18h16V16l3 2 3-6-8-6c-2 3-8 3-10 0z"/><path d="M20 10v24M16 22h-2M26 22h-2"/></svg>
+        Техно-дизайнер<span class="lk" data-lk="fashion">МІСІЯ</span></button>
+    </div>
+    <div class="prof" id="profInfo"></div>
+    <div class="stage3d" id="stage3d">
+      <div id="simCanvas"></div>
+      <div class="hud"><span class="m" id="simMission">Місія</span></div>
+      <div class="viewbtns"><button type="button" id="zIn" aria-label="Наблизити">+</button><button type="button" id="zOut" aria-label="Віддалити">−</button><button type="button" id="zReset" aria-label="Скинути вигляд">↺</button></div>
+      <span class="hint">Тягни вбік, щоб обертати</span>
+    </div>
+    <div class="controls" id="simControls"></div>
+    <p class="status" id="simStatus" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- ===== Етап 6 ===== -->
+<section class="stage" id="s6">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 6 · Порівняння</span>
+    <h2>Матриця скілів: обери свій шлях</h2>
+    <p class="lead">Порівняй професії: яка сфера, яка наука і яка м’яка навичка у кожної головні. На телефоні таблицю можна гортати вбік.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Професія</th><th>Сфера</th><th>Головна наука</th><th>Головний Soft skill</th><th>Результат</th></tr></thead>
+      <tbody>
+        <tr><td>Біомедичний інженер</td><td>Тіло людини</td><td>Біологія + Фізика</td><td>Емпатія</td><td>Кібер-протези</td></tr>
+        <tr><td>VR-розробник</td><td>Цифровий світ</td><td>Код + Геометрія</td><td>Сторітелінг</td><td>Віртуальні світи</td></tr>
+        <tr><td>Еко-архітектор</td><td>Довкілля</td><td>Географія + Фізика</td><td>Турбота про природу</td><td>Розумні будинки</td></tr>
+        <tr><td>Техно-дизайнер</td><td>Одяг та мода</td><td>Хімія матеріалів</td><td>Відчуття стилю</td><td>Розумні куртки</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== Етап 7 ===== -->
+<section class="stage" id="s7">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 7 · Секретний артефакт</span>
+    <h2>Універсальний ключ для всіх STEM-героїв</h2>
+  </div>
+  <div class="card goal">
+    <h3>Найбільша таємниця успіху: українська та іноземна мови</h3>
+    <p>Навіщо? Навіть найрозумніший інженер має вміти чітко презентувати свій винахід, написати про нього статтю або домовитися з колегами. <b>Без мови твій геніальний винахід назавжди залишиться в шухляді!</b></p>
+  </div>
+  <div class="stack">
+    <details class="info c-blue" data-xp="s7a">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linejoin="round"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg></span><span class="sum-t"><h3>Українська мова</h3><small>Твій інструмент, щоб тебе почули</small></span></summary>
+      <div class="info-body">
+        <p>Грамотний лист, зрозуміла інструкція, яскрава презентація проєкту — усе це потребує вміння добре говорити і писати рідною мовою.</p>
+        <p class="tip blue">Порада: коли готуєш виступ, перевір, чи можна пояснити головну думку одним реченням.</p>
+      </div>
+    </details>
+    <details class="info c-orange" data-xp="s7b">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#f26b0f" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span class="sum-t"><h3>Іноземна мова</h3><small>Ключ до міжнародних команд</small></span></summary>
+      <div class="info-body">
+        <p>Науковці, програмісти й інженери з різних країн працюють в одних командах. Більшість інструкцій до нових технологій пишуть англійською.</p>
+        <p>Навіть мови програмування складаються з англійських слів: <span class="mono">if</span> (якщо), <span class="mono">for</span> (для), <span class="mono">print</span> (надрукувати), <span class="mono">while</span> (поки).</p>
+      </div>
+    </details>
+    <details class="info c-mint" data-xp="s7c">
+      <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#138a5a" stroke-width="2" stroke-linecap="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span><span class="sum-t"><h3>Бонус: мова формул і коду</h3><small>Мова, яку розуміють і люди, і машини</small></span></summary>
+      <div class="info-body">
+        <p>Математика і програмування — теж мови. Формула <span class="mono">S = v · t</span> однаково зрозуміла і в Києві, і в Токіо. А код однаково виконає комп’ютер у будь-якій країні.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Етап 8 ===== -->
+<section class="stage" id="s8">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 8 · Практика</span>
+    <h2>Твоє перше резюме: картка гравця</h2>
+    <p class="lead">Резюме — це не нудний дорослий документ. Це візитка героя, де ти показуєш свої унікальні суперсили.</p>
+  </div>
+  <details class="info c-blue" data-xp="s8a">
+    <summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M8 16h8M9 13.5c1-1 5-1 6 0"/></svg></span><span class="sum-t"><h3>З чого складається резюме?</h3><small>Шість розділів картки гравця</small></span></summary>
+    <div class="info-body">
+      <ul>
+        <li><b>Ім’я та фото (аватар)</b> — хто ти;</li>
+        <li><b>Мета</b> — ким хочеш стати або чого хочеш навчитися;</li>
+        <li><b>Досвід (квести)</b> — шкільні проєкти, гуртки, спорт, конкурси, волонтерство;</li>
+        <li><b>Навички</b> — Hard і Soft skills з рівнем прокачки;</li>
+        <li><b>Мови</b> — які мови знаєш і на якому рівні;</li>
+        <li><b>Хобі</b> — що тобі цікаво у вільний час.</li>
+      </ul>
+      <p class="tip">Головні правила: будь чесним, пиши конкретно («переміг у шкільній олімпіаді з математики», а не «я розумний») і коротко.</p>
+    </div>
+  </details>
+  <div class="steps">
+    <div class="card step"><span class="n">1</span><p><b>Крок 1:</b> Проаналізуй свої характеристики — твої реальні Hard і Soft skills на сьогодні.</p></div>
+    <div class="card step"><span class="n">2</span><p><b>Крок 2:</b> Обери професію мрії і подивись, які шкільні предмети треба прокачати.</p></div>
+    <div class="card step"><span class="n">3</span><p><b>Крок 3:</b> Заповни шаблон свого першого резюме-профілю.</p></div>
+  </div>
+  <div class="resume">
+    <form class="card rform" id="resumeForm" novalidate>
+      <h3>Заповни картку</h3>
+      <div class="field"><label for="rDream">Професія мрії</label>
+        <select id="rDream">
+          <option value="arm">Біомедичний інженер</option>
+          <option value="vr" selected>VR-розробник</option>
+          <option value="eco">Еко-архітектор</option>
+          <option value="fashion">Техно-дизайнер одягу</option>
+          <option value="psy">Психолог</option>
+          <option value="other">Інша професія</option>
+        </select></div>
+      <div class="field" id="rOtherWrap" hidden><label for="rOther">Яка саме?</label><input type="text" id="rOther" maxlength="40" placeholder="Наприклад, програміст дронів"></div>
+      <div class="field"><label for="rQuests">Досвід (квести) <small style="font-weight:600;color:var(--muted)">— приклад, заміни на свій</small></label>
+        <textarea id="rQuests" maxlength="400">Участь у шкільному проєкті «Україна – країна моєї мрії»
+Гурток робототехніки
+Футбол, 2 роки</textarea></div>
+      <div class="ctl"><label for="rCre">Креативність <b id="rCreV">80%</b></label><input type="range" id="rCre" min="0" max="100" step="10" value="80"></div>
+      <div class="ctl"><label for="rTeam">Командна робота <b id="rTeamV">60%</b></label><input type="range" id="rTeam" min="0" max="100" step="10" value="60"></div>
+      <div class="ctl"><label for="rCrit">Критичне мислення <b id="rCritV">50%</b></label><input type="range" id="rCrit" min="0" max="100" step="10" value="50"></div>
+      <div class="ctl"><label for="rCom">Комунікація <b id="rComV">70%</b></label><input type="range" id="rCom" min="0" max="100" step="10" value="70"></div>
+      <div class="ctl"><label for="rEng">Англійська <b id="rEngV">30%</b></label><input type="range" id="rEng" min="0" max="100" step="10" value="30"></div>
+      <div class="field"><label for="rHobby">Хобі</label><input type="text" id="rHobby" maxlength="80" value="Малювання, Minecraft, велосипед"></div>
+      <div class="btn-row"><button class="btn" type="button" id="rCopy">Скопіювати резюме</button></div>
+    </form>
+    <div class="card player" aria-live="polite">
+      <div class="player-head"><div class="avatar" id="pAva">?</div><div><div class="nm" id="pName">Ім’я гравця</div><small id="pLvl">Поточний рівень: Учень 6 класу</small></div></div>
+      <div class="player-body">
+        <div><h4>Мета</h4><p id="pGoal"></p></div>
+        <div><h4>Досвід (квести)</h4><p class="quests" id="pQuests"></p></div>
+        <div><h4>Навички (прогрес)</h4><div id="pBars"></div></div>
+        <div><h4>Предмети для прокачки</h4><div class="pills" id="pSubj"></div></div>
+        <div><h4>Хобі</h4><p id="pHobby"></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Етап 9 ===== -->
+<section class="stage" id="s9">
+  <div class="stage-head">
+    <span class="eyebrow">Етап 9 · Бос-рівень</span>
+    <h2>Перевір себе</h2>
+    <p class="lead">7 запитань. За кожну правильну відповідь +10 XP. Відповідь можна дати лише один раз, тож подумай!</p>
+  </div>
+  <div class="stack" id="quiz"></div>
+</section>
+
+<!-- ===== Фініш ===== -->
+<section class="stage" id="s10">
+  <div class="stage-head">
+    <span class="eyebrow">Фініш · Рефлексія</span>
+    <h2>Твій шлях тільки починається</h2>
+    <p class="lead">Школа — це не просто уроки. Це тренувальний табір, де математика, біологія, мистецтво та мови перетворюються на інструменти для створення майбутнього.</p>
+  </div>
+  <div class="card final">
+    <h3>Яку навичку почнеш прокачувати сьогодні?</h3>
+    <div class="choice" id="refSkill">
+      <button type="button" aria-pressed="false">Критичне мислення</button><button type="button" aria-pressed="false">Креативність</button><button type="button" aria-pressed="false">Комунікацію</button><button type="button" aria-pressed="false">Командну роботу</button><button type="button" aria-pressed="false">Іноземну мову</button><button type="button" aria-pressed="false">Програмування</button>
+    </div>
+    <h3>Як тобі урок?</h3>
+    <div class="choice" id="refMood">
+      <button type="button" aria-pressed="false">Усе зрозуміло, було цікаво</button><button type="button" aria-pressed="false">Цікаво, але є питання</button><button type="button" aria-pressed="false">Було складно</button>
+    </div>
+    <h3>Твій результат</h3>
+    <div class="sumgrid">
+      <div class="stat"><small>Гравець</small><b id="fName2">—</b></div>
+      <div class="stat"><small>Досвід</small><b id="fXP">0 XP</b></div>
+      <div class="stat"><small>Тест</small><b id="fQuiz">0 / 7</b></div>
+      <div class="stat"><small>Сортувальник</small><b id="fSort">0 / 12</b></div>
+      <div class="stat"><small>Місії 3D</small><b id="fMis">0 / 4</b></div>
+    </div>
+    <label for="fReport">Звіт для вчителя</label>
+    <textarea class="copybox" id="fReport" readonly></textarea>
+    <div class="btn-row"><button class="btn orange" type="button" id="fCopy">Скопіювати звіт</button></div>
+  </div>
+</section>
+
+<footer>STEAM · 6 клас · Міжгалузевий інтегрований курс «STEM 5–6» · Тема «Навички людини XXI століття»</footer>
+</div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+
+/* ---------- стан учня ---------- */
+let student=store.get("steam6.student",null);
+let prog=null;
+const freshProg=()=>({xp:0,done:{},missions:{},quiz:{},sortOk:0,sortN:0,skill:"",mood:""});
+const progKey=()=>"steam6.prog."+student.name+"|"+student.surname+"|"+student.cls;
+const save=()=>{if(student)store.set(progKey(),prog)};
+const LEVELS=["Новачок","Дослідник","Винахідник","Інженер","STEM-герой"];
+function renderXP(){
+  const lvl=Math.min(LEVELS.length-1,Math.floor(prog.xp/100));
+  const inLvl=lvl===LEVELS.length-1?100:prog.xp%100;
+  $("#xpFill").style.width=inLvl+"%";
+  $("#xpNum").textContent=prog.xp+" XP";
+  $("#lvlName").textContent="Рівень "+(lvl+1)+" · "+LEVELS[lvl];
+  renderFinal();
+}
+let toastT=0;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1800)}
+function addXP(n,id,msg){
+  if(!prog)return;
+  if(id){if(prog.done[id])return;prog.done[id]=1}
+  prog.xp+=n;renderXP();save();toast((msg?msg+" ":"")+"+"+n+" XP");
+}
+
+/* ---------- вхід ---------- */
+function startLesson(){
+  prog=Object.assign(freshProg(),store.get(progKey(),{}));
+  $("#loginForm").hidden=true;
+  $("#welcome").hidden=false;
+  $("#welcomeText").textContent="Вітаємо, "+student.name+"! Клас "+student.cls;
+  $("#topbar").hidden=false;
+  $("#lesson").hidden=false;
+  $("#whoName").textContent=student.name+" "+student.surname.charAt(0)+". · "+student.cls;
+  renderXP();
+  restoreUI();
+  updateResume();
+  initSims();
+}
+$("#loginForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("#fName").value.trim(),surname=$("#fSurname").value.trim();
+  let cls=$("#fClass").value.trim().toUpperCase().replace(/\s+/g,"").replace(/[–—]/g,"-");
+  const err=$("#loginErr");
+  if(name.length<2){err.textContent="Введи своє ім’я (щонайменше 2 літери).";$("#fName").focus();return}
+  if(surname.length<2){err.textContent="Введи своє прізвище.";$("#fSurname").focus();return}
+  const m=cls.match(/^(\d{1,2})-?([А-ЯІЇЄҐA-Z])?$/);
+  if(!m){err.textContent="Клас запиши так: 6-А.";$("#fClass").focus();return}
+  cls=m[1]+(m[2]?"-"+m[2]:"");
+  err.textContent="";
+  student={name,surname,cls};
+  store.set("steam6.student",student);
+  startLesson();
+  setTimeout(()=>$("#s1").scrollIntoView({behavior:"smooth"}),150);
+});
+$("#logout").addEventListener("click",()=>{
+  store.del("steam6.student");
+  $("#fName").value=student?student.name:"";$("#fSurname").value=student?student.surname:"";$("#fClass").value=student?student.cls:"";
+  student=null;prog=null;
+  $("#loginForm").hidden=false;$("#welcome").hidden=true;$("#topbar").hidden=true;$("#lesson").hidden=true;
+  window.scrollTo(0,0);
+});
+
+/* ---------- розгортальні блоки ---------- */
+$$("details.info").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)addXP(5,"open-"+d.dataset.xp,"Нове знання!")}));
+
+/* ---------- навігація ---------- */
+const navLinks=$$("#nav a");
+const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){navLinks.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+en.target.id));const on=navLinks.find(a=>a.classList.contains("on"));if(on){const n=$("#nav");n.scrollTo({left:on.offsetLeft-n.clientWidth/2+on.clientWidth/2,behavior:"smooth"})}}})},{rootMargin:"-45% 0px -50% 0px"});
+$$(".stage").forEach(s=>io.observe(s));
+
+/* ---------- сортувальник ---------- */
+const SKILLS=[["Програмування","H","Це вміння можна вивчити і перевірити тестом."],["Емпатія","S","Емпатія — це вміння відчути, що переживає інша людина."],["Математика","H","Математичні знання перевіряють контрольною."],["Вміння домовлятися","S","Видно лише у спілкуванні з людьми."],["3D-моделювання","H","Це конкретне технічне вміння в програмі."],["Адаптивність","S","Це вміння пристосовуватися до змін."],["Фізика","H","Шкільний предмет, знання з якого можна виміряти."],["Робота в команді","S","Проявляється тільки разом з іншими."],["Граматика англійської","H","Правила граматики вивчають і перевіряють тестом."],["Вирішення конфліктів","S","Це про стосунки між людьми."],["Сторітелінг","S","Вміння цікаво розповідати історії, щоб захопити слухачів."],["Креслення","H","Технічне вміння за чіткими правилами."]];
+let sIdx=0,sOk=0,sLock=false;
+function showSkill(){
+  if(sIdx>=SKILLS.length){
+    $("#sortSkill").textContent="Результат: "+sOk+" з "+SKILLS.length;
+    $("#sortProg").textContent="Готово";
+    $$("#sorter [data-ans]").forEach(b=>b.disabled=true);
+    $("#sortFb").className="feedback ok";
+    $("#sortFb").innerHTML=(sOk>=10?"Чудово! Ти справжній знавець навичок. ":"Непогано! Перечитай блоки вище і спробуй ще. ")+'<button class="btn small ghost" type="button" id="sortAgain">Грати ще</button>';
+    $("#sortAgain").onclick=()=>{sIdx=0;sOk=0;$$("#sorter [data-ans]").forEach(b=>b.disabled=false);$("#sortFb").textContent="";showSkill()};
+    if(prog){prog.sortOk=Math.max(prog.sortOk,sOk);prog.sortN=SKILLS.length;save();renderFinal()}
+    return;
+  }
+  $("#sortSkill").textContent=SKILLS[sIdx][0];
+  $("#sortProg").textContent=(sIdx+1)+" / "+SKILLS.length;
+}
+$$("#sorter [data-ans]").forEach(b=>b.addEventListener("click",()=>{
+  if(sLock||sIdx>=SKILLS.length)return;
+  const [nm,ans,why]=SKILLS[sIdx];const ok=b.dataset.ans===ans;
+  const fb=$("#sortFb");fb.className="feedback "+(ok?"ok":"no");
+  fb.textContent=(ok?"Правильно! ":"Не зовсім: це "+(ans==="H"?"Hard":"Soft")+" skill. ")+why;
+  if(ok){sOk++;addXP(5,"sort-"+nm)}
+  sLock=true;setTimeout(()=>{sLock=false;sIdx++;showSkill()},ok?900:1700);
+}));
+showSkill();
+
+/* ---------- професії: дані ---------- */
+const PROF={
+  arm:{t:"Біомедичний інженер",s:"Інженер медичних роботів",d:"Створює штучні кібер-руки та ноги, які керуються силою думки, а також роботів-хірургів для лікарень.",
+    hard:"Фізика, Біологія, Інформатика, Математика",soft:"Емпатія, Творчість",subj:["Біологія","Фізика","Математика","Інформатика"],
+    how:"На шкірі руки є датчики, які «чують» слабкі електричні сигнали м’язів, коли людина думає про рух. Мікрокомп’ютер перетворює ці сигнали на команди для моторчиків у пальцях. Інженер має налаштувати силу так, щоб протез міг і втримати чашку, і не розчавити її.",
+    mission:"Місія: підніми чашку кібер-рукою і не розчав її"},
+  vr:{t:"Архітектор віртуальних світів",s:"VR-розробник",d:"Будує цілі цифрові світи у віртуальній реальності: від ігор (як Minecraft та Fortnite) до віртуальних шкіл і музеїв.",
+    hard:"Інформатика, Геометрія",soft:"Сторітелінг, Розуміння гравця",subj:["Інформатика","Геометрія","Мистецтво"],
+    how:"Будь-який 3D-світ складається з об’єктів, у кожного є координати x, y, z, як у математиці. Розробник розставляє об’єкти, задає їм кольори, світло і правила поведінки, а потім продумує історію, щоб гравцю було цікаво.",
+    mission:"Місія: збудуй острів — 10 блоків, дерево і вода"},
+  eco:{t:"Еко-архітектор розумних будинків",s:"Архітектор майбутнього",d:"Проєктує будинки, які самі забезпечують себе світлом і теплом, не шкодячи природі. Дах із сонячних батарей, а на стінах росте справжній ліс.",
+    hard:"Фізика, Географія, Біологія",soft:"Турбота про довкілля, Вміння створювати затишок",subj:["Географія","Біологія","Фізика","Мистецтво"],
+    how:"Сонячні панелі дають енергію лише вдень, а вітряки працюють і вночі, якщо є вітер. Зелені стіни та дах утримують тепло взимку і прохолоду влітку, тож будинку потрібно менше енергії. Архітектор рахує баланс: скільки енергії будинок виробляє і скільки споживає (у кіловатах, кВт).",
+    mission:"Місія: зроби 5-поверховий будинок енергонезалежним"},
+  fashion:{t:"Техно-дизайнер одягу",s:"Digital-кутюр’є",d:"Створює розумний одяг: куртки, які самі підігріваються в мороз, кросівки, що підлаштовуються під стопу, або цифрове вбрання для аватарів.",
+    hard:"Хімія, Фізика, Трудове навчання, 3D-моделювання",soft:"Відчуття стилю, Трендвотчинг, Турбота про комфорт",subj:["Трудове навчання","Хімія","Фізика","Малювання"],
+    how:"У тканину вшивають тонкі нагрівальні нитки, датчик температури і маленький мікроконтролер. Коли надворі холодно, «розумний режим» вмикає підігрів, а в спеку відкриває вентиляційні отвори. Світловідбивні смуги роблять людину помітною вночі.",
+    mission:"Місія: перевір розумну куртку в мороз і в спеку"}
+};
+const PSY={t:"Психолог",subj:["Біологія","Українська мова","Література"]};
+
+function renderProf(k){
+  const p=PROF[k];
+  $("#profInfo").innerHTML=`<div><h3>${p.t}</h3><p class="prof-sub">${p.s}</p></div><p>${p.d}</p>
+  <div class="prof-grid"><div class="mini blue"><h4>Наука (Hard skills)</h4><p>${p.hard}</p></div><div class="mini orange"><h4>Творчість і люди (Soft skills)</h4><p>${p.soft}</p></div><div class="mini mint"><h4>Шкільні предмети для прокачки</h4><p>${p.subj.join(", ")}</p></div></div>
+  <details class="info c-blue" id="howInfo"><summary><span class="sum-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2a56d6" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.3"/></svg></span><span class="sum-t"><h3>Як це працює?</h3><small>Наукове пояснення до симулятора</small></span></summary><div class="info-body"><p>${p.how}</p></div></details>`;
+  const d=$("#howInfo");d.addEventListener("toggle",()=>{if(d.open)addXP(5,"how-"+k,"Нове знання!")});
+}
+
+/* ---------- Three.js рушій ---------- */
+const SIM={ok:false,renderer:null,cur:null,key:null,visible:false,raf:0,last:0};
+const SIMS={};
+let ray,ndc;
+function setMission(txt,done){const m=$("#simMission");m.textContent=(done?"✓ ":"")+txt;m.classList.toggle("done",!!done)}
+function setStatus(txt,kind){const s=$("#simStatus");s.textContent=txt;s.className="status"+(kind?" "+kind:"")}
+function missionDone(k){
+  if(!prog)return;
+  if(!prog.missions[k]){prog.missions[k]=1;addXP(30,"mis-"+k,"Місію виконано!");markTabs();renderFinal()}
+  setMission(PROF[k].mission.replace("Місія: ",""),true);
+}
+function markTabs(){$$(".tab").forEach(t=>{const k=t.dataset.sim,done=prog&&prog.missions[k];t.classList.toggle("done",!!done);$(".lk",t).textContent=done?"ВИКОНАНО":"МІСІЯ"})}
+
+function initSims(){
+  if(SIM.inited){markTabs();return}
+  SIM.inited=true;
+  markTabs();
+  $$(".tab").forEach(t=>t.addEventListener("click",()=>{$$(".tab").forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));loadSim(t.dataset.sim)}));
+  renderProf("arm");
+  if(typeof THREE==="undefined"){$("#simCanvas").innerHTML='<p class="sim-fallback">3D-симулятор не завантажився. Перевір інтернет і онови сторінку.</p>';setStatus("Без 3D можна читати опис професій вище.","warn");setMission("Немає з’єднання",false);return}
+  const host=$("#simCanvas");
+  try{SIM.renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"low-power"})}catch(e){host.innerHTML='<p class="sim-fallback">Твій пристрій не підтримує 3D-графіку (WebGL). Спробуй інший браузер.</p>';return}
+  SIM.ok=true;ray=new THREE.Raycaster();ndc=new THREE.Vector2();
+  const r=SIM.renderer;
+  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  r.outputEncoding=THREE.sRGBEncoding;
+  r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
+  host.appendChild(r.domElement);
+  if("ResizeObserver" in window)new ResizeObserver(resize).observe(host);else window.addEventListener("resize",resize);
+  new IntersectionObserver(es=>{SIM.visible=es[0].isIntersecting;if(SIM.visible)loop()},{threshold:0.02}).observe(host);
+  // керування камерою і дотики
+  const el=r.domElement;let dn=null;
+  el.addEventListener("pointerdown",e=>{dn={x:e.clientX,y:e.clientY,lx:e.clientX,ly:e.clientY,moved:false,mouse:e.pointerType==="mouse"};if(dn.mouse)el.style.cursor="grabbing"});
+  el.addEventListener("pointermove",e=>{
+    if(!dn||!SIM.cur)return;
+    if(Math.abs(e.clientX-dn.x)+Math.abs(e.clientY-dn.y)>7)dn.moved=true;
+    if(dn.moved){const v=SIM.cur.view;v.theta-=(e.clientX-dn.lx)*0.009;if(dn.mouse)v.phi=clamp(v.phi-(e.clientY-dn.ly)*0.006,0.25,1.48)}
+    dn.lx=e.clientX;dn.ly=e.clientY;
+  });
+  el.addEventListener("pointerup",e=>{
+    if(dn&&!dn.moved&&SIM.cur&&SIM.cur.tap){const b=el.getBoundingClientRect();ndc.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(ndc,SIM.cur.camera);SIM.cur.tap(ray)}
+    dn=null;el.style.cursor="";
+  });
+  el.addEventListener("pointercancel",()=>{dn=null});
+  el.addEventListener("pointerleave",()=>{dn=null;el.style.cursor=""});
+  $("#zIn").onclick=()=>{if(SIM.cur)SIM.cur.view.r=Math.max(SIM.cur.view.r*0.85,SIM.cur.view.min||3)};
+  $("#zOut").onclick=()=>{if(SIM.cur)SIM.cur.view.r=Math.min(SIM.cur.view.r*1.18,SIM.cur.view.max||30)};
+  $("#zReset").onclick=()=>{if(SIM.cur)Object.assign(SIM.cur.view,SIM.cur.view0)};
+  loadSim("arm");
+}
+function resize(){
+  if(!SIM.ok)return;const host=$("#simCanvas");const w=host.clientWidth||300,h=host.clientHeight||225;
+  SIM.renderer.setSize(w,h,false);
+  if(SIM.cur){SIM.cur.camera.aspect=w/h;SIM.cur.camera.updateProjectionMatrix()}
+}
+function disposeScene(s){s.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.map)m.map.dispose();if(m.emissiveMap)m.emissiveMap.dispose();m.dispose()})}})}
+function loadSim(k){
+  renderProf(k);
+  if(!SIM.ok)return;
+  if(SIM.cur){if(SIM.cur.dispose)SIM.cur.dispose();disposeScene(SIM.cur.scene)}
+  SIM.key=k;
+  const ctl=$("#simControls");ctl.innerHTML="";
+  SIM.cur=SIMS[k](ctl);
+  SIM.cur.view0=Object.assign({},SIM.cur.view);SIM.cur.view0.target=SIM.cur.view.target.clone();
+  const done=prog&&prog.missions[k];setMission(PROF[k].mission.replace("Місія: ",""),done);
+  resize();loop();
+}
+function loop(){
+  cancelAnimationFrame(SIM.raf);SIM.last=performance.now();
+  const step=now=>{
+    if(!SIM.visible||!SIM.cur)return;
+    const dt=Math.min(0.05,(now-SIM.last)/1000);SIM.last=now;
+    const c=SIM.cur,v=c.view;
+    c.update(dt,now/1000);
+    const t=v.target;
+    c.camera.position.set(t.x+v.r*Math.sin(v.phi)*Math.sin(v.theta),t.y+v.r*Math.cos(v.phi),t.z+v.r*Math.sin(v.phi)*Math.cos(v.theta));
+    c.camera.lookAt(t);
+    SIM.renderer.render(c.scene,c.camera);
+    SIM.raf=requestAnimationFrame(step);
+  };
+  SIM.raf=requestAnimationFrame(step);
+}
+
+/* helpers */
+const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:.05},o||{}));
+function mesh(g,m,x,y,z){const o=new THREE.Mesh(g,m);o.position.set(x||0,y||0,z||0);o.castShadow=true;o.receiveShadow=true;return o}
+function baseScene(bg,lightPos){
+  const scene=new THREE.Scene();scene.background=new THREE.Color(bg);
+  const camera=new THREE.PerspectiveCamera(42,1.33,0.1,200);
+  const hemi=new THREE.HemisphereLight(0xffffff,0xc9bfe6,0.75);scene.add(hemi);
+  const sun=new THREE.DirectionalLight(0xffffff,0.85);sun.position.copy(lightPos||new THREE.Vector3(5,9,6));sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);const sc=sun.shadow.camera;sc.left=-9;sc.right=9;sc.top=9;sc.bottom=-9;sc.near=1;sc.far=40;sun.shadow.bias=-0.0008;
+  scene.add(sun);scene.add(sun.target);
+  return {scene,camera,hemi,sun};
+}
+function ctlHTML(id,label,min,max,step,val,unit){return `<div class="ctl"><label for="${id}">${label} <b id="${id}V">${val}${unit||""}</b></label><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`}
+function bindRange(id,unit,fn,fmt){const el=$("#"+id);const out=$("#"+id+"V");const h=()=>{const v=+el.value;out.textContent=(fmt?fmt(v):v)+(unit||"");fn(v)};el.addEventListener("input",h);return el}
+
+/* ===== 1. Біомедичний інженер: кібер-рука ===== */
+SIMS.arm=function(ctl){
+  const {scene,camera}=baseScene(0xeef0fb);
+  const view={target:new THREE.Vector3(0.1,0,0.3),r:6,theta:0.85,phi:1.12,min:4,max:12};
+  const metal=M(0xe9ecf6,{metalness:.45,roughness:.3}),dark=M(0x3b1670,{roughness:.4}),joint=M(0x6a7aa8,{metalness:.6,roughness:.3});
+  const glow=M(0x2f8cff,{emissive:0x2f8cff,emissiveIntensity:.6});
+  // стіл
+  const table=mesh(new THREE.CylinderGeometry(4.2,4.2,0.25,48),M(0xdcd5f0),0.4,-0.83,0.4);scene.add(table);
+  const arm=new THREE.Group();scene.add(arm);
+  const fore=mesh(new THREE.CylinderGeometry(0.42,0.36,2.7,28),metal,-1.45,0,0);fore.rotation.z=Math.PI/2;arm.add(fore);
+  const band=mesh(new THREE.TorusGeometry(0.44,0.06,10,40),glow,-1.9,0,0);band.rotation.y=Math.PI/2;arm.add(band);
+  const band2=band.clone();band2.position.x=-1.25;arm.add(band2);
+  arm.add(mesh(new THREE.SphereGeometry(0.4,24,16),joint,-0.05,0,0));
+  const palm=mesh(new THREE.BoxGeometry(1.05,1.1,0.38),metal,0.5,0,0);arm.add(palm);
+  const chip=mesh(new THREE.BoxGeometry(0.4,0.3,0.05),dark,0.45,0.1,-0.2);arm.add(chip);
+  const led=mesh(new THREE.SphereGeometry(0.05,10,8),glow,0.55,0.1,-0.23);arm.add(led);
+  const fingers=[];
+  const fy=[0.4,0.14,-0.12,-0.38],fs=[0.92,1,0.96,0.78];
+  fy.forEach((y,i)=>{
+    const root=new THREE.Group();root.position.set(1.03,y,0);arm.add(root);
+    let p=root;const js=[];
+    [0.42,0.34,0.26].forEach(L0=>{const L=L0*fs[i];p.add(mesh(new THREE.SphereGeometry(0.1,12,10),joint));
+      p.add(mesh(new THREE.BoxGeometry(L,0.17,0.2),metal,L/2,0,0));js.push(p);const n=new THREE.Group();n.position.set(L,0,0);p.add(n);p=n});
+    p.add(mesh(new THREE.SphereGeometry(0.09,10,8),dark));
+    fingers.push(js);
+  });
+  const tBase=new THREE.Group();tBase.position.set(0.3,-0.5,0.2);tBase.rotation.set(0,-0.7,-0.75);arm.add(tBase);
+  const thumb=[];{let p=tBase;[0.38,0.3].forEach(L=>{p.add(mesh(new THREE.SphereGeometry(0.11,12,10),joint));p.add(mesh(new THREE.BoxGeometry(L,0.19,0.21),metal,L/2,0,0));thumb.push(p);const n=new THREE.Group();n.position.set(L,0,0);p.add(n);p=n})}
+  // чашка
+  const cupG=new THREE.Group();const cupY=-0.15;cupG.position.set(0.85,cupY,0.95);scene.add(cupG);
+  const cupMat=M(0xffffff,{roughness:.35});
+  const cup=mesh(new THREE.CylinderGeometry(0.42,0.34,1.1,32),cupMat);cupG.add(cup);
+  cupG.add(mesh(new THREE.CylinderGeometry(0.38,0.38,0.02,32),M(0x6b3b1a),0,0.5,0));
+  const stripe=mesh(new THREE.TorusGeometry(0.405,0.03,8,40),M(0x3b1670),0,0.15,0);stripe.rotation.x=Math.PI/2;cupG.add(stripe);
+  const handle=mesh(new THREE.TorusGeometry(0.22,0.06,10,24,Math.PI),cupMat,0,0,0.4);handle.rotation.set(0,Math.PI/2,-Math.PI/2);cupG.add(handle);
+  // UI
+  ctl.innerHTML=ctlHTML("armGrip","Сила нейросигналу (хват)",0,100,1,15,"%")+
+   `<div class="btn-row"><button class="btn" type="button" id="armLift">Підняти чашку</button><button class="btn ghost" type="button" id="armReset">Нова чашка</button></div>`;
+  let grip=15,curl=0,crushed=false,lift=0,liftDir=0,carry=false;
+  function evalGrip(){
+    if(crushed){setStatus("Чашку розчавлено! Натисни «Нова чашка» і зменш силу.","no");return}
+    if(grip<40)setStatus("Рука відкрита — сигнал заслабкий, чашка не втримається.","");
+    else if(grip<55)setStatus("Пальці торкаються чашки, але хват ще слабкий.","warn");
+    else if(grip<=82)setStatus("Ідеальний хват! Тепер натисни «Підняти чашку».","ok");
+    else{crushed=true;cupMat.color.set(0xff8fa3);cupG.scale.set(0.82,0.93,0.82);setStatus("Забагато сили — чашка тріснула! Біомедичний інженер завжди калібрує протез.","no")}
+  }
+  bindRange("armGrip","%",v=>{grip=v;evalGrip()});
+  $("#armLift").onclick=()=>{if(liftDir)return;carry=!crushed&&grip>=55&&grip<=82;liftDir=1;
+    if(!carry&&!crushed)setStatus("Чашка вислизнула! Додай трохи сили хвату.","warn")};
+  $("#armReset").onclick=()=>{crushed=false;cupMat.color.set(0xffffff);cupG.scale.set(1,1,1);grip=15;$("#armGrip").value=15;$("#armGripV").textContent="15%";evalGrip()};
+  evalGrip();
+  return {scene,camera,view,update(dt,t){
+    const target=(crushed?Math.min(grip,100):Math.min(grip,55))/100;
+    curl+=(target-curl)*Math.min(1,dt*8);
+    fingers.forEach((js,i)=>{js[0].rotation.y=-curl*1.15;js[1].rotation.y=-curl*1.25;js[2].rotation.y=-curl*0.9});
+    thumb[0].rotation.y=-curl*0.5;thumb[1].rotation.y=-curl*0.7;
+    const pulse=0.3+grip/100*1.6*(0.6+0.4*Math.sin(t*(4+grip/10)));glow.emissiveIntensity=pulse;
+    if(liftDir){lift+=liftDir*dt*1.1;if(lift>=1){lift=1;liftDir=-1;if(carry){missionDone("arm");setStatus("Місію виконано! Ти відкалібрував(-ла) кібер-руку. Саме так інженери налаштовують протези для людей.","ok")}}if(lift<=0){lift=0;liftDir=0}}
+    const e=lift<.5?2*lift*lift:1-Math.pow(-2*lift+2,2)/2;
+    arm.position.y=e*1.0+Math.sin(t*1.5)*0.02;
+    cupG.position.y=cupY+(carry?e*1.0:0);
+  }};
+};
+
+/* ===== 2. VR-розробник: конструктор острова ===== */
+SIMS.vr=function(ctl){
+  const {scene,camera}=baseScene(0xdfeaff,new THREE.Vector3(6,12,5));
+  scene.fog=new THREE.Fog(0xdfeaff,22,45);
+  const view={target:new THREE.Vector3(0,0.6,0),r:13.5,theta:0.7,phi:0.98,min:7,max:26};
+  const world=new THREE.Group();scene.add(world);
+  const dirt=M(0x9b6b43),grassM=M(0x58b85c);
+  const top=mesh(new THREE.BoxGeometry(8,0.6,8),[dirt,dirt,grassM,dirt,dirt,dirt],0,-0.3,0);world.add(top);
+  const under=mesh(new THREE.ConeGeometry(5.6,4.2,4),M(0x7a5236),0,-2.7,0);under.rotation.set(Math.PI,Math.PI/4,0);world.add(under);
+  const grid=new THREE.GridHelper(8,8,0x3b1670,0x3b1670);grid.position.y=0.01;grid.material.transparent=true;grid.material.opacity=0.25;world.add(grid);
+  const blocks=new THREE.Group();world.add(blocks);
+  const box=new THREE.BoxGeometry(0.98,0.98,0.98);
+  const TYPES={
+    grass:{n:"Трава",c:"#58b85c",m:[dirt,dirt,grassM,dirt,dirt,dirt]},
+    stone:{n:"Камінь",c:"#9aa0ae",m:M(0x9aa0ae,{roughness:.8})},
+    water:{n:"Вода",c:"#3d8bff",m:M(0x3d8bff,{transparent:true,opacity:.75,roughness:.1})},
+    sand:{n:"Пісок",c:"#f0d58c",m:M(0xf0d58c)},
+    tree:{n:"Дерево",c:"#2f7a3a"},
+    lamp:{n:"Ліхтар",c:"#ffcf4a",m:M(0xffe08a,{emissive:0xffb400,emissiveIntensity:.7})}
+  };
+  const trunkM=M(0x7a4b2a),leafM=M(0x2f9a45);
+  const occ={};let sel="grass",erase=false,userCount=0,userTree=0,userWater=0,done=prog&&prog.missions.vr;
+  function make(type){
+    if(type==="tree"){const g=new THREE.Group();g.add(mesh(new THREE.CylinderGeometry(0.13,0.17,0.7,8),trunkM,0,-0.15,0));const l=mesh(new THREE.IcosahedronGeometry(0.45,0),leafM,0,0.35,0);g.add(l);return g}
+    return mesh(box,TYPES[type].m);
+  }
+  function place(ix,iy,iz,type,user){
+    const k=ix+","+iy+","+iz;if(occ[k])return false;
+    if(ix<0||ix>7||iz<0||iz>7||iy<0||iy>5)return false;
+    const o=make(type);o.position.set(ix-3.5,iy+0.5,iz-3.5);o.userData={cell:[ix,iy,iz],type,user,born:user?0:1};o.scale.setScalar(user?0.2:1);
+    blocks.add(o);occ[k]=o;
+    if(user){userCount++;if(type==="tree")userTree++;if(type==="water")userWater++;check()}
+    return true;
+  }
+  function remove(o){const [x,y,z]=o.userData.cell;delete occ[x+","+y+","+z];blocks.remove(o);if(o.userData.user){userCount--;if(o.userData.type==="tree")userTree--;if(o.userData.type==="water")userWater--}check()}
+  function check(){
+    const s=`Блоків: ${userCount}/10 · Дерево: ${userTree?"так":"ні"} · Вода: ${userWater?"так":"ні"}`;
+    if(userCount>=10&&userTree&&userWater){if(!done){done=true;missionDone("vr")}setStatus("Світ готовий! "+s+". Придумай історію: хто живе на твоєму острові?","ok")}
+    else setStatus(s,"");
+  }
+  // стартові блоки (приклад)
+  [[0,0,0,"stone"],[0,1,0,"stone"],[1,0,0,"stone"],[7,0,7,"sand"],[6,0,7,"sand"],[7,0,6,"sand"]].forEach(a=>place(a[0],a[1],a[2],a[3],false));
+  place(2,0,6,"tree",false);
+  // хмари
+  const clouds=[];const cm=M(0xffffff,{roughness:1});
+  for(let i=0;i<4;i++){const c=new THREE.Group();for(let j=0;j<3;j++){const s=new THREE.Mesh(new THREE.SphereGeometry(0.6+Math.random()*0.4,12,10),cm);s.position.set(j*0.8,Math.random()*0.3,0);c.add(s)}c.position.set(-9+i*6,4+Math.random()*2,-6+Math.random()*4);scene.add(c);clouds.push(c)}
+  ctl.innerHTML=`<div class="swatches" id="vrPal">${Object.keys(TYPES).map(k=>`<button type="button" class="sw" data-t="${k}" aria-pressed="${k===sel}"><i style="background:${TYPES[k].c}"></i>${TYPES[k].n}</button>`).join("")}</div>
+   <div class="btn-row"><label class="toggle"><input type="checkbox" id="vrErase"> Режим гумки (видаляти блоки)</label><button class="btn small ghost" type="button" id="vrClear">Очистити мої блоки</button></div>
+   <p style="color:var(--muted);font-weight:600;font-size:.92rem">Торкнись острова, щоб поставити блок. Торкнись блока — новий стане поруч або зверху.</p>`;
+  $$("#vrPal .sw").forEach(b=>b.onclick=()=>{sel=b.dataset.t;$$("#vrPal .sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"))});
+  $("#vrErase").onchange=e=>{erase=e.target.checked};
+  $("#vrClear").onclick=()=>{blocks.children.slice().forEach(o=>{if(o.userData.user)remove(o)})};
+  check();
+  return {scene,camera,view,
+    tap(r){
+      const hits=r.intersectObjects([top].concat(blocks.children),true);if(!hits.length)return;
+      const h=hits[0];let o=h.object;while(o&&!o.userData.cell&&o!==top)o=o.parent;
+      if(o&&o.userData.cell){
+        if(erase){remove(o);return}
+        const n=h.face.normal.clone();const ax=Math.abs(n.x)>Math.abs(n.y)?(Math.abs(n.x)>Math.abs(n.z)?"x":"z"):(Math.abs(n.y)>Math.abs(n.z)?"y":"z");
+        const c=o.userData.cell.slice();const idx={x:0,y:1,z:2}[ax];c[idx]+=Math.sign(n[ax])||1;
+        if(!place(c[0],c[1],c[2],sel,true))setStatus("Тут ставити не можна: місце зайняте або край світу.","warn");
+      }else if(!erase){
+        const p=world.worldToLocal(h.point.clone());const ix=Math.floor(p.x+4),iz=Math.floor(p.z+4);
+        let iy=0;while(occ[ix+","+iy+","+iz]&&iy<6)iy++;
+        if(!place(ix,iy,iz,sel,true))setStatus("Тут ставити не можна: місце зайняте або край світу.","warn");
+      }
+    },
+    update(dt,t){
+      blocks.children.forEach(o=>{if(o.userData.born<1){o.userData.born=Math.min(1,o.userData.born+dt*5);const b=o.userData.born;o.scale.setScalar(0.2+0.8*(1-Math.pow(1-b,3))+Math.sin(b*Math.PI)*0.15)}});
+      clouds.forEach((c,i)=>{c.position.x+=dt*(0.3+i*0.08);if(c.position.x>12)c.position.x=-12});
+      world.position.y=Math.sin(t*0.8)*0.08;
+    }};
+};
+
+/* ===== 3. Еко-архітектор: енергонезалежний будинок ===== */
+SIMS.eco=function(ctl){
+  const {scene,camera,hemi,sun}=baseScene(0xdcebff,new THREE.Vector3(5,10,5));
+  const view={target:new THREE.Vector3(0,2.2,0),r:15,theta:0.75,phi:1.12,min:8,max:28};
+  const ground=mesh(new THREE.CylinderGeometry(8,8,0.3,48),M(0x8fcf7e),0,-0.15,0);scene.add(ground);
+  const path=mesh(new THREE.BoxGeometry(1.2,0.02,5),M(0xd9d2c3),0,0.01,4.2);scene.add(path);
+  function canvasTex(draw){const c=document.createElement("canvas");c.width=128;c.height=64;draw(c.getContext("2d"));const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t}
+  const wallTex=canvasTex(g=>{g.fillStyle="#eef1f7";g.fillRect(0,0,128,64);g.fillStyle="#7fb3e6";for(let i=0;i<4;i++)g.fillRect(8+i*30,14,22,38);g.fillStyle="#3b1670";g.fillRect(0,60,128,4)});
+  wallTex.encoding=THREE.sRGBEncoding;
+  const winTex=canvasTex(g=>{g.fillStyle="#000";g.fillRect(0,0,128,64);g.fillStyle="#fff";for(let i=0;i<4;i++)g.fillRect(8+i*30,14,22,38)});
+  const wallM=M(0xffffff,{map:wallTex,emissive:0xffc766,emissiveMap:winTex,emissiveIntensity:0});
+  const roofM=M(0xb9b3cc);
+  const panelM=M(0x1f3c88,{metalness:.5,roughness:.25}),frameM=M(0xdddddd,{metalness:.6});
+  const vineM=M(0x3f9b4a,{roughness:.9}),bushM=M(0x2f8a3e);
+  const house=new THREE.Group();scene.add(house);
+  const turbG=new THREE.Group();scene.add(turbG);
+  const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(0.7,20,14),new THREE.MeshBasicMaterial({color:0xffd23f}));scene.add(sunMesh);
+  const st={floors:3,panels:2,turb:0,wind:40,green:false,time:12};
+  const FH=0.8,W=3.4;
+  let hubs=[],dayOk=!!(prog&&prog.missions.eco),eveOk=dayOk;
+  function buildHouse(){
+    disposeScene(house);house.clear();
+    const H=st.floors*FH;
+    wallTex.repeat.set(1,st.floors);winTex.repeat.set(1,st.floors);
+    house.add(mesh(new THREE.BoxGeometry(W,H,W),[wallM,wallM,roofM,roofM,wallM,wallM],0,H/2,0));
+    house.add(mesh(new THREE.BoxGeometry(0.7,0.95,0.06),M(0x7a4b2a),0,0.48,W/2+0.03));
+    for(let i=0;i<st.panels;i++){const r=Math.floor(i/3),c=i%3;const p=new THREE.Group();p.position.set(-1.05+c*1.05,H+0.25,-1.05+r*1.05);p.rotation.x=-0.45;
+      p.add(mesh(new THREE.BoxGeometry(0.9,0.05,0.9),frameM));p.add(mesh(new THREE.BoxGeometry(0.82,0.06,0.82),panelM));house.add(p);
+      house.add(mesh(new THREE.CylinderGeometry(0.03,0.03,0.25,6),frameM,-1.05+c*1.05,H+0.12,-1.05+r*1.05))}
+    if(st.green){
+      const vine=mesh(new THREE.BoxGeometry(W*0.92,H*0.9,0.12),vineM,0,H*0.47,-W/2-0.06);house.add(vine);
+      const vine2=mesh(new THREE.BoxGeometry(0.12,H*0.9,W*0.92),vineM,-W/2-0.06,H*0.47,0);house.add(vine2);
+      for(let i=0;i<10;i++){const a=i/10*Math.PI*2;house.add(mesh(new THREE.IcosahedronGeometry(0.22+((i*37)%5)/30,0),bushM,Math.cos(a)*1.45,H+0.18,Math.sin(a)*1.45))}
+      for(let i=0;i<6;i++)house.add(mesh(new THREE.IcosahedronGeometry(0.35,0),bushM,-W/2-0.15,0.3+i*H/6,-W/2-0.1+((i%2)*0.2)));
+    }
+  }
+  function buildTurbines(){
+    disposeScene(turbG);turbG.clear();hubs=[];
+    for(let i=0;i<st.turb;i++){const g=new THREE.Group();g.position.set(3.7,0,-2.6+i*2.2);
+      g.add(mesh(new THREE.CylinderGeometry(0.08,0.14,4.2,10),M(0xf4f4f8),0,2.1,0));
+      g.add(mesh(new THREE.BoxGeometry(0.3,0.28,0.55),M(0xf4f4f8),0,4.25,0));
+      const hub=new THREE.Group();hub.position.set(0,4.25,0.32);
+      hub.add(mesh(new THREE.SphereGeometry(0.12,10,8),M(0x3b1670)));
+      for(let b=0;b<3;b++){const bl=mesh(new THREE.BoxGeometry(0.14,1.6,0.04),M(0xffffff),0,0.8,0);const pv=new THREE.Group();pv.rotation.z=b*Math.PI*2/3;pv.add(bl);hub.add(pv)}
+      g.rotation.y=-0.5;g.add(hub);hubs.push(hub);turbG.add(g)}
+  }
+  ctl.innerHTML=`<div class="ctl-grid">${ctlHTML("eFloors","Поверхи",1,8,1,st.floors,"")}${ctlHTML("ePanels","Сонячні панелі",0,9,1,st.panels," шт")}${ctlHTML("eTurb","Вітряки",0,3,1,st.turb," шт")}${ctlHTML("eWind","Сила вітру",0,100,5,st.wind,"%")}${ctlHTML("eTime","Час доби",6,22,0.5,st.time,"")}</div>
+   <label class="toggle"><input type="checkbox" id="eGreen"> Зелені стіни і дах (утеплення природою)</label>
+   <div class="meter"><div class="meter-row"><span>Виробляє</span><span class="bar"><i id="eProdBar" style="background:var(--mint)"></i></span><span id="eProd">0 кВт</span></div>
+   <div class="meter-row"><span>Споживає</span><span class="bar"><i id="eDemBar" style="background:var(--accent)"></i></span><span id="eDem">0 кВт</span></div></div>
+   <div class="checks"><span class="check" id="eC1">5+ поверхів вдень (11:00–13:00)</span><span class="check" id="eC2">5+ поверхів увечері (19:00+)</span></div>`;
+  const fmtT=v=>{const h=Math.floor(v),m=v%1?"30":"00";return h+":"+m};
+  $("#eTimeV").textContent=fmtT(st.time);
+  bindRange("eFloors","",v=>{st.floors=v;buildHouse();calc()});
+  bindRange("ePanels"," шт",v=>{st.panels=v;buildHouse();calc()});
+  bindRange("eTurb"," шт",v=>{st.turb=v;buildTurbines();calc()});
+  bindRange("eWind","%",v=>{st.wind=v;calc()});
+  bindRange("eTime","",v=>{st.time=v;calc()},fmtT);
+  $("#eGreen").onchange=e=>{st.green=e.target.checked;buildHouse();calc()};
+  let sunF=1;
+  function calc(){
+    sunF=Math.max(0,Math.sin(Math.PI*(st.time-6)/14));
+    const prod=st.panels*3*sunF+st.turb*10*st.wind/100;
+    const dem=st.floors*6*(st.green?0.75:1);
+    $("#eProd").textContent=prod.toFixed(1)+" кВт";$("#eDem").textContent=dem.toFixed(1)+" кВт";
+    const mx=Math.max(prod,dem,1);$("#eProdBar").style.width=(prod/mx*100)+"%";$("#eDemBar").style.width=(dem/mx*100)+"%";
+    const ok=prod>=dem;
+    if(ok&&st.floors>=5&&st.time>=11&&st.time<=13)dayOk=true;
+    if(ok&&st.floors>=5&&st.time>=19)eveOk=true;
+    $("#eC1").classList.toggle("on",dayOk);$("#eC2").classList.toggle("on",eveOk);
+    if(dayOk&&eveOk&&!(prog&&prog.missions.eco))missionDone("eco");
+    if(dayOk&&eveOk)setStatus(ok?"Будинок енергонезалежний! Місію виконано — ти справжній еко-архітектор.":"Місію виконано! Зараз енергії не вистачає, але ти знаєш, як це виправити.",ok?"ok":"warn");
+    else if(ok)setStatus("Баланс зелений: будинок виробляє більше, ніж споживає"+(st.floors<5?". Тепер збільш до 5 поверхів!":"."),"ok");
+    else setStatus(sunF<0.05?"Ніч: сонячні панелі не працюють. Що може дати енергію вночі?":"Енергії не вистачає на "+(dem-prod).toFixed(1)+" кВт. Додай панелі, вітряки або зелені стіни.","no");
+    // небо і сонце
+    const a=Math.PI*(st.time-6)/14;sunMesh.position.set(-Math.cos(a)*10,Math.sin(a)*9+0.5,-5);
+    sun.position.copy(sunMesh.position);sun.intensity=0.1+0.85*sunF;hemi.intensity=0.35+0.45*sunF;
+    scene.background.setRGB(0.24+0.62*sunF,0.24+0.68*sunF,0.42+0.58*sunF);
+    wallM.emissiveIntensity=(1-sunF)*0.9;sunMesh.visible=st.time<20.2;
+  }
+  buildHouse();buildTurbines();calc();
+  return {scene,camera,view,update(dt){hubs.forEach(h=>h.rotation.z-=dt*(0.4+st.wind/100*9))}};
+};
+
+/* ===== 4. Техно-дизайнер: розумна куртка ===== */
+SIMS.fashion=function(ctl){
+  const {scene,camera,hemi,sun}=baseScene(0xeef0fb);
+  const view={target:new THREE.Vector3(0,2.2,0),r:7.4,theta:0.35,phi:1.3,min:4.5,max:14};
+  scene.add(mesh(new THREE.CylinderGeometry(3.2,3.2,0.2,40),M(0xdcd5f0),0,-0.1,0));
+  const white=M(0xf3f1f8,{roughness:.6});
+  scene.add(mesh(new THREE.CylinderGeometry(0.9,1,0.15,32),M(0x3b1670),0,0.08,0));
+  scene.add(mesh(new THREE.CylinderGeometry(0.06,0.06,1.4,10),M(0x999999,{metalness:.8}),0,0.8,0));
+  scene.add(mesh(new THREE.CylinderGeometry(0.2,0.24,0.35,16),white,0,3.25,0));
+  scene.add(mesh(new THREE.SphereGeometry(0.42,24,18),white,0,3.75,0));
+  const fabric=M(0x2a56d6,{roughness:.7});
+  const body=new THREE.Group();body.position.y=2.15;body.scale.z=0.62;scene.add(body);
+  body.add(mesh(new THREE.CylinderGeometry(0.74,0.68,1.7,36),fabric));
+  const sh=mesh(new THREE.SphereGeometry(0.74,32,16,0,Math.PI*2,0,Math.PI/2),fabric,0,0.85,0);sh.scale.y=0.45;body.add(sh);
+  const heatM=M(0xff7a1a,{emissive:0xff5a00,emissiveIntensity:0});
+  const reflM=M(0xd9dde6,{metalness:.3,roughness:.2,emissive:0xffffff,emissiveIntensity:0});
+  [-0.45,0,0.45].forEach(y=>{const r=mesh(new THREE.TorusGeometry(0.72,0.025,8,48),heatM,0,y,0);r.rotation.x=Math.PI/2;body.add(r)});
+  const refl=mesh(new THREE.TorusGeometry(0.71,0.05,8,48),reflM,0,-0.72,0);refl.rotation.x=Math.PI/2;body.add(refl);
+  const collar=mesh(new THREE.TorusGeometry(0.3,0.09,10,30),fabric,0,0.98,0);collar.rotation.x=Math.PI/2;body.add(collar);
+  body.add(mesh(new THREE.BoxGeometry(0.05,1.65,0.06),M(0xcfcfd8,{metalness:.7}),0,-0.02,0.705));
+  const chipM=M(0x16a36a,{emissive:0x16a36a,emissiveIntensity:.5});
+  body.add(mesh(new THREE.BoxGeometry(0.22,0.14,0.05),chipM,0.4,0.35,0.62));
+  const vents=[];[-0.3,0.3].forEach(x=>{const v=mesh(new THREE.BoxGeometry(0.4,0.12,0.05),M(0x1d2a55),x,0.5,-0.7);body.add(v);vents.push(v)});
+  const sleeves=[];[-1,1].forEach(s=>{const g=new THREE.Group();g.position.set(s*0.8,2.85,0);g.rotation.z=s*0.22;scene.add(g);
+    g.add(mesh(new THREE.SphereGeometry(0.24,16,12),fabric));
+    g.add(mesh(new THREE.CylinderGeometry(0.22,0.18,1.45,20),fabric,0,-0.72,0));
+    const sr=mesh(new THREE.TorusGeometry(0.2,0.04,8,24),reflM,0,-1.2,0);sr.rotation.x=Math.PI/2;g.add(sr);
+    const hr=mesh(new THREE.TorusGeometry(0.215,0.02,8,24),heatM,0,-0.5,0);hr.rotation.x=Math.PI/2;g.add(hr);sleeves.push(g)});
+  // сніг і сонячні промені
+  const N=260,pos=new Float32Array(N*3);for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*9;pos[i*3+1]=Math.random()*6;pos[i*3+2]=(Math.random()-.5)*7}
+  const sg=new THREE.BufferGeometry();sg.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  const snow=new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:0.09}));scene.add(snow);
+  const heatWaves=new THREE.Group();scene.add(heatWaves);
+  for(let i=0;i<5;i++){const w=new THREE.Mesh(new THREE.TorusGeometry(1.3+i*0.35,0.015,6,60),new THREE.MeshBasicMaterial({color:0xffa53d,transparent:true,opacity:.35}));w.rotation.x=Math.PI/2;w.position.y=0.3+i*0.7;heatWaves.add(w)}
+  const COLORS=[["Електрик","#2a56d6"],["Мандарин","#f26b0f"],["М’ята","#2fbf8a"],["Ультрафіолет","#6b2fbf"]];
+  ctl.innerHTML=`<div class="ctl-grid">${ctlHTML("fTemp","Температура надворі",-25,35,1,-5,"°C")}<div class="ctl"><span style="font-weight:700">Колір тканини</span><div class="swatches" id="fCol">${COLORS.map((c,i)=>`<button type="button" class="sw" data-c="${c[1]}" aria-pressed="${i===0}"><i style="background:${c[1]}"></i>${c[0]}</button>`).join("")}</div></div></div>
+   <div class="btn-row"><label class="toggle"><input type="checkbox" id="fSmart" checked> Розумний режим (датчик + мікроконтролер)</label><label class="toggle"><input type="checkbox" id="fNight"> Ніч</label></div>
+   <div class="meter"><div class="meter-row"><span>Під курткою</span><span class="bar"><i id="fInBar"></i></span><span id="fIn">0°C</span></div></div>
+   <div class="checks"><span class="check" id="fC1">Мороз −15 °C і нижче: комфорт</span><span class="check" id="fC2">Спека +28 °C і вище: комфорт</span></div>`;
+  let temp=-5,smart=true,night=false,heat=0,cool=0,coldOk=!!(prog&&prog.missions.fashion),hotOk=coldOk;
+  $$("#fCol .sw").forEach(b=>b.onclick=()=>{fabric.color.set(b.dataset.c);$$("#fCol .sw").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"))});
+  bindRange("fTemp","°C",v=>{temp=v;calc()});
+  $("#fSmart").onchange=e=>{smart=e.target.checked;calc()};
+  $("#fNight").onchange=e=>{night=e.target.checked;calc()};
+  function calc(){
+    let inside=temp+12;heat=0;cool=0;
+    if(smart){if(inside<21){heat=Math.min(1,(21-inside)/35);inside+=heat*35}if(inside>24){cool=Math.min(1,(inside-24)/25);inside-=cool*25}}
+    inside=Math.round(inside);
+    const comfy=inside>=18&&inside<=26;
+    $("#fIn").textContent=inside+"°C";
+    const bar=$("#fInBar");bar.style.width=clamp((inside+15)/60*100,4,100)+"%";bar.style.background=comfy?"var(--mint)":inside<18?"var(--blue)":"var(--bad)";
+    if(smart&&comfy&&temp<=-15)coldOk=true;
+    if(smart&&comfy&&temp>=28)hotOk=true;
+    $("#fC1").classList.toggle("on",coldOk);$("#fC2").classList.toggle("on",hotOk);
+    if(coldOk&&hotOk&&!(prog&&prog.missions.fashion))missionDone("fashion");
+    let msg;
+    if(comfy)msg="Комфортно: "+inside+"°C. "+(heat>0.02?"Нагрівальні нитки працюють на "+Math.round(heat*100)+"%.":cool>0.02?"Вентиляція відкрита на "+Math.round(cool*100)+"%.":"Куртці не треба нічого вмикати.");
+    else msg=(inside<18?"Холодно":"Спекотно")+": під курткою "+inside+"°C. "+(smart?"Навіть розумна куртка має межі.":"Увімкни розумний режим!");
+    if(night)msg+=" Світловідбивні смуги роблять тебе помітним на дорозі.";
+    if(coldOk&&hotOk&&comfy)msg="Місію виконано! "+msg;
+    setStatus(msg,comfy?"ok":"no");
+    heatM.emissiveIntensity=heat*2.2;
+    reflM.emissiveIntensity=night?1.1:0;
+    const dk=night?0.35:1;
+    scene.background.setRGB((temp>25?0.98:0.93)*dk,(temp>25?0.93:0.94)*dk,(temp>25?0.86:0.98)*dk);
+    hemi.intensity=night?0.25:0.75;sun.intensity=night?0.15:0.85;
+    snow.visible=temp<0;heatWaves.visible=temp>25;
+  }
+  calc();
+  return {scene,camera,view,update(dt,t){
+    const a=sg.attributes.position.array;
+    if(snow.visible){for(let i=0;i<N;i++){a[i*3+1]-=dt*(0.6+(i%5)*0.15);a[i*3]+=Math.sin(t+i)*dt*0.2;if(a[i*3+1]<0)a[i*3+1]=6}sg.attributes.position.needsUpdate=true}
+    heatWaves.children.forEach((w,i)=>{w.position.y=((t*0.5+i*0.7)%3.5)+0.3;w.material.opacity=0.35*(1-w.position.y/3.8)});
+    vents.forEach(v=>{v.rotation.x+=((cool*1.1)-v.rotation.x)*Math.min(1,dt*5)});
+    chipM.emissiveIntensity=smart?0.5+0.5*Math.sin(t*4):0.05;
+    if(heat>0.02)heatM.emissiveIntensity=heat*(1.8+0.6*Math.sin(t*3));
+  }};
+};
+
+/* ---------- резюме ---------- */
+const DREAM_SUBJ={arm:PROF.arm.subj,vr:PROF.vr.subj,eco:PROF.eco.subj,fashion:PROF.fashion.subj,psy:PSY.subj,other:["Обери сам(-а)"]};
+const DREAM_NAME={arm:"Біомедичний інженер",vr:"VR-розробник",eco:"Еко-архітектор",fashion:"Техно-дизайнер одягу",psy:"Психолог"};
+const RS=[["rCre","Креативність","#f26b0f"],["rTeam","Командна робота","#138a5a"],["rCrit","Критичне мислення","#6b2fbf"],["rCom","Комунікація","#e0457b"],["rEng","Англійська","#2a56d6"]];
+function dreamName(){const v=$("#rDream").value;return v==="other"?($("#rOther").value.trim()||"Професія мрії"):DREAM_NAME[v]}
+function updateResume(){
+  const d=$("#rDream").value;$("#rOtherWrap").hidden=d!=="other";
+  const nm=student?student.name+" "+student.surname:"Ім’я гравця";
+  $("#pName").textContent=nm;
+  $("#pAva").textContent=student?(student.name[0]+student.surname[0]).toUpperCase():"?";
+  $("#pLvl").textContent="Поточний рівень: Учень "+(student?student.cls:"6")+" класу";
+  $("#pGoal").textContent="Стати: "+dreamName();
+  $("#pQuests").textContent=$("#rQuests").value.trim()||"Додай свої квести";
+  $("#pHobby").textContent=$("#rHobby").value.trim()||"—";
+  $("#pBars").innerHTML=RS.map(([id,n,c])=>{const v=+$("#"+id).value;$("#"+id+"V").textContent=v+"%";return `<div class="pbar"><div class="t"><i style="width:${v}%;background:${c};opacity:.85"></i><span>${n}</span></div><b>${v}%</b></div>`}).join("");
+  $("#pSubj").innerHTML=DREAM_SUBJ[d].map(s=>`<span class="pill">${s}</span>`).join("");
+}
+$$("#resumeForm input,#resumeForm select,#resumeForm textarea").forEach(el=>el.addEventListener("input",()=>{updateResume();addXP(10,"resume-edit","Резюме оновлено!")}));
+$("#rDream").addEventListener("change",updateResume);
+function resumeText(){
+  return ["МОЄ ПЕРШЕ РЕЗЮМЕ — КАРТКА ГРАВЦЯ","Ім’я: "+(student?student.name+" "+student.surname:""),"Клас: "+(student?student.cls:""),"Мета: стати — "+dreamName(),"Досвід (квести):",$("#rQuests").value.trim(),"Навички:",...RS.map(([id,n])=>"  "+n+": "+$("#"+id).value+"%"),"Предмети для прокачки: "+DREAM_SUBJ[$("#rDream").value].join(", "),"Хобі: "+$("#rHobby").value.trim()].join("\n");
+}
+function copyText(txt,fallbackEl){
+  const ok=()=>toast("Скопійовано!");
+  const fb=()=>{if(fallbackEl){fallbackEl.focus();fallbackEl.select()}toast("Виділи текст і скопіюй вручну")};
+  try{navigator.clipboard.writeText(txt).then(ok,fb)}catch(e){fb()}
+}
+$("#rCopy").addEventListener("click",()=>{addXP(15,"resume-copy","Резюме готове!");const ta=$("#fReport");copyText(resumeText(),ta)});
+
+/* ---------- тест ---------- */
+const QUIZ=[
+  {q:"Що таке Hard skills?",o:["Вміння дружити та підтримувати інших","Знання і вміння, які можна виміряти та перевірити на іспиті","Улюблені хобі людини","Навички, які мають лише роботи"],a:1,e:"Hard skills — «залізо» твого персонажа: математика, програмування, фізика."},
+  {q:"Яка з цих навичок належить до Soft skills?",o:["Програмування","Розв’язування рівнянь","Вміння домовлятися","3D-моделювання"],a:2,e:"Вміння домовлятися проявляється у спілкуванні з людьми."},
+  {q:"Яка суперсила з 4К допомагає розпізнати фейкову новину?",o:["Креативність","Критичне мислення","Командна робота","Швидкий біг"],a:1,e:"Критичне мислення фільтрує інформацію і шукає джерела."},
+  {q:"Хто проєктує будинки, які самі забезпечують себе світлом і теплом?",o:["VR-розробник","Біомедичний інженер","Еко-архітектор","Техно-дизайнер одягу"],a:2,e:"Еко-архітектор поєднує фізику, географію і турботу про природу."},
+  {q:"Які шкільні предмети найважливіші для VR-розробника?",o:["Інформатика і геометрія","Хімія і трудове навчання","Лише фізкультура","Біологія і хімія"],a:0,e:"Віртуальні світи — це код і координати в просторі."},
+  {q:"Чому роботодавці сьогодні цінують Soft skills?",o:["Бо Hard skills більше не потрібні","Бо рутину виконують машини, а людина має мислити, домовлятися і створювати нове","Бо Soft skills легко вивчити за один день","Бо так вирішили роботи"],a:1,e:"Hard skills потрібні, але саме Soft skills найважче замінити машиною."},
+  {q:"Навіщо інженеру майбутнього мови?",o:["Тільки щоб читати книжки","Щоб презентувати свій винахід і домовлятися з колегами з різних країн","Мови інженеру не потрібні","Щоб писати без помилок у чаті"],a:1,e:"Без мови геніальний винахід залишиться в шухляді!"}
+];
+function renderQuiz(){
+  $("#quiz").innerHTML=QUIZ.map((x,i)=>`<div class="card q" data-q="${i}"><span class="q-n">ПИТАННЯ ${i+1} З ${QUIZ.length}</span><h3>${x.q}</h3><div class="opts">${x.o.map((o,j)=>`<button class="opt" type="button" data-o="${j}">${o}</button>`).join("")}</div><p class="expl" hidden></p></div>`).join("");
+  $$("#quiz .q").forEach(c=>{const i=+c.dataset.q;$$(".opt",c).forEach(b=>b.addEventListener("click",()=>answer(i,+b.dataset.o)))});
+}
+function showAnswer(i,j){
+  const c=$(`#quiz [data-q="${i}"]`),x=QUIZ[i];
+  $$(".opt",c).forEach((b,k)=>{b.disabled=true;if(k===x.a)b.classList.add("right");else if(k===j)b.classList.add("wrong")});
+  const e=$(".expl",c);e.hidden=false;e.textContent=(j===x.a?"Правильно! ":"Неправильно. ")+x.e;
+}
+function answer(i,j){
+  if(!prog||prog.quiz[i]!==undefined)return;
+  prog.quiz[i]=j;showAnswer(i,j);
+  if(j===QUIZ[i].a)addXP(10,"quiz-"+i,"Правильно!");else{save();renderFinal()}
+}
+renderQuiz();
+
+/* ---------- рефлексія і звіт ---------- */
+function bindChoice(id,field){$$("#"+id+" button").forEach(b=>b.addEventListener("click",()=>{$$("#"+id+" button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));if(prog){prog[field]=b.textContent;addXP(5,"ref-"+field,"Дякуємо!");save();renderFinal()}}))}
+bindChoice("refSkill","skill");bindChoice("refMood","mood");
+function renderFinal(){
+  if(!prog||!student)return;
+  const qOk=QUIZ.filter((x,i)=>prog.quiz[i]===x.a).length,qN=Object.keys(prog.quiz).length;
+  const mis=Object.keys(prog.missions).length;
+  $("#fName2").textContent=student.name+" · "+student.cls;
+  $("#fXP").textContent=prog.xp+" XP";
+  $("#fQuiz").textContent=qOk+" / "+QUIZ.length;
+  $("#fSort").textContent=prog.sortOk+" / "+SKILLS.length;
+  $("#fMis").textContent=mis+" / 4";
+  const d=new Date();
+  $("#fReport").value=["STEAM, 6 клас. Урок «Навички XXI століття»","Учень/учениця: "+student.name+" "+student.surname+", клас "+student.cls,"Дата: "+d.toLocaleDateString("uk-UA"),"Досвід: "+prog.xp+" XP (рівень "+(Math.min(4,Math.floor(prog.xp/100))+1)+")","Тест: "+qOk+" з "+QUIZ.length+" правильних"+(qN<QUIZ.length?" (відповіді на "+qN+" з "+QUIZ.length+")":""),"Сортувальник навичок: "+prog.sortOk+" з "+SKILLS.length,"Місії 3D-симуляторів: "+mis+" з 4"+(mis?" ("+Object.keys(prog.missions).map(k=>PROF[k].t).join(", ")+")":""),"Навичка, яку прокачуватиму: "+(prog.skill||"не обрано"),"Враження від уроку: "+(prog.mood||"не обрано")].join("\n");
+}
+$("#fCopy").addEventListener("click",()=>copyText($("#fReport").value,$("#fReport")));
+function restoreUI(){
+  renderQuiz();
+  Object.keys(prog.quiz).forEach(i=>showAnswer(+i,prog.quiz[i]));
+  [["refSkill","skill"],["refMood","mood"]].forEach(([id,f])=>$$("#"+id+" button").forEach(b=>b.setAttribute("aria-pressed",b.textContent===prog[f]?"true":"false")));
+  renderFinal();
+}
+
+/* ---------- старт ---------- */
+if(student&&student.name){
+  $("#fName").value=student.name;$("#fSurname").value=student.surname;$("#fClass").value=student.cls;
+  startLesson();
+}
+})();
+</script>
+</body>
+</html>
