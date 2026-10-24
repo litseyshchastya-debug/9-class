@@ -13,8 +13,10 @@
 """
 import base64
 import html
+import json
 import pathlib
 import re
+import shutil
 import sys
 
 import markdown
@@ -22,6 +24,10 @@ import markdown
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
 OUT = ROOT / "storinky"
+sys.path.insert(0, str(TOOLS / "ide"))
+from startery import STARTERY, STARTER_FROM_SKETCH, PISOCHNYTSIA  # noqa: E402
+
+PJS_CDN = "https://cdn.jsdelivr.net/npm/processing-js@1.6.6/processing.min.js"
 
 COURSE = "Креативне програмування в Processing"
 MODULES = [
@@ -76,11 +82,76 @@ def code_block(src):
 FENCE = re.compile(r"^```[\w-]*\n(.*?)^```\s*$", re.S | re.M)
 
 
-def md_to_html(text, root):
+RUNNABLE = re.compile(r"\bsize\s*\(|\bvoid\s+setup\s*\(")
+
+
+CLASS_DEF = re.compile(r"^class\s+(\w+)[^{]*\{", re.M)
+
+
+def class_sources(text):
+    """Класи з фрагментів коду уроку та зі скетчів курсу: назва → (код класу, кількість параметрів конструктора)."""
+    found = {}
+    sources = [m.group(1) for m in FENCE.finditer(text)]
+    sources += [f["code"] for e in EXAMPLES for f in e["files"]]
+    for src in sources:
+        for m in CLASS_DEF.finditer(src):
+            name = m.group(1)
+            if name in found:
+                continue
+            depth, i = 0, m.end() - 1
+            while i < len(src):
+                depth += {"{": 1, "}": -1}.get(src[i], 0)
+                if depth == 0:
+                    break
+                i += 1
+            body = src[m.start():i + 1]
+            ctor = re.search(rf"\b{name}\s*\(([^)]*)\)\s*\{{", body[len(m.group(0)):])
+            argc = len([a for a in ctor.group(1).split(",") if a.strip()]) if ctor else 0
+            found[name] = (body + "\n", argc)
+    return found
+
+
+def call_argc(args):
+    depth, n, cur = 0, 0, ""
+    for ch in args:
+        depth += {"(": 1, ")": -1}.get(ch, 0)
+        if ch == "," and depth == 0:
+            n += 1
+        cur += ch
+    return n + 1 if cur.strip() else 0
+
+
+def runnable_tabs(code, lesson_text):
+    """Фрагмент можна запустити, якщо він має size()/setup() і всі класи, які він створює, відомі.
+    Відсутні класи додаються окремими вкладками (як у Processing)."""
+    if not RUNNABLE.search(code):
+        return None
+    tabs = [["Pryklad", code]]
+    defined = set(m.group(1) for m in CLASS_DEF.finditer(code))
+    known = class_sources(lesson_text)
+    for m in re.finditer(r"\bnew\s+([A-Z]\w*)\s*\(((?:[^()]|\([^()]*\))*)\)", code):
+        name, args = m.group(1), m.group(2)
+        if name in defined or name in ("ArrayList", "PVector", "IntList", "FloatList", "StringList", "HashMap"):
+            continue
+        if name not in known or known[name][1] != call_argc(args):
+            return None
+        tabs.append([name, known[name][0]])
+        defined.add(name)
+    return tabs
+
+
+def md_to_html(text, root, snippets=None):
     blocks = []
 
     def stash(m):
-        blocks.append(code_block(m.group(1)))
+        code = m.group(1)
+        block = code_block(code)
+        tabs = runnable_tabs(code, text) if snippets is not None else None
+        if tabs:
+            snippets.append(tabs)
+            block += (f'<button class="try" type="button" data-try="{len(snippets) - 1}">'
+                      "▶ Спробувати в онлайн-середовищі</button>")
+        blocks.append(block)
         return f"\n\nCODEBLOCK{len(blocks) - 1}\n\n"
 
     text = FENCE.sub(stash, text)
@@ -129,6 +200,60 @@ def sketches_for(n):
 
 
 CSS = read(TOOLS / "stil.css")
+PDE_CSS = read(TOOLS / "ide" / "pde.css")
+PDE_JS = read(TOOLS / "ide" / "pde.js")
+
+
+def all_examples():
+    ex = []
+    for d in sorted((ROOT / "skechi").glob("L*_*")):
+        main = d / f"{d.name}.pde"
+        files = [main] + sorted(p for p in d.glob("*.pde") if p != main)
+        ex.append({"lesson": int(d.name[1:3]), "name": d.name,
+                   "files": [{"name": p.name, "code": read(p)} for p in files]})
+    return ex
+
+
+EXAMPLES = all_examples()
+
+
+def json_script(id_, data):
+    return (f'<script type="application/json" id="{id_}">'
+            + json.dumps(data, ensure_ascii=False).replace("</", "<\\/") + "</script>")
+
+
+def ide_block(key, tabs, intro, heading="Практикум в онлайн-середовищі Processing"):
+    """Розділ з онлайн-середовищем Processing і скрипт його запуску."""
+    section = (f'<section class="pde-section" id="praktykum"><h2>{heading}</h2>'
+               f"<p>{intro}</p><div id=\"pde\"></div></section>")
+    js = (PDE_JS + """
+(function () {
+  var data = JSON.parse(document.getElementById('pde-data').textContent);
+  var ide = PDE.mount('#pde', {
+    key: data.key, tabs: data.tabs, examples: data.examples, courseRef: 'dovidnyk.html',
+    pjs: ['ide/processing.min.js', '""" + PJS_CDN + """']
+  });
+  var snippets = data.snippets || [];
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-try], [data-open-ex]');
+    if (!t) return;
+    if (t.hasAttribute('data-try')) { ide.loadCode(snippets[+t.getAttribute('data-try')], 'Pryklad'); return; }
+    var name = t.getAttribute('data-open-ex');
+    data.examples.forEach(function (ex) { if (ex.name === name) ide.loadExample(ex); });
+    document.getElementById('praktykum').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();""")
+    return section, js
+
+
+def ide_data(key, tabs, snippets=None):
+    return json_script("pde-data", {"key": key, "tabs": [{"name": n, "code": c} for n, c in tabs],
+                                    "examples": EXAMPLES, "snippets": snippets or []})
+
+
+IDE_INTRO = ("Виконуйте завдання уроку просто тут: пишіть код, натискайте ▶ і дивіться результат у вікні скетчу. "
+             "Код зберігається в цьому браузері автоматично. Меню «Приклади» відкриває скетчі курсу, "
+             "«Файл → Завантажити як .pde» допоможе перенести роботу в настільний Processing.")
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700'
          '&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">')
@@ -155,17 +280,18 @@ def toc(root, current):
             for l in lessons if a <= l["n"] <= b)
         parts.append(f"<div><h4>{title}</h4><ol>{items}</ol></div>")
     parts.append('<div class="solo"><h4>Матеріали</h4><ol>'
+                 + link(f"{root}storinky/seredovyshche.html", "ide", "Онлайн-середовище Processing")
                  + link(f"{root}storinky/dovidnyk.html", "dovidnyk", "Довідник і словник термінів")
                  + f'<li><a href="{root}test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li>'
                  + "</ol></div>")
     return "".join(parts)
 
 
-def head(title, description):
+def head(title, description, extra_css=""):
     return (f"<title>{html.escape(title)}</title>\n"
             '<meta name="claude:viewport-fit-sides" content="cover">\n'
             f'<meta name="description" content="{html.escape(description)}">\n'
-            f"{FONTS}\n<style>\n{CSS}</style>")
+            f"{FONTS}\n<style>\n{CSS}{extra_css}</style>")
 
 
 def body(root, current, main_html, extra_js=""):
@@ -204,7 +330,9 @@ def lesson_page(l, prev, nxt):
                 for i, (name, code) in enumerate(s["files"]))
             img = f'<img src="{s["img"]}" alt="Результат роботи скетчу {s["name"]}" loading="lazy">' if s["img"] else ""
             items.append(f'<div class="sk"><figure>{img}<figcaption>Знімок вікна програми</figcaption></figure>'
-                         f'<div class="files"><h3>{s["name"]}</h3>{files}</div></div>')
+                         f'<div class="files"><h3>{s["name"]}</h3>'
+                         f'<button class="try" type="button" data-open-ex="{s["name"]}">▶ Відкрити в онлайн-середовищі</button>'
+                         f'{files}</div></div>')
         sk_html = ('<section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або '
                    'відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, '
                    'а класи покладіть в окремі вкладки.</p>' + "".join(items) + "</section>")
@@ -219,11 +347,35 @@ def lesson_page(l, prev, nxt):
     else:
         nx = f'<a class="next" href="{root}test/processing_test.html" target="_blank" rel="noopener"><small>Далі →</small>Підсумковий тест</a>'
 
-    main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / {"Уроки" if l["n"] == 16 else "Урок"} {l["label"]} з 17</p>'
-                 f'<article><div class="doc">{md_to_html(l["md"], root)}</div>{sk_html}</article>'
-                 f'<nav class="pager" aria-label="Попередній і наступний урок">{p}{nx}</nav>')
+    snippets = []
+    doc_html = md_to_html(l["md"], root, snippets)
+    if l["n"] in STARTER_FROM_SKETCH:
+        ex = next(e for e in EXAMPLES if e["name"] == STARTER_FROM_SKETCH[l["n"]])
+        tabs = [(f["name"][:-4], f["code"]) for f in ex["files"]]
+    else:
+        tabs = STARTERY[l["n"]]
+    ide_html, ide_js = ide_block(f"urok-{l['n']:02d}", tabs, IDE_INTRO)
+    main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / {"Уроки" if l["n"] == 16 else "Урок"} {l["label"]} з 17'
+                 ' · <a href="#praktykum">до практикуму ↓</a></p>'
+                 f'<article><div class="doc">{doc_html}</div>{ide_html}{sk_html}</article>'
+                 f'<nav class="pager" aria-label="Попередній і наступний урок">{p}{nx}</nav>'
+                 + ide_data(f"urok-{l['n']:02d}", tabs, snippets))
     title = f'{"Уроки" if l["n"] == 16 else "Урок"} {l["label"]}. {l["short"]}'
-    return full_page(head(title, f"{COURSE}: {l['title']}"), body(root, f"urok-{l['n']}", main_html))
+    return full_page(head(title, f"{COURSE}: {l['title']}", PDE_CSS), body(root, f"urok-{l['n']}", main_html, ide_js))
+
+
+def ide_page():
+    root = "../"
+    ide_html, ide_js = ide_block("pisochnytsia", PISOCHNYTSIA,
+                                 "Пісочниця для будь-яких експериментів. Усі скетчі курсу — у меню «Приклади», "
+                                 "гарячі клавіші — у меню «Довідка».", "Пісочниця")
+    main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / Онлайн-середовище</p>'
+                 f'<article><div class="doc"><h1>Онлайн-середовище Processing</h1>'
+                 "<p>Навчальна копія середовища Processing, що працює просто в браузері: на комп'ютері, планшеті й телефоні. "
+                 "Тут є вкладки, консоль, приклади, вибір кольору, збереження кадрів і файли для <code>loadImage()</code>.</p></div>"
+                 f"{ide_html}</article>" + ide_data("pisochnytsia", PISOCHNYTSIA))
+    return full_page(head("Онлайн-середовище Processing", "Навчальне середовище Processing у браузері", PDE_CSS),
+                     body(root, "ide", main_html, ide_js))
 
 
 def dovidnyk_page():
@@ -259,6 +411,7 @@ def index_parts():
         <canvas id="grid" width="900" height="230" aria-label="Система координат Processing: наведіть курсор, щоб побачити mouseX і mouseY"></canvas>
         <div class="readout" id="readout">mouseX = 160 · mouseY = 90</div>
       </div>
+      <p><a href="storinky/seredovyshche.html">Відкрити онлайн-середовище Processing →</a></p>
       <div class="stats"><span><b>16</b> уроків + проєкт</span><span><b>25</b> скетчів</span><span><b>25</b> питань у тесті</span><span>оцінювання за <b>12</b>-бальною шкалою</span></div>
     </section>
     {"".join(cards)}
@@ -274,6 +427,10 @@ for i, l in enumerate(lessons):
     nxt = lessons[i + 1] if i + 1 < len(lessons) else None
     (OUT / f"urok-{l['n']:02d}.html").write_text(lesson_page(l, prev, nxt), encoding="utf-8")
 (OUT / "dovidnyk.html").write_text(dovidnyk_page(), encoding="utf-8")
+(OUT / "seredovyshche.html").write_text(ide_page(), encoding="utf-8")
+(OUT / "ide").mkdir(exist_ok=True)
+shutil.copy(TOOLS / "ide" / "processing.min.js", OUT / "ide" / "processing.min.js")
+shutil.copy(TOOLS / "ide" / "LICENSE-processing-js.txt", OUT / "ide" / "LICENSE-processing-js.txt")
 h, b = index_parts()
 (ROOT / "index.html").write_text(full_page(h, b), encoding="utf-8")
 
@@ -281,4 +438,4 @@ h, b = index_parts()
 if len(sys.argv) > 2 and sys.argv[1] == "--artifact":
     pathlib.Path(sys.argv[2]).write_text(h + "\n" + b + "\n", encoding="utf-8")
 
-print(f"Зібрано: index.html, {len(lessons)} сторінок уроків і довідник у {OUT.relative_to(ROOT)}/")
+print(f"Зібрано: index.html, {len(lessons)} сторінок уроків, довідник і онлайн-середовище у {OUT.relative_to(ROOT)}/")

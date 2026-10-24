@@ -191,14 +191,168 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
   .doc th, .doc td { padding: 6px 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+/* Онлайн-середовище Processing (PDE): меню, панель інструментів, вкладки, редактор, рядок стану, консоль, вікно скетчу */
+:root {
+  --pde-bar: #1d2b3e;
+  --pde-bar-ink: #e8eef6;
+  --pde-bar-muted: #9fb0c4;
+  --pde-run: #3ddc84;
+  --pde-editor: #ffffff;
+  --pde-gutter: #f2f5f8;
+  --pde-gutter-ink: #9aa7b4;
+  --pde-status: #2d5a8c;
+  --pde-status-ink: #ffffff;
+  --pde-err: #b3261e;
+  --pde-err-ink: #ffffff;
+  --pde-warn: #8a5a00;
+  --pde-console: #0e1621;
+  --pde-console-ink: #d6e0ea;
+  --pde-console-err: #ff8f87;
+  --pde-console-warn: #ffd27a;
+  --pde-menu: #ffffff;
+  --pde-menu-hover: #e8ecfd;
+  --pde-shadow: 0 10px 30px rgba(15, 25, 40, 0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pde-bar: #0b121c; --pde-bar-ink: #e3e9ef; --pde-bar-muted: #8596a8; --pde-run: #3ddc84;
+    --pde-editor: #111922; --pde-gutter: #0d141c; --pde-gutter-ink: #5d6d7d;
+    --pde-status: #1f4673; --pde-status-ink: #ffffff; --pde-err: #a3221b; --pde-err-ink: #ffffff; --pde-warn: #ffcf70;
+    --pde-console: #070c12; --pde-console-ink: #d6e0ea; --pde-console-err: #ff8f87; --pde-console-warn: #ffd27a;
+    --pde-menu: #18222d; --pde-menu-hover: #1b2447; --pde-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme="dark"] {
+  --pde-bar: #0b121c; --pde-bar-ink: #e3e9ef; --pde-bar-muted: #8596a8; --pde-run: #3ddc84;
+  --pde-editor: #111922; --pde-gutter: #0d141c; --pde-gutter-ink: #5d6d7d;
+  --pde-status: #1f4673; --pde-status-ink: #ffffff; --pde-err: #a3221b; --pde-err-ink: #ffffff; --pde-warn: #ffcf70;
+  --pde-console: #070c12; --pde-console-ink: #d6e0ea; --pde-console-err: #ff8f87; --pde-console-warn: #ffd27a;
+  --pde-menu: #18222d; --pde-menu-hover: #1b2447; --pde-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.pde-section { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 14px; min-width: 0; }
+.pde-section > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.pde-section > p { margin: 0; color: var(--muted); max-width: 68ch; }
+
+.pde { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 8px; overflow: visible; background: var(--pde-editor); min-width: 0; position: relative; }
+.pde button { font: inherit; }
+
+/* Меню */
+.pde-menubar { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px 6px; background: var(--panel); border-bottom: 1px solid var(--rule); border-radius: 8px 8px 0 0; font-size: 0.86rem; }
+.pde-menu { position: relative; }
+.pde-menu > button { background: none; border: 0; color: var(--ink); padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+.pde-menu > button:hover, .pde-menu > button[aria-expanded="true"] { background: var(--pde-menu-hover); }
+.pde-menu-list { position: absolute; top: calc(100% + 2px); left: 0; z-index: 30; min-width: 250px; max-width: min(320px, 86vw); max-height: 60vh; overflow-y: auto; margin: 0; padding: 6px; list-style: none; background: var(--pde-menu); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--pde-shadow); }
+.pde-menu-list li button, .pde-menu-list li a { display: flex; justify-content: space-between; gap: 16px; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 4px; color: var(--ink); cursor: pointer; text-decoration: none; font-size: 0.88rem; }
+.pde-menu-list li button:hover, .pde-menu-list li a:hover, .pde-menu-list li button:focus-visible { background: var(--pde-menu-hover); }
+.pde-menu-list kbd { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); white-space: nowrap; }
+.pde-menu-list .sep { height: 1px; background: var(--rule); margin: 5px 4px; }
+.pde-menu-list .grp { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 8px 10px 2px; }
+
+/* Панель інструментів */
+.pde-toolbar { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--pde-bar); color: var(--pde-bar-ink); }
+.pde-btn-round { width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; background: #2a3c55; color: var(--pde-bar-ink); flex: none; }
+.pde-btn-round svg { width: 16px; height: 16px; }
+.pde-btn-round.run:hover, .pde.running .pde-btn-round.run { background: var(--pde-run); color: #0b1a10; }
+.pde-btn-round.stop:hover { background: #e0533d; color: #fff; }
+.pde-btn-round:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.pde-sketchname { font-family: var(--f-mono); font-size: 0.88rem; color: var(--pde-bar-ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pde-mode { margin-left: auto; font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--pde-bar-muted); border: 1px solid #3b4d66; border-radius: 4px; padding: 3px 7px; flex: none; }
+
+/* Вкладки */
+.pde-tabs { display: flex; align-items: flex-end; gap: 2px; padding: 6px 8px 0; background: var(--pde-bar); overflow-x: auto; }
+.pde-tab { display: flex; align-items: center; gap: 2px; background: #2a3c55; color: var(--pde-bar-muted); border-radius: 5px 5px 0 0; flex: none; }
+.pde-tab.active { background: var(--pde-editor); color: var(--ink); }
+.pde-tab > button { background: none; border: 0; color: inherit; padding: 7px 10px; font-family: var(--f-mono); font-size: 0.8rem; cursor: pointer; }
+.pde-tab .x { padding: 7px 8px 7px 2px; opacity: 0.6; }
+.pde-tab .x:hover { opacity: 1; color: var(--mark); }
+.pde-tab input { width: 12ch; font-family: var(--f-mono); font-size: 0.8rem; padding: 4px 6px; margin: 2px 4px; border: 1px solid var(--accent); border-radius: 3px; background: var(--pde-editor); color: var(--ink); }
+.pde-addtab { background: none; border: 0; color: var(--pde-bar-muted); padding: 6px 10px; cursor: pointer; font-size: 1rem; flex: none; }
+.pde-addtab:hover { color: var(--pde-bar-ink); }
+.pde-files { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; background: var(--pde-gutter); border-bottom: 1px solid var(--rule); font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted); }
+.pde-files span.f { background: var(--panel); border: 1px solid var(--rule); border-radius: 3px; padding: 1px 6px; color: var(--ink); }
+.pde-files button { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 0 2px; }
+
+/* Редактор */
+.pde-editor { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); height: 380px; background: var(--pde-editor); resize: vertical; overflow: hidden; min-height: 160px; }
+.pde-gutter { margin: 0; padding: 12px 8px 12px 10px; background: var(--pde-gutter); color: var(--pde-gutter-ink); font-family: var(--f-mono); font-size: 14px; line-height: 21px; text-align: right; overflow: hidden; user-select: none; min-width: 3.2em; white-space: pre; }
+.pde-gutter .err { color: var(--pde-err-ink); background: var(--pde-err); border-radius: 3px; padding: 0 3px; }
+.pde-code { position: relative; min-width: 0; overflow: hidden; }
+.pde-hl, .pde-input { position: absolute; inset: 0; margin: 0; padding: 12px 14px; border: 0; font-family: var(--f-mono); font-size: 14px; line-height: 21px; tab-size: 2; white-space: pre; overflow: auto; letter-spacing: 0; word-spacing: 0; font-variant-ligatures: none; }
+.pde-hl { color: var(--code-ink); pointer-events: none; overflow: hidden; }
+.pde-input { background: transparent; color: transparent; caret-color: var(--ink); resize: none; outline: none; -webkit-text-fill-color: transparent; }
+.pde-input::selection { background: rgba(34, 66, 214, 0.25); -webkit-text-fill-color: transparent; }
+.pde-input:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+
+/* Рядок стану і консоль */
+.pde-status { display: flex; align-items: center; gap: 10px; min-height: 34px; padding: 6px 12px; background: var(--pde-status); color: var(--pde-status-ink); font-size: 0.86rem; line-height: 1.35; }
+.pde-status.err { background: var(--pde-err); color: var(--pde-err-ink); }
+.pde-status .msg { flex: 1; min-width: 0; }
+.pde-status button { background: rgba(255, 255, 255, 0.16); color: inherit; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 0.8rem; flex: none; }
+.pde-console-wrap { background: var(--pde-console); border-radius: 0 0 8px 8px; }
+.pde-console-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pde-bar-muted); border-bottom: 1px solid #1c2735; }
+.pde-console-head button { background: none; border: 0; color: var(--pde-bar-muted); cursor: pointer; font-family: var(--f-mono); font-size: 0.72rem; }
+.pde-console { margin: 0; padding: 8px 12px; height: 120px; overflow: auto; color: var(--pde-console-ink); font-family: var(--f-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.pde-console .e { color: var(--pde-console-err); }
+.pde-console .w { color: var(--pde-console-warn); }
+.pde-console .s { color: var(--pde-bar-muted); }
+
+/* Вікно скетчу */
+.pde-window { margin-top: 14px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); overflow: hidden; min-width: 0; }
+.pde-window-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 10px; background: var(--pde-gutter); border-bottom: 1px solid var(--rule); font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.pde-window-bar .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pde-window-bar button { background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 8px; color: var(--ink); cursor: pointer; font-family: var(--f-mono); font-size: 0.74rem; }
+.pde-window-bar button:hover { border-color: var(--accent); color: var(--accent); }
+.pde-stage { overflow: auto; padding: 14px; background-color: var(--paper); min-height: 140px; display: flex; -webkit-overflow-scrolling: touch; }
+.pde-stage canvas { display: block; margin: auto; box-shadow: 0 0 0 1px var(--rule); background: #c8c8c8; outline: none; touch-action: none; }
+.pde-stage canvas:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+.pde-stage .idle { margin: auto; color: var(--muted); font-size: 0.9rem; text-align: center; max-width: 40ch; }
+.pde-window-foot { padding: 6px 12px; font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 4px 18px; font-variant-numeric: tabular-nums; }
+.pde-window:fullscreen { display: flex; flex-direction: column; border-radius: 0; background: #1b1b1b; }
+.pde-window:fullscreen .pde-stage { flex: 1; background: #1b1b1b; }
+
+/* Діалоги */
+.pde-overlay { position: fixed; inset: 0; z-index: 60; background: rgba(10, 16, 24, 0.55); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.pde-dialog { background: var(--panel); color: var(--ink); border-radius: 8px; box-shadow: var(--pde-shadow); width: min(520px, 100%); max-height: 100%; overflow: auto; padding: 18px 20px; display: grid; gap: 12px; }
+.pde-dialog h3 { margin: 0; font-size: 1.1rem; }
+.pde-dialog p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.pde-dialog .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pde-dialog .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.pde-dialog button, .pde-dialog a.btn { background: var(--panel); border: 1px solid var(--rule); color: var(--ink); border-radius: 5px; padding: 7px 12px; cursor: pointer; font-size: 0.9rem; text-decoration: none; }
+.pde-dialog button.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.pde-dialog input[type="color"] { width: 64px; height: 44px; border: 1px solid var(--rule); border-radius: 6px; padding: 2px; background: var(--panel); }
+.pde-dialog input[type="range"] { width: 100%; }
+.pde-dialog code, .pde-dialog kbd { font-family: var(--f-mono); font-size: 0.85rem; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+.pde-dialog img { display: block; max-width: 100%; border: 1px solid var(--rule); border-radius: 4px; }
+.pde-dialog table { border-collapse: collapse; font-size: 0.88rem; width: 100%; }
+.pde-dialog td { padding: 5px 6px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.pde-dialog ul { margin: 0; padding-left: 1.2em; color: var(--ink); font-size: 0.92rem; }
+.pde-swatch { width: 44px; height: 44px; border-radius: 6px; border: 1px solid var(--rule); }
+
+/* Кнопки «Спробувати» біля прикладів */
+.try { display: inline-flex; align-items: center; gap: 6px; margin: -0.4em 0 1em; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); border-radius: 5px; padding: 5px 12px; font: 600 0.84rem var(--f-body); cursor: pointer; }
+.try:hover { background: var(--accent); color: var(--panel); }
+
+@media (max-width: 900px) {
+  .pde-editor { height: 340px; }
+  .pde-gutter, .pde-hl, .pde-input { font-size: 15px; line-height: 22px; }
+  .pde-input { font-size: 16px; }
+  .pde-hl { font-size: 16px; }
+  .pde-gutter { font-size: 16px; }
+}
+@media (max-width: 520px) {
+  .pde-menubar { flex-wrap: nowrap; overflow-x: auto; }
+  .pde-menu-list { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-width: none; max-height: 70vh; }
+  .pde-console { height: 110px; }
+}
 </style>
 </head>
 <body>
 <div class="shell">
-  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html" aria-current="page"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html" aria-current="page"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
   <main>
-    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html" aria-current="page"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
-<p class="crumbs"><a href="../index.html">Програма</a> / Урок 2 з 17</p><article><div class="doc"><h1>Урок 2. Геометричні фігури та атрибути малювання</h1>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html" aria-current="page"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 2 з 17 · <a href="#praktykum">до практикуму ↓</a></p><article><div class="doc"><h1>Урок 2. Геометричні фігури та атрибути малювання</h1>
 <blockquote>
 <p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 1 «Pixels» (Simple Shapes); Reas &amp; Fry — розд. 3 «Draw», 15 «Vertices».</p>
 </blockquote>
@@ -302,7 +456,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 <pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">size</span>(<span class="t-num">300</span>, <span class="t-num">200</span>);
 <span class="t-fn">background</span>(<span class="t-num">220</span>);
 <span class="t-fn">fill</span>(<span class="t-num">255</span>);  <span class="t-fn">rect</span>(<span class="t-num">50</span>, <span class="t-num">50</span>, <span class="t-num">120</span>, <span class="t-num">80</span>);    <span class="t-com">// білий прямокутник — знизу</span>
-<span class="t-fn">fill</span>(<span class="t-num">100</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">150</span>, <span class="t-num">100</span>, <span class="t-num">100</span>, <span class="t-num">100</span>);  <span class="t-com">// сіре коло — зверху</span></code></pre>
+<span class="t-fn">fill</span>(<span class="t-num">100</span>);  <span class="t-fn">ellipse</span>(<span class="t-num">150</span>, <span class="t-num">100</span>, <span class="t-num">100</span>, <span class="t-num">100</span>);  <span class="t-com">// сіре коло — зверху</span></code></pre><button class="try" type="button" data-try="0">▶ Спробувати в онлайн-середовищі</button>
 <h2>Довільні фігури: beginShape()</h2>
 <pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">beginShape</span>();
 <span class="t-fn">vertex</span>(<span class="t-num">100</span>, <span class="t-num">20</span>);
@@ -329,7 +483,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 <span class="t-fn">ellipse</span>(<span class="t-num">119</span>, <span class="t-num">70</span>, <span class="t-num">16</span>, <span class="t-num">32</span>);
 <span class="t-com">// ноги</span>
 <span class="t-fn">line</span>(<span class="t-num">90</span>, <span class="t-num">150</span>, <span class="t-num">80</span>, <span class="t-num">160</span>);
-<span class="t-fn">line</span>(<span class="t-num">110</span>, <span class="t-num">150</span>, <span class="t-num">120</span>, <span class="t-num">160</span>);</code></pre>
+<span class="t-fn">line</span>(<span class="t-num">110</span>, <span class="t-num">150</span>, <span class="t-num">120</span>, <span class="t-num">160</span>);</code></pre><button class="try" type="button" data-try="1">▶ Спробувати в онлайн-середовищі</button>
 <p>📁 Скетчі: <code>skechi/L02_Figury</code>, <code>skechi/L02_Personazh</code></p>
 <h2>Практика</h2>
 <p><strong>Рівень 1.</strong> Намалюйте світлофор: прямокутник і три кола.</p>
@@ -341,7 +495,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 <li>Що станеться, якщо викликати <code>noFill()</code> перед <code>rect()</code>?</li>
 <li>Скільки градусів відповідає <code>HALF_PI</code>?</li>
 <li>Як зробити, щоб коло опинилося <strong>під</strong> квадратом?</li>
-</ol></div><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L02_Figury" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L02_Figury</h3><details open><summary>L02_Figury.pde · 49 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 2. Базові фігури та атрибути малювання</span>
+</ol></div><section class="pde-section" id="praktykum"><h2>Практикум в онлайн-середовищі Processing</h2><p>Виконуйте завдання уроку просто тут: пишіть код, натискайте ▶ і дивіться результат у вікні скетчу. Код зберігається в цьому браузері автоматично. Меню «Приклади» відкриває скетчі курсу, «Файл → Завантажити як .pde» допоможе перенести роботу в настільний Processing.</p><div id="pde"></div></section><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L02_Figury" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L02_Figury</h3><button class="try" type="button" data-open-ex="L02_Figury">▶ Відкрити в онлайн-середовищі</button><details open><summary>L02_Figury.pde · 49 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 2. Базові фігури та атрибути малювання</span>
 
 <span class="t-fn">size</span>(<span class="t-num">600</span>, <span class="t-num">400</span>);
 <span class="t-fn">background</span>(<span class="t-num">240</span>);
@@ -388,7 +542,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 <span class="t-fn">vertex</span>(<span class="t-num">272</span>, <span class="t-num">360</span>);
 <span class="t-fn">vertex</span>(<span class="t-num">230</span>, <span class="t-num">330</span>);
 <span class="t-fn">vertex</span>(<span class="t-num">282</span>, <span class="t-num">330</span>);
-<span class="t-fn">endShape</span>(<span class="t-fn">CLOSE</span>);</code></pre></details></div></div><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L02_Personazh" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L02_Personazh</h3><details open><summary>L02_Personazh.pde · 25 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 2. Персонаж Зуг (за прикладом Д. Шиффмана)</span>
+<span class="t-fn">endShape</span>(<span class="t-fn">CLOSE</span>);</code></pre></details></div></div><div class="sk"><figure><img src="data:image/jpeg;base64,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" alt="Результат роботи скетчу L02_Personazh" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L02_Personazh</h3><button class="try" type="button" data-open-ex="L02_Personazh">▶ Відкрити в онлайн-середовищі</button><details open><summary>L02_Personazh.pde · 25 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 2. Персонаж Зуг (за прикладом Д. Шиффмана)</span>
 
 <span class="t-fn">size</span>(<span class="t-num">200</span>, <span class="t-num">200</span>);
 <span class="t-fn">background</span>(<span class="t-num">255</span>);
@@ -411,7 +565,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 
 <span class="t-com">// Ноги</span>
 <span class="t-fn">line</span>(<span class="t-num">90</span>, <span class="t-num">150</span>, <span class="t-num">80</span>, <span class="t-num">160</span>);
-<span class="t-fn">line</span>(<span class="t-num">110</span>, <span class="t-num">150</span>, <span class="t-num">120</span>, <span class="t-num">160</span>);</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-01.html"><small>← Урок 1</small>Знайомство з Processing. Піксель і система координат</a><a class="next" href="urok-03.html"><small>Урок 3 →</small>Колір: відтінки сірого, RGB, прозорість, HSB</a></nav>
+<span class="t-fn">line</span>(<span class="t-num">110</span>, <span class="t-num">150</span>, <span class="t-num">120</span>, <span class="t-num">160</span>);</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-01.html"><small>← Урок 1</small>Знайомство з Processing. Піксель і система координат</a><a class="next" href="urok-03.html"><small>Урок 3 →</small>Колір: відтінки сірого, RGB, прозорість, HSB</a></nav><script type="application/json" id="pde-data">{"key": "urok-02", "tabs": [{"name": "Urok02", "code": "// Практикум до уроку 2\n// Рівень 1: світлофор — прямокутник і три кола.\n// Рівень 2: перенесіть на екран свого робота; використайте rectMode(CENTER).\n// Рівень 3: п'ятикутна зірка через beginShape()/vertex() і «Пакмен» через arc().\n\nsize(200, 400);\nbackground(255);\nrectMode(CENTER);\n\nfill(60);\nrect(100, 200, 120, 340);    // корпус світлофора\n\nfill(255, 0, 0);\nellipse(100, 90, 80, 80);    // червоне світло\n// додайте жовте та зелене світло:\n"}], "examples": [{"lesson": 1, "name": "L01_PershyiSketch", "files": [{"name": "L01_PershyiSketch.pde", "code": "// Урок 1. Мій перший скетч\n// Статичний режим: команди виконуються один раз, зверху вниз.\n\nsize(400, 300);             // розмір вікна: ширина 400, висота 300\nbackground(255);            // білий фон\n\nline(0, 0, 400, 300);       // лінія з лівого верхнього в правий нижній кут\nline(400, 0, 0, 300);       // друга діагональ\n\nrect(150, 100, 100, 60);    // прямокутник: x, y лівого верхнього кута, ширина, висота\nellipse(200, 130, 50, 50);  // коло: x, y центру, ширина, висота\npoint(20, 20);              // точка\n\nprintln(\"Привіт, Processing!\");   // повідомлення в консоль\n"}]}, {"lesson": 2, "name": "L02_Figury", "files": [{"name": "L02_Figury.pde", "code": "// Урок 2. Базові фігури та атрибути малювання\n\nsize(600, 400);\nbackground(240);\n\n// Рядок 1: базові фігури\nstrokeWeight(2);\nstroke(0);\nfill(255);\npoint(40, 60);\nline(70, 30, 150, 90);\nrect(180, 30, 100, 60);\nellipse(350, 60, 100, 60);\ntriangle(440, 90, 490, 30, 540, 90);\n\n// Рядок 2: режими CENTER — фігури вирівняні по одній осі\nrectMode(CENTER);\nfill(200);\nrect(100, 200, 120, 80);\nellipse(100, 200, 60, 60);\n\n// Товщина та форма кінців ліній\nstrokeWeight(12);\nstrokeCap(ROUND);   line(220, 170, 320, 170);\nstrokeCap(SQUARE);  line(220, 200, 320, 200);\nstrokeCap(PROJECT); line(220, 230, 320, 230);\n\n// Дуги: кути в радіанах\nstrokeWeight(2);\nfill(255, 220, 0);\narc(420, 200, 100, 100, QUARTER_PI, TWO_PI - QUARTER_PI, PIE);   // «Пакмен»\nnoFill();\narc(530, 200, 80, 80, 0, PI);                                    // нижня половина кола\n\n// Довільна фігура: зірка\nfill(255);\nbeginShape();\nvertex(300, 280);\nvertex(318, 330);\nvertex(370, 330);\nvertex(328, 360);\nvertex(345, 395);\nvertex(300, 372);\nvertex(255, 395);\nvertex(272, 360);\nvertex(230, 330);\nvertex(282, 330);\nendShape(CLOSE);\n"}]}, {"lesson": 2, "name": "L02_Personazh", "files": [{"name": "L02_Personazh.pde", "code": "// Урок 2. Персонаж Зуг (за прикладом Д. Шиффмана)\n\nsize(200, 200);\nbackground(255);\nrectMode(CENTER);\nellipseMode(CENTER);\n\n// Тіло\nstroke(0);\nfill(150);\nrect(100, 100, 20, 100);\n\n// Голова\nfill(255);\nellipse(100, 70, 60, 60);\n\n// Очі\nfill(0);\nellipse(81, 70, 16, 32);\nellipse(119, 70, 16, 32);\n\n// Ноги\nline(90, 150, 80, 160);\nline(110, 150, 120, 160);\n"}]}, {"lesson": 3, "name": "L03_Kolir", "files": [{"name": "L03_Kolir.pde", "code": "// Урок 3. Колір: HSB-веселка та змішування RGB з прозорістю\n\nsize(600, 400);\nbackground(255);\nnoStroke();\n\n// Веселка в моделі HSB: змінюється лише відтінок (Hue)\ncolorMode(HSB, 360, 100, 100);\nfloat stripeW = width / 7.0;\nfor (int i = 0; i < 7; i++) {\n  fill(i * 45, 90, 100);          // відтінок 0°, 45°, 90°, ...\n  rect(i * stripeW, 0, stripeW, 150);\n}\n\n// Змішування світла RGB з альфа-каналом\ncolorMode(RGB, 255);\nfill(255, 0, 0, 130);  ellipse(250, 260, 160, 160);\nfill(0, 255, 0, 130);  ellipse(350, 260, 160, 160);\nfill(0, 0, 255, 130);  ellipse(300, 330, 160, 160);\n\n// Колір у змінній та шістнадцятковий запис\ncolor orange = #FF8800;\nfill(orange);\nrect(500, 330, 60, 40);\nprintln(\"Червона складова: \" + red(orange) + \", зелена: \" + green(orange));\n"}]}, {"lesson": 4, "name": "L04_Zminni", "files": [{"name": "L04_Zminni.pde", "code": "// Урок 4. Змінні керують малюнком\n// Змініть zoogX, zoogY або zoogScale — і весь персонаж зміниться.\n\nint zoogX = 100;\nint zoogY = 100;\nfloat zoogScale = 1.0;\n\nsize(200, 200);\nbackground(255);\nrectMode(CENTER);\n\n// Тіло\nfill(150);\nrect(zoogX, zoogY, 20 * zoogScale, 100 * zoogScale);\n\n// Голова\nfill(255);\nellipse(zoogX, zoogY - 30 * zoogScale, 60 * zoogScale, 60 * zoogScale);\n\n// Очі\nfill(0);\nellipse(zoogX - 19 * zoogScale, zoogY - 30 * zoogScale, 16 * zoogScale, 32 * zoogScale);\nellipse(zoogX + 19 * zoogScale, zoogY - 30 * zoogScale, 16 * zoogScale, 32 * zoogScale);\n\n// Ноги\nline(zoogX - 10 * zoogScale, zoogY + 50 * zoogScale, zoogX - 20 * zoogScale, zoogY + 60 * zoogScale);\nline(zoogX + 10 * zoogScale, zoogY + 50 * zoogScale, zoogX + 20 * zoogScale, zoogY + 60 * zoogScale);\n\n// Пастка цілочисельного ділення\nprintln(\"7 / 2 = \" + (7 / 2));\nprintln(\"7.0 / 2 = \" + (7.0 / 2));\nprintln(\"7 % 2 = \" + (7 % 2));\nprintln(\"Відстань: \" + dist(0, 0, 3, 4));\n"}]}, {"lesson": 5, "name": "L05_Animatsiya", "files": [{"name": "L05_Animatsiya.pde", "code": "// Урок 5. Анімація: рух, зростання, шлейф\n// Натисніть будь-яку клавішу, щоб увімкнути/вимкнути шлейф.\n\nfloat x = 0;          // 1. Оголосили глобальні змінні\nfloat diameter = 10;\nfloat gray = 0;\nboolean trail = false;\n\nvoid setup() {\n  size(500, 300);     // 2. Початкові налаштування\n  background(255);\n}\n\nvoid draw() {\n  if (trail) {\n    noStroke();\n    fill(255, 20);    // напівпрозоре «стирання» — плавний шлейф\n    rect(0, 0, width, height);\n  } else {\n    background(255);\n  }\n\n  stroke(0);\n  fill(gray);\n  ellipse(x, height/2, diameter, diameter);   // 3. Використали змінні\n\n  x = x + 2;          // 4. Змінили змінні\n  diameter = diameter + 0.3;\n  gray = gray + 1;\n\n  if (x > width + diameter/2) {   // повертаємося на початок\n    x = -diameter/2;\n    diameter = 10;\n    gray = 0;\n  }\n}\n\nvoid keyPressed() {\n  trail = !trail;\n}\n"}]}, {"lesson": 6, "name": "L06_Malyuvalka", "files": [{"name": "L06_Malyuvalka.pde", "code": "// Урок 6. Малювалка\n// Мишею — малювати; 1, 2, 3 — колір; c — очистити; s — зберегти PNG.\n\ncolor brushColor;\n\nvoid setup() {\n  size(800, 500);\n  background(255);\n  brushColor = color(0);\n}\n\nvoid draw() {\n  if (mousePressed) {\n    // чим швидше рухається миша, тим тонша лінія\n    float speed = dist(pmouseX, pmouseY, mouseX, mouseY);\n    float w = map(speed, 0, 50, 12, 1);\n    strokeWeight(constrain(w, 1, 12));\n    stroke(brushColor);\n    line(pmouseX, pmouseY, mouseX, mouseY);\n  }\n  drawPalette();\n}\n\n// Підказка-палітра в лівому верхньому куті\nvoid drawPalette() {\n  noStroke();\n  fill(0);           rect(10, 10, 20, 20);\n  fill(220, 30, 30); rect(35, 10, 20, 20);\n  fill(30, 90, 220); rect(60, 10, 20, 20);\n  fill(brushColor);  rect(90, 10, 20, 20);\n}\n\nvoid keyPressed() {\n  if (key == '1') brushColor = color(0);\n  if (key == '2') brushColor = color(220, 30, 30);\n  if (key == '3') brushColor = color(30, 90, 220);\n  if (key == 'c') background(255);\n  if (key == 's') saveFrame(\"malyunok-####.png\");\n}\n"}]}, {"lesson": 7, "name": "L07_Knopka", "files": [{"name": "L07_Knopka.pde", "code": "// Урок 7. Кнопка-перемикач і підсвічування при наведенні\n\nint bx = 150, by = 120, bw = 200, bh = 80;\nboolean isOn = false;\n\nvoid setup() {\n  size(500, 320);\n  textAlign(CENTER, CENTER);\n  textSize(24);\n}\n\nvoid draw() {\n  if (isOn) background(255, 240, 150);\n  else      background(40);\n\n  boolean over = mouseX > bx && mouseX < bx + bw && mouseY > by && mouseY < by + bh;\n\n  if (over) fill(255, 160, 0);   // наведення\n  else      fill(200);\n  stroke(0);\n  rect(bx, by, bw, bh, 12);\n\n  fill(0);\n  if (isOn) text(\"ВИМКНУТИ\", bx + bw/2, by + bh/2);\n  else      text(\"УВІМКНУТИ\", bx + bw/2, by + bh/2);\n}\n\nvoid mousePressed() {\n  if (mouseX > bx && mouseX < bx + bw && mouseY > by && mouseY < by + bh) {\n    isOn = !isOn;\n  }\n}\n"}]}, {"lesson": 7, "name": "L07_Vidskok", "files": [{"name": "L07_Vidskok.pde", "code": "// Урок 7. М'яч відскакує від стінок і падає під дією гравітації\n\nfloat x = 100, y = 50;\nfloat xSpeed = 3, ySpeed = 0;\nfloat gravity = 0.3;\nfloat d = 40;\n\nvoid setup() {\n  size(500, 400);\n}\n\nvoid draw() {\n  background(255);\n\n  ySpeed += gravity;     // гравітація збільшує швидкість падіння\n  x += xSpeed;\n  y += ySpeed;\n\n  // відскок від бічних стінок\n  if (x > width - d/2 || x < d/2) {\n    xSpeed *= -1;\n  }\n  // відскок від підлоги з втратою енергії\n  if (y > height - d/2) {\n    y = height - d/2;\n    ySpeed *= -0.85;\n  }\n\n  fill(255, 120, 0);\n  ellipse(x, y, d, d);\n}\n\n// Клацання — підкинути м'яч заново\nvoid mousePressed() {\n  x = mouseX;\n  y = mouseY;\n  ySpeed = -8;\n}\n"}]}, {"lesson": 8, "name": "L08_Shakhy", "files": [{"name": "L08_Shakhy.pde", "code": "// Урок 8. Шахова дошка 8×8 — вкладені цикли та остача від ділення\n\nint n = 8;\n\nvoid setup() {\n  size(400, 400);\n  noStroke();\n}\n\nvoid draw() {\n  float cell = width / (float) n;\n  for (int i = 0; i < n; i++) {        // рядки\n    for (int j = 0; j < n; j++) {      // стовпці\n      if ((i + j) % 2 == 0) fill(240, 217, 181);\n      else                  fill(181, 136, 99);\n      rect(j * cell, i * cell, cell, cell);\n    }\n  }\n}\n"}]}, {"lesson": 8, "name": "L08_Tsykly", "files": [{"name": "L08_Tsykly.pde", "code": "// Урок 8. Цикли: інтерактивні лінії, кольорова сітка, концентричні кола\n// Клавіші 1, 2, 3 перемикають режим.\n\nint mode = 1;\n\nvoid setup() {\n  size(400, 400);\n}\n\nvoid draw() {\n  background(255);\n  if (mode == 1) drawLines();\n  else if (mode == 2) drawGrid();\n  else drawCircles();\n}\n\n// Лінії, що світлішають, коли далеко від курсора\nvoid drawLines() {\n  strokeWeight(3);\n  for (int x = 0; x < width; x += 10) {\n    float d = abs(mouseX - x);\n    stroke(constrain(d, 0, 255));\n    line(x, 0, x, height);\n  }\n}\n\n// Вкладені цикли: рядки × стовпці\nvoid drawGrid() {\n  stroke(255);\n  for (int y = 0; y < height; y += 40) {\n    for (int x = 0; x < width; x += 40) {\n      fill(x * 255 / width, y * 255 / height, 150);\n      rect(x, y, 40, 40);\n    }\n  }\n}\n\n// Концентричні кола, центр — у курсора\nvoid drawCircles() {\n  noFill();\n  stroke(0);\n  strokeWeight(1);\n  for (int d = 600; d > 0; d -= 20) {\n    ellipse(mouseX, mouseY, d, d);\n  }\n}\n\nvoid keyPressed() {\n  if (key == '1') mode = 1;\n  if (key == '2') mode = 2;\n  if (key == '3') mode = 3;\n}\n"}]}, {"lesson": 9, "name": "L09_Labirynt", "files": [{"name": "L09_Labirynt.pde", "code": "// Урок 9. «10 PRINT» — генеративний лабіринт\n// Клацання мишею — новий лабіринт.\n\nint step = 20;\n\nvoid setup() {\n  size(600, 400);\n  strokeWeight(3);\n  strokeCap(ROUND);\n  drawMaze();\n}\n\nvoid draw() {\n  // малюємо лише при клацанні\n}\n\nvoid drawMaze() {\n  background(30, 40, 90);\n  stroke(255);\n  for (int y = 0; y < height; y += step) {\n    for (int x = 0; x < width; x += step) {\n      if (random(1) < 0.5) {\n        line(x, y, x + step, y + step);   // діагональ «\\»\n      } else {\n        line(x + step, y, x, y + step);   // діагональ «/»\n      }\n    }\n  }\n}\n\nvoid mousePressed() {\n  drawMaze();\n}\n"}]}, {"lesson": 9, "name": "L09_Noise", "files": [{"name": "L09_Noise.pde", "code": "// Урок 9. Шум Перліна: гірський пейзаж і плавний блукач\n\nfloat t = 0;        // «час» для блукача\nfloat offset = 0;   // зсув пейзажу — гори «пливуть»\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(200, 225, 255);\n\n  // Три шари гір: що далі, то світліші\n  drawMountains(0.005, 180, color(150, 170, 200), offset * 0.3);\n  drawMountains(0.01, 250, color(90, 120, 150), offset * 0.6 + 100);\n  drawMountains(0.02, 320, color(40, 60, 80), offset + 200);\n  offset += 1;\n\n  // Блукач: плавний рух через noise()\n  float x = noise(t) * width;\n  float y = noise(t + 1000) * height * 0.5;\n  noStroke();\n  fill(255, 200, 0);\n  ellipse(x, y, 30, 30);\n  t += 0.005;\n}\n\n// Малює шар гір; scale — «зернистість» шуму, base — висота шару\nvoid drawMountains(float scale, float base, color c, float shift) {\n  stroke(c);\n  for (int x = 0; x < width; x++) {\n    float h = noise((x + shift) * scale) * 200;\n    line(x, height, x, base - h + 100);\n  }\n}\n"}]}, {"lesson": 10, "name": "L10_Funktsii", "files": [{"name": "L10_Funktsii.pde", "code": "// Урок 10. Власна функція з параметрами: машинки\n\nvoid setup() {\n  size(400, 300);\n}\n\nvoid draw() {\n  background(255);\n  drawCar(100, 100, color(255, 0, 0));\n  drawCar(250, 200, color(0, 0, 255));\n  drawCar(mouseX, mouseY, color(0, 200, 0));\n}\n\n// Малює машину з центром у (x, y) кольору c\nvoid drawCar(float x, float y, color c) {\n  rectMode(CENTER);\n  stroke(0);\n  fill(c);\n  rect(x, y, 80, 30);              // кузов\n  fill(200, 230, 255);\n  rect(x + 10, y - 22, 40, 16);    // кабіна\n  fill(0);\n  ellipse(x - 25, y + 15, 20, 20); // колеса\n  ellipse(x + 25, y + 15, 20, 20);\n}\n"}]}, {"lesson": 10, "name": "L10_Kvity", "files": [{"name": "L10_Kvity.pde", "code": "// Урок 10. Функції, що малюють і повертають значення: клумба квітів\n// Клацання мишею — посадити нову клумбу.\n\nvoid setup() {\n  size(600, 400);\n  noLoop();          // малюємо один кадр; redraw() — ще один\n}\n\nvoid draw() {\n  background(120, 190, 90);\n  for (int i = 0; i < 12; i++) {\n    float x = random(50, width - 50);\n    float y = random(50, height - 50);\n    drawFlower(x, y, random(30, 80), randomPetalColor());\n  }\n}\n\n// Малює квітку: центр (x, y), розмір s, колір пелюсток c\nvoid drawFlower(float x, float y, float s, color c) {\n  noStroke();\n  fill(c);\n  for (int i = 0; i < 6; i++) {\n    float a = TWO_PI / 6 * i;\n    ellipse(x + cos(a) * s / 3, y + sin(a) * s / 3, s / 2, s / 2);\n  }\n  fill(255, 210, 0);\n  ellipse(x, y, s / 3, s / 3);\n}\n\n// Повертає випадковий «квітковий» колір\ncolor randomPetalColor() {\n  color[] palette = { color(255, 90, 120), color(255, 255, 255), color(160, 110, 230), color(255, 150, 40) };\n  return palette[int(random(palette.length))];\n}\n\nvoid mousePressed() {\n  redraw();\n}\n"}]}, {"lesson": 11, "name": "L11_Myachi", "files": [{"name": "L11_Myachi.pde", "code": "// Урок 11. Клас Ball: три незалежні м'ячі\n\nBall b1, b2, b3;\n\nvoid setup() {\n  size(500, 350);\n  b1 = new Ball(100, 100, 40);\n  b2 = new Ball(250, 200, 60);\n  b3 = new Ball(400, 80, 25);\n}\n\nvoid draw() {\n  background(255);\n  b1.move();  b1.bounce();  b1.display();\n  b2.move();  b2.bounce();  b2.display();\n  b3.move();  b3.bounce();  b3.display();\n}\n\nclass Ball {\n  float x, y, d;\n  float xSpeed, ySpeed;\n  color c;\n\n  Ball(float tempX, float tempY, float tempD) {\n    x = tempX;\n    y = tempY;\n    d = tempD;\n    xSpeed = random(-4, 4);\n    ySpeed = random(-4, 4);\n    c = color(random(255), random(255), random(255));\n  }\n\n  void move() {\n    x += xSpeed;\n    y += ySpeed;\n  }\n\n  // Відскок від стінок + зміна кольору\n  void bounce() {\n    if (x > width - d/2 || x < d/2) {\n      xSpeed *= -1;\n      c = color(random(255), random(255), random(255));\n    }\n    if (y > height - d/2 || y < d/2) {\n      ySpeed *= -1;\n      c = color(random(255), random(255), random(255));\n    }\n  }\n\n  void display() {\n    stroke(0);\n    fill(c);\n    ellipse(x, y, d, d);\n  }\n\n  // Чи знаходиться курсор над м'ячем?\n  boolean isUnderMouse() {\n    return dist(mouseX, mouseY, x, y) < d/2;\n  }\n}\n\n// Клацання по м'ячу зупиняє його\nvoid mousePressed() {\n  if (b1.isUnderMouse()) { b1.xSpeed = 0; b1.ySpeed = 0; }\n  if (b2.isUnderMouse()) { b2.xSpeed = 0; b2.ySpeed = 0; }\n  if (b3.isUnderMouse()) { b3.xSpeed = 0; b3.ySpeed = 0; }\n}\n"}]}, {"lesson": 11, "name": "L11_Obyekty", "files": [{"name": "L11_Obyekty.pde", "code": "// Урок 11. Об'єкти: дві машини одного класу Car (клас — у вкладці Car)\n\nCar redCar;    // 1. Оголошуємо об'єкти\nCar blueCar;\n\nvoid setup() {\n  size(400, 200);\n  // 2. Створюємо об'єкти конструктором\n  redCar  = new Car(color(255, 0, 0), 0, 60, 2);\n  blueCar = new Car(color(0, 0, 255), 0, 140, 1);\n}\n\nvoid draw() {\n  background(255);\n  // 3. Викликаємо методи\n  redCar.move();\n  redCar.display();\n  blueCar.move();\n  blueCar.display();\n}\n"}, {"name": "Car.pde", "code": "// Клас Car — «формочка» для машин\n\nclass Car {\n  // Поля (дані)\n  color c;\n  float x, y;\n  float speed;\n\n  // Конструктор\n  Car(color tempC, float tempX, float tempY, float tempSpeed) {\n    c = tempC;\n    x = tempX;\n    y = tempY;\n    speed = tempSpeed;\n  }\n\n  // Метод: рух\n  void move() {\n    x += speed;\n    if (x > width + 20) {\n      x = -20;\n    }\n  }\n\n  // Метод: малювання\n  void display() {\n    rectMode(CENTER);\n    stroke(0);\n    fill(c);\n    rect(x, y, 40, 20);\n    fill(0);\n    ellipse(x - 12, y + 10, 10, 10);\n    ellipse(x + 12, y + 10, 10, 10);\n  }\n}\n"}]}, {"lesson": 12, "name": "L12_Chastynky", "files": [{"name": "L12_Chastynky.pde", "code": "// Урок 12. Система частинок з ArrayList: фонтан за курсором\n// Клацання — «вибух» із 100 частинок.\n\nArrayList<Particle> particles = new ArrayList<Particle>();\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(20);\n  // Щокадру додаємо дві нові частинки\n  particles.add(new Particle(mouseX, mouseY));\n  particles.add(new Particle(mouseX, mouseY));\n\n  // Перебираємо з кінця, щоб безпечно видаляти\n  for (int i = particles.size() - 1; i >= 0; i--) {\n    Particle p = particles.get(i);\n    p.update();\n    p.display();\n    if (p.isDead()) {\n      particles.remove(i);\n    }\n  }\n\n  fill(255);\n  text(\"Частинок: \" + particles.size(), 10, 20);\n}\n\nvoid mousePressed() {\n  for (int i = 0; i < 100; i++) {\n    particles.add(new Particle(mouseX, mouseY));\n  }\n}\n\nclass Particle {\n  float x, y;\n  float vx, vy;\n  float life = 255;     // «тривалість життя» = прозорість\n  color c;\n\n  Particle(float startX, float startY) {\n    x = startX;\n    y = startY;\n    float angle = random(TWO_PI);\n    float speed = random(1, 4);\n    vx = cos(angle) * speed;\n    vy = sin(angle) * speed - 2;\n    c = color(random(200, 255), random(80, 200), random(50));\n  }\n\n  void update() {\n    vy += 0.1;          // гравітація\n    x += vx;\n    y += vy;\n    life -= 3;\n  }\n\n  void display() {\n    noStroke();\n    fill(c, life);\n    ellipse(x, y, 8, 8);\n  }\n\n  boolean isDead() {\n    return life <= 0;\n  }\n}\n"}]}, {"lesson": 12, "name": "L12_Slid", "files": [{"name": "L12_Slid.pde", "code": "// Урок 12. Масиви: слід миші з 50 останніх положень\n\nint num = 50;\nint[] xs = new int[num];\nint[] ys = new int[num];\n\nvoid setup() {\n  size(500, 400);\n  noStroke();\n}\n\nvoid draw() {\n  background(255);\n\n  // Зсуваємо всі значення на одну позицію вліво\n  for (int i = 0; i < num - 1; i++) {\n    xs[i] = xs[i + 1];\n    ys[i] = ys[i + 1];\n  }\n  // Нове положення миші — в кінець масиву\n  xs[num - 1] = mouseX;\n  ys[num - 1] = mouseY;\n\n  // Малюємо: старіші точки — менші та світліші\n  for (int i = 0; i < num; i++) {\n    fill(255 - i * 5, 100, i * 5);\n    ellipse(xs[i], ys[i], i, i);\n  }\n}\n"}]}, {"lesson": 13, "name": "L13_Derevo", "files": [{"name": "L13_Derevo.pde", "code": "// Урок 13. Рекурсія + трансформації: фрактальне дерево\n// Кут розгалуження керується положенням миші по X.\n\nfloat theta;\n\nvoid setup() {\n  size(600, 450);\n}\n\nvoid draw() {\n  background(255);\n  stroke(60, 40, 20);\n  theta = map(mouseX, 0, width, 0, HALF_PI);\n  translate(width/2, height);   // стовбур росте від низу по центру\n  branch(120);\n}\n\n// Малює гілку довжини len і дві менші гілки на її кінці\nvoid branch(float len) {\n  strokeWeight(max(1, len / 12));\n  line(0, 0, 0, -len);\n  translate(0, -len);\n  if (len > 4) {               // умова зупинки рекурсії\n    pushMatrix();\n    rotate(theta);\n    branch(len * 0.67);\n    popMatrix();\n\n    pushMatrix();\n    rotate(-theta);\n    branch(len * 0.67);\n    popMatrix();\n  }\n}\n"}]}, {"lesson": 13, "name": "L13_Khvylya", "files": [{"name": "L13_Khvylya.pde", "code": "// Урок 13. Синус: хвиля та маятник\n// Миша по X змінює довжину хвилі, по Y — амплітуду.\n\nfloat angle = 0;\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(255);\n\n  float waveLen = map(mouseX, 0, width, 0.01, 0.15);\n  float amp = map(mouseY, 0, height, 10, 150);\n\n  // Хвиля з кружечків\n  noStroke();\n  fill(0, 120, 255);\n  for (int x = 0; x < width; x += 10) {\n    float y = height/2 + amp * sin(angle + x * waveLen);\n    ellipse(x, y, 10, 10);\n  }\n\n  // Маятник: кут коливається через sin()\n  float a = QUARTER_PI * sin(frameCount * 0.05);\n  float bx = 520 + 80 * sin(a);\n  float by = 20 + 80 * cos(a);\n  stroke(0);\n  line(520, 20, bx, by);\n  fill(255, 80, 80);\n  ellipse(bx, by, 20, 20);\n\n  angle += 0.05;\n}\n"}]}, {"lesson": 13, "name": "L13_Orbita", "files": [{"name": "L13_Orbita.pde", "code": "// Урок 13. Трансформації: Сонячна система (Сонце — Земля — Місяць, Марс)\n\nfloat earthAngle = 0;\nfloat moonAngle = 0;\nfloat marsAngle = 0;\n\nvoid setup() {\n  size(600, 600);\n}\n\nvoid draw() {\n  background(10, 10, 30);\n  translate(width/2, height/2);   // початок координат — у центрі\n\n  // Орбіти\n  noFill();\n  stroke(60);\n  ellipse(0, 0, 300, 300);\n  ellipse(0, 0, 480, 480);\n\n  // Сонце\n  noStroke();\n  fill(255, 200, 0);\n  ellipse(0, 0, 60, 60);\n\n  // Земля + Місяць\n  pushMatrix();                   // запам'ятали систему «Сонце»\n  rotate(earthAngle);\n  translate(150, 0);\n  fill(50, 120, 255);\n  ellipse(0, 0, 25, 25);\n  rotate(moonAngle);\n  translate(30, 0);               // Місяць — відносно Землі\n  fill(200);\n  ellipse(0, 0, 8, 8);\n  popMatrix();                    // повернулися до Сонця\n\n  // Марс\n  pushMatrix();\n  rotate(marsAngle);\n  translate(240, 0);\n  fill(220, 80, 40);\n  ellipse(0, 0, 18, 18);\n  popMatrix();\n\n  earthAngle += 0.01;\n  moonAngle += 0.05;\n  marsAngle += 0.006;\n}\n"}]}, {"lesson": 14, "name": "L14_Puantylizm", "files": [{"name": "L14_Puantylizm.pde", "code": "// Урок 14. Пікселі: пуантилізм\n// Програма створює зображення-джерело сама (градієнт і «сонце»),\n// тож працює без файлу. Щоб узяти фото: покладіть photo.jpg у папку data\n// і розкоментуйте рядок з loadImage().\n\nPImage img;\n\nvoid setup() {\n  size(600, 400);\n  img = makeSourceImage();\n  // img = loadImage(\"photo.jpg\"); img.resize(width, height);\n  background(255);\n  noStroke();\n}\n\nvoid draw() {\n  // Щокадру малюємо 50 «мазків» кольором пікселя з джерела\n  for (int i = 0; i < 50; i++) {\n    int x = int(random(img.width));\n    int y = int(random(img.height));\n    int index = x + y * img.width;   // індекс пікселя в масиві\n    color c = img.pixels[index];\n    fill(c, 150);\n    float d = map(mouseX, 0, width, 4, 24);\n    ellipse(x, y, d, d);\n  }\n}\n\n// Створює зображення попіксельно: небо, сонце, море\nPImage makeSourceImage() {\n  PImage src = createImage(width, height, RGB);\n  src.loadPixels();\n  for (int y = 0; y < src.height; y++) {\n    for (int x = 0; x < src.width; x++) {\n      int i = x + y * src.width;\n      if (dist(x, y, 420, 150) < 60) {\n        src.pixels[i] = color(255, 220, 60);                    // сонце\n      } else if (y < src.height * 0.6) {\n        src.pixels[i] = color(255, 150 + y / 4, 100 + y / 2);   // небо\n      } else {\n        src.pixels[i] = color(20, 80 + (y % 20) * 3, 160);      // море\n      }\n    }\n  }\n  src.updatePixels();\n  return src;\n}\n\nvoid keyPressed() {\n  if (key == 'c') background(255);\n  if (key == 's') saveFrame(\"puantylizm-####.png\");\n}\n"}]}, {"lesson": 14, "name": "L14_Tekst", "files": [{"name": "L14_Tekst.pde", "code": "// Урок 14. Кінетична типографіка: «хвиля» з літер\n\nString message = \"Привіт, Processing!\";\nPFont font;\n\nvoid setup() {\n  size(700, 300);\n  font = createFont(\"Arial\", 40);   // шрифт із кирилицею\n  textFont(font);\n  textAlign(LEFT, CENTER);\n}\n\nvoid draw() {\n  background(20, 30, 60);\n  float x = 40;\n  for (int i = 0; i < message.length(); i++) {\n    char letter = message.charAt(i);\n    float y = height/2 + 30 * sin(frameCount * 0.08 + i * 0.5);\n    fill(150 + 100 * sin(i * 0.4), 200, 255);\n    text(letter, x, y);\n    x += textWidth(letter);           // зсув на ширину літери\n  }\n\n  textSize(16);\n  fill(255);\n  text(\"Кадр: \" + frameCount, 10, height - 20);\n  textSize(40);\n}\n"}]}, {"lesson": 15, "name": "L15_Lovets", "files": [{"name": "L15_Lovets.pde", "code": "// Урок 15. Гра «Ловець крапель» (за ідеєю Д. Шиффмана, розд. 10)\n// Керування — мишею. Стани: 0 — меню, 1 — гра, 2 — кінець гри.\n\nint state = 0;\nCatcher catcher;\nArrayList<Drop> drops;\nTimer timer;\nint score;\nint lives;\nint best = 0;\n\nvoid setup() {\n  size(500, 600);\n  textAlign(CENTER, CENTER);\n  restart();\n}\n\nvoid restart() {\n  catcher = new Catcher(32);\n  drops = new ArrayList<Drop>();\n  timer = new Timer(1000);   // нова крапля щосекунди\n  timer.start();\n  score = 0;\n  lives = 3;\n}\n\nvoid draw() {\n  background(235, 245, 255);\n  if (state == 0)      drawMenu();\n  else if (state == 1) playGame();\n  else                 drawGameOver();\n}\n\nvoid drawMenu() {\n  fill(30, 60, 120);\n  textSize(40);\n  text(\"Ловець крапель\", width/2, height/2 - 40);\n  textSize(18);\n  text(\"Клацніть, щоб почати\", width/2, height/2 + 20);\n}\n\nvoid playGame() {\n  catcher.setLocation(mouseX, height - 60);\n  catcher.display();\n\n  if (timer.isFinished()) {\n    drops.add(new Drop(1 + score * 0.1));   // що більший рахунок, то швидше\n    timer.start();\n  }\n\n  for (int i = drops.size() - 1; i >= 0; i--) {\n    Drop d = drops.get(i);\n    d.move();\n    d.display();\n    if (catcher.intersect(d)) {\n      score++;\n      drops.remove(i);\n    } else if (d.reachedBottom()) {\n      lives--;\n      drops.remove(i);\n    }\n  }\n\n  fill(0);\n  textSize(18);\n  text(\"Рахунок: \" + score + \"    Життя: \" + lives, width/2, 20);\n\n  if (lives <= 0) {\n    best = max(best, score);\n    state = 2;\n  }\n}\n\nvoid drawGameOver() {\n  fill(180, 30, 30);\n  textSize(40);\n  text(\"Гру закінчено\", width/2, height/2 - 40);\n  fill(0);\n  textSize(20);\n  text(\"Рахунок: \" + score + \"   Рекорд: \" + best, width/2, height/2 + 10);\n  text(\"Клацніть, щоб грати ще\", width/2, height/2 + 50);\n}\n\nvoid mousePressed() {\n  if (state == 0) {\n    state = 1;\n  } else if (state == 2) {\n    restart();\n    state = 1;\n  }\n}\n"}, {"name": "Catcher.pde", "code": "// Ловець — коло, що рухається за мишею\n\nclass Catcher {\n  float r;\n  float x, y;\n\n  Catcher(float tempR) {\n    r = tempR;\n  }\n\n  void setLocation(float tempX, float tempY) {\n    x = tempX;\n    y = tempY;\n  }\n\n  void display() {\n    stroke(0);\n    fill(255, 170, 0);\n    ellipse(x, y, r * 2, r * 2);\n  }\n\n  // Зіткнення: відстань між центрами менша за суму радіусів\n  boolean intersect(Drop d) {\n    return dist(x, y, d.x, d.y) < r + d.r;\n  }\n}\n"}, {"name": "Drop.pde", "code": "// Крапля падає згори\n\nclass Drop {\n  float x, y;\n  float speed;\n  float r = 8;\n  color c = color(50, 100, 255);\n\n  Drop(float baseSpeed) {\n    x = random(r, width - r);\n    y = -r * 4;\n    speed = baseSpeed + random(1, 3);\n  }\n\n  void move() {\n    y += speed;\n  }\n\n  boolean reachedBottom() {\n    return y > height + r * 4;\n  }\n\n  // Крапля малюється стовпчиком кіл, що збільшуються донизу (як у Шиффмана)\n  void display() {\n    noStroke();\n    fill(c);\n    for (int i = 2; i < r; i++) {\n      ellipse(x, y + i * 4, i * 2, i * 2);\n    }\n  }\n}\n"}, {"name": "Timer.pde", "code": "// Таймер на основі millis()\n\nclass Timer {\n  int savedTime;\n  int totalTime;\n\n  Timer(int tempTotalTime) {\n    totalTime = tempTotalTime;\n  }\n\n  void start() {\n    savedTime = millis();\n  }\n\n  boolean isFinished() {\n    return millis() - savedTime > totalTime;\n  }\n}\n"}]}], "snippets": [[["Pryklad", "size(300, 200);\nbackground(220);\nfill(255);  rect(50, 50, 120, 80);    // білий прямокутник — знизу\nfill(100);  ellipse(150, 100, 100, 100);  // сіре коло — зверху\n"]], [["Pryklad", "size(200, 200);\nbackground(255);\nrectMode(CENTER);\nellipseMode(CENTER);\n// тіло\nstroke(0);\nfill(150);\nrect(100, 100, 20, 100);\n// голова\nfill(255);\nellipse(100, 70, 60, 60);\n// очі\nfill(0);\nellipse(81, 70, 16, 32);\nellipse(119, 70, 16, 32);\n// ноги\nline(90, 150, 80, 160);\nline(110, 150, 120, 160);\n"]]]}</script>
   </main>
 </div>
 <script>
@@ -423,7 +577,1150 @@ document.addEventListener('click', function (e) {
   function selectIt() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done('Виділено'); }
   try { navigator.clipboard.writeText(code.innerText).then(function () { done('Скопійовано'); }, selectIt); } catch (err) { selectIt(); }
 });
+/* Онлайн-середовище Processing для курсу «Креативне програмування в Processing».
+ * Код скетчу виконується бібліотекою Processing.js (MIT), яка перекладає Processing (Java) у JavaScript.
+ * Щоб поведінка збігалася з настільним Processing, перед запуском середовище:
+ *   — перевіряє дужки та пропущені крапки з комою (як PDE, а не як JavaScript);
+ *   — емулює цілочисельне ділення int / int;
+ *   — зупиняє «нескінченні» цикли;
+ *   — підставляє файли з папки data для loadImage().
+ */
+(function () {
+  'use strict';
 
+  // ---------- Допоміжне ----------
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function el(tag, attrs, html) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  var store = {
+    get: function (k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  var IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || '');
+  var MOD = IS_MAC ? '⌘' : 'Ctrl+';
+
+  // ---------- Підсвічування ----------
+  var KW = 'if else for while do return new class void true false null this extends break continue switch case default public private static final import super';
+  var TYPES = 'int float boolean char String color PImage PFont PVector ArrayList IntList FloatList StringList HashMap double long byte';
+  var BUILTIN = ('size background fill noFill stroke noStroke strokeWeight strokeCap strokeJoin point line rect ellipse circle square triangle quad arc ' +
+    'beginShape vertex curveVertex bezierVertex endShape rectMode ellipseMode colorMode println print random randomSeed noise noiseSeed map constrain dist abs sqrt ' +
+    'pow min max round floor ceil sin cos tan atan2 radians degrees lerp norm sq translate rotate rotateX rotateY rotateZ scale pushMatrix popMatrix push pop ' +
+    'image imageMode loadImage tint noTint filter loadPixels updatePixels text textSize textAlign textFont createFont textWidth textLeading millis second minute hour day month year ' +
+    'frameRate saveFrame save noLoop loop redraw red green blue alpha hue saturation brightness lerpColor setup draw mousePressed keyPressed mouseReleased ' +
+    'mouseDragged mouseMoved mouseClicked keyReleased smooth noSmooth createImage get set cursor noCursor box sphere lights camera exit append').split(' ');
+  function toSet(a) { var o = Object.create(null); (typeof a === 'string' ? a.split(' ') : a).forEach(function (w) { o[w] = 1; }); return o; }
+  var kwSet = toSet(KW), tySet = toSet(TYPES), biSet = toSet(BUILTIN);
+  var HL_RE = /(\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])'?)|(#[0-9A-Fa-f]{6}\b|\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+  function highlight(src) {
+    var out = '', last = 0, m;
+    HL_RE.lastIndex = 0;
+    while ((m = HL_RE.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      var t = m[0], cls = null;
+      if (m[1]) cls = 't-com';
+      else if (m[2]) cls = 't-str';
+      else if (m[3]) cls = 't-num';
+      else if (kwSet[t]) cls = 't-kw';
+      else if (tySet[t]) cls = 't-type';
+      else if (biSet[t] || /^[A-Z][A-Z_]+$/.test(t)) cls = 't-fn';
+      out += cls ? '<span class="' + cls + '">' + esc(t) + '</span>' : esc(t);
+      last = HL_RE.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+
+  // ---------- Маскування рядків і коментарів (для аналізу коду) ----------
+  // Повертає рядок тієї самої довжини, де вміст рядків/коментарів замінено пробілами (переноси рядків зберігаються).
+  function mask(src) {
+    return src.replace(/\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$)|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/g, function (s) {
+      if (s[0] === '"' || s[0] === "'") return s[0] + s.slice(1, -1).replace(/[^\n]/g, ' ') + s[s.length - 1];
+      return s.replace(/[^\n]/g, ' ');
+    });
+  }
+  function lineOf(src, idx) { return src.slice(0, idx).split('\n').length; }
+
+  // ---------- Перевірка синтаксису (як у PDE) ----------
+  function checkBrackets(tab) {
+    var m = mask(tab.code), stack = [], pairs = { ')': '(', ']': '[', '}': '{' };
+    for (var i = 0; i < m.length; i++) {
+      var c = m[i];
+      if (c === '(' || c === '[' || c === '{') stack.push({ c: c, i: i });
+      else if (c === ')' || c === ']' || c === '}') {
+        var top = stack.pop();
+        if (!top) return { line: lineOf(m, i), msg: 'Зайва дужка «' + c + '». Знайдіть, де її відкрито, або видаліть.' };
+        if (top.c !== pairs[c]) return { line: lineOf(m, i), msg: 'Дужка «' + c + '» не відповідає відкритій «' + top.c + '» (рядок ' + lineOf(m, top.i) + ').' };
+      }
+    }
+    if (stack.length) {
+      var t = stack.pop();
+      var close = { '(': ')', '[': ']', '{': '}' }[t.c];
+      return { line: lineOf(m, t.i), msg: 'Дужку «' + t.c + '» не закрито. Додайте «' + close + '».' };
+    }
+    if (/"[^"\n]*$/m.test(tab.code.replace(/\/\/[^\n]*/g, '').replace(/"(?:\\.|[^"\\\n])*"/g, '""'))) {
+      var lines = tab.code.split('\n');
+      for (var k = 0; k < lines.length; k++) {
+        var clean = lines[k].replace(/\/\/.*$/, '').replace(/"(?:\\.|[^"\\])*"/g, '');
+        if (clean.indexOf('"') >= 0) return { line: k + 1, msg: 'Рядок тексту не закрито лапками «"».' };
+      }
+    }
+    return null;
+  }
+
+  var STMT_START = /^(if|for|while|else|do|switch|case|default|try|catch|finally|class|void|public|private|static|abstract|interface|import|@)\b/;
+  function checkSemicolons(tab) {
+    var lines = mask(tab.code).split('\n');
+    var depthParen = 0, braces = [], prevSig = '';
+    for (var i = 0; i < lines.length; i++) {
+      var raw = lines[i];
+      var line = raw.trim();
+      var before = depthParen;
+      var inInitBefore = braces.length && braces[braces.length - 1] === 'init';
+      for (var j = 0; j < raw.length; j++) {
+        var ch = raw[j];
+        if (ch === '(') depthParen++;
+        else if (ch === ')') depthParen--;
+        else if (ch === '{') braces.push(/[=\],{(]$/.test(prevSig) ? 'init' : 'block');   // «= {» — ініціалізатор масиву
+        else if (ch === '}') braces.pop();
+        if (!/\s/.test(ch)) prevSig = (prevSig + ch).slice(-3);
+      }
+      var inInit = braces.length && braces[braces.length - 1] === 'init';
+      if (!line || before > 0 || depthParen > 0 || inInitBefore || inInit) continue;
+      if (!/[\w)\]"'+\-]$/.test(line)) continue;            // рядок закінчується на ; { } , оператор тощо
+      if (/(\+\+|--)$/.test(line) === false && /[+\-]$/.test(line)) continue; // перенос виразу після + або -
+      if (STMT_START.test(line)) continue;                   // if (...), for (...), void f(), class …
+      if (/^\}?\s*else\b/.test(line)) continue;
+      if (/^[\w<>\[\],\s]+\([^;]*\)\s*$/.test(line) && !/=/.test(line)) {
+        // може бути оголошення методу: «float area(float r)» з «{» у наступному рядку
+        var nxt = nextLine(lines, i);
+        if (nxt && nxt[0] === '{') continue;
+        if (/^[A-Za-z_][\w<>\[\]]*\s+[A-Za-z_]\w*\s*\(/.test(line) && !nxt) continue;
+      }
+      var next = nextLine(lines, i);
+      if (next === null) return { line: i + 1, msg: 'Схоже, пропущено «;» у кінці рядка ' + (i + 1) + '.' };
+      if (/^[{.?:&|+\-*\/%=<>)\]]/.test(next)) continue;      // вираз продовжується
+      if (/^(else|catch|finally)\b/.test(next)) continue;
+      return { line: i + 1, msg: 'Схоже, пропущено «;» у кінці рядка ' + (i + 1) + '.' };
+    }
+    return null;
+  }
+  function nextLine(lines, i) {
+    for (var k = i + 1; k < lines.length; k++) { var t = lines[k].trim(); if (t) return t; }
+    return null;
+  }
+
+  // Попередження (програма запускається, але вчитель Java-синтаксису їх би підкреслив)
+  function lint(tab) {
+    var out = [], m = mask(tab.code).split('\n');
+    m.forEach(function (line, i) {
+      if (/\bint\s+\w+\s*=\s*random\s*\(/.test(line)) out.push({ line: i + 1, msg: 'random() повертає float. У Processing тут буде помилка: напишіть int(random(...)).' });
+      if (/\bif\s*\((?:[^=!<>()]|\([^()]*\))*[^=!<>]=[^=](?:[^()]|\([^()]*\))*\)/.test(line)) out.push({ line: i + 1, msg: 'В умові стоїть «=» (присвоєння). Для порівняння потрібно «==».' });
+    });
+    return out;
+  }
+
+  // ---------- Перетворення коду перед запуском ----------
+  var INT_SYSTEM = toSet('width height mouseX mouseY pmouseX pmouseY frameCount keyCode displayWidth displayHeight');
+  var INT_FUNCS = toSet('int __pdeIdiv round floor ceil millis second minute hour day month year');
+  // Імена, оголошені як int (змінні, масиви int[], параметри, функції, що повертають int)
+  function intNames(m) {
+    var names = Object.create(null), re = /\bint\s*(?:\[\s*\]\s*)?(?=[A-Za-z_])/g, x;
+    while ((x = re.exec(m))) {
+      var i = re.lastIndex, depth = 0;
+      while (i < m.length) {
+        var id = /^[A-Za-z_]\w*/.exec(m.slice(i));
+        if (!id) break;
+        names[id[0]] = 1;
+        i += id[0].length;
+        while (i < m.length) {               // до коми на нульовому рівні або кінця оголошення
+          var c = m[i];
+          if ('([{'.indexOf(c) >= 0) depth++;
+          else if (')]}'.indexOf(c) >= 0) { if (depth === 0) break; depth--; }
+          else if (depth === 0 && (c === ';' || c === ',')) break;
+          i++;
+        }
+        if (m[i] !== ',') break;
+        i++;
+        while (/\s/.test(m[i] || '')) i++;
+      }
+    }
+    return names;
+  }
+  function matchBack(m, j, open, close) {      // m[j] — закривна дужка; повертає індекс відкривної
+    for (var d = 0; j >= 0; j--) { if (m[j] === close) d++; else if (m[j] === open && --d === 0) return j; }
+    return -1;
+  }
+  function matchFwd(m, j, open, close) {
+    for (var d = 0; j < m.length; j++) { if (m[j] === open) d++; else if (m[j] === close && --d === 0) return j; }
+    return -1;
+  }
+  function groupIsInt(text, ints) {
+    var re = /[A-Za-z_]\w*(?:\s*\()?|\d+\.\d*|\.\d+|\d+|\S/g, t;
+    while ((t = re.exec(text))) {
+      var w = t[0];
+      if (/^\d+$/.test(w)) continue;
+      if (/^[\d.]/.test(w)) return false;
+      if (/^[A-Za-z_]/.test(w)) {
+        var name = w.replace(/\s*\($/, '');
+        if (/\($/.test(w)) { if (!INT_FUNCS[name] && !ints[name]) return false; continue; }
+        if (name === 'length' || ints[name] || INT_SYSTEM[name]) continue;
+        return false;
+      }
+      if ('+-*%/()[],'.indexOf(w) < 0) return false;
+    }
+    return true;
+  }
+  // Лівий операнд ділення: ланцюжок множників через * і % (a * b / c — ціле, як у Java)
+  function leftExpr(m, i, ints) {
+    var j = i - 1, isInt = true, s;
+    for (;;) {
+      while (j >= 0 && /\s/.test(m[j])) j--;
+      if (j < 0) return null;
+      var c = m[j];
+      if (c === ')') {
+        var g = matchBack(m, j, '(', ')'); if (g < 0) return null;
+        var k = g; while (k > 0 && /\w/.test(m[k - 1])) k--;
+        var fname = m.slice(k, g);
+        if (fname) { if (/^(if|while|for|switch|return)$/.test(fname)) return null; isInt = isInt && !!(INT_FUNCS[fname] || ints[fname]); s = k; }
+        else { isInt = isInt && groupIsInt(m.slice(g + 1, j), ints); s = g; }
+      } else if (c === ']' || /\w/.test(c)) {
+        var e = j;
+        if (c === ']') { var b = matchBack(m, j, '[', ']'); if (b < 0) return null; e = b - 1; }
+        var k2 = e; while (k2 >= 0 && /[\w.]/.test(m[k2])) k2--;
+        var tok = m.slice(k2 + 1, e + 1);
+        if (!tok) return null;
+        if (/^\d+$/.test(tok)) { if (c === ']') return null; }
+        else if (/^[\d.]/.test(tok)) isInt = false;
+        else if (/\.length$/.test(tok) && c !== ']') { /* int */ }
+        else if (tok.indexOf('.') >= 0) isInt = false;
+        else if (!(ints[tok] || INT_SYSTEM[tok])) isInt = false;
+        s = k2 + 1;
+      } else return null;
+      j = s - 1;
+      while (j >= 0 && /\s/.test(m[j])) j--;
+      if (j >= 0 && (m[j] === '*' || m[j] === '%') && m[j - 1] !== '/' && m[j + 1] !== '/') { j--; continue; }
+      if (j >= 0 && (m[j] === '/' || m[j] === '.')) return null;   // a / b / c — спершу перетворюється ліве ділення
+      return { s: s, isInt: isInt };
+    }
+  }
+  function rightTerm(m, i, ints) {
+    var j = i;
+    while (j < m.length && /\s/.test(m[j])) j++;
+    var st = j, isInt;
+    if (m[j] === '-' || m[j] === '+') j++;
+    if (m[j] === '(') {
+      var e = matchFwd(m, j, '(', ')'); if (e < 0) return null;
+      isInt = groupIsInt(m.slice(j + 1, e), ints); j = e + 1;
+    } else {
+      var id = /^(?:[A-Za-z_]\w*|\d+(?:\.\d*)?)/.exec(m.slice(j));
+      if (!id) return null;
+      var tok = id[0]; j += tok.length;
+      if (m[j] === '(') {
+        var e2 = matchFwd(m, j, '(', ')'); if (e2 < 0) return null;
+        isInt = !!(INT_FUNCS[tok] || ints[tok]); j = e2 + 1;
+      } else {
+        if (/^\d+$/.test(tok)) isInt = true;
+        else if (/^\d/.test(tok)) isInt = false;
+        else isInt = !!(ints[tok] || INT_SYSTEM[tok]);
+        if (m[j] === '[') { var e3 = matchFwd(m, j, '[', ']'); if (e3 < 0) return null; j = e3 + 1; }
+        if (m.slice(j, j + 7) === '.length') { j += 7; isInt = true; }
+      }
+    }
+    if (m[j] === '.' || m[j] === '(') return null;
+    return { s: st, e: j, isInt: isInt };
+  }
+  // int / int → __pdeIdiv(a, b): ціле ділення як у Java (під час виконання ще раз перевіряється, що числа цілі)
+  function rewriteIntDivision(code) {
+    var ints = intNames(mask(code));
+    for (var guard = 0; guard < 3000; guard++) {
+      var m = mask(code), done = true;
+      for (var i = 0; i < m.length; i++) {
+        if (m[i] !== '/' || m[i + 1] === '=' || m[i + 1] === '/' || m[i + 1] === '*' || m[i - 1] === '/' || m[i - 1] === '*') continue;
+        var L = leftExpr(m, i, ints); if (!L || !L.isInt) continue;
+        var R = rightTerm(m, i + 1, ints); if (!R || !R.isInt) continue;
+        code = code.slice(0, L.s) + '__pdeIdiv(' + code.slice(L.s, i).replace(/\s+$/, '') + ', ' + code.slice(R.s, R.e) + ')' + code.slice(R.e);
+        done = false;
+        break;
+      }
+      if (done) break;
+    }
+    return code;
+  }
+  // На початок тіла кожного циклу додаємо __pdeGuard() — він зупиняє скетч, якщо цикл «завис».
+  function addLoopGuards(code) {
+    var masked = mask(code), re = /\b(for|while)\s*\(/g, ins = [], m;
+    while ((m = re.exec(masked))) {
+      var i = re.lastIndex, depth = 1;
+      while (i < masked.length && depth) { if (masked[i] === '(') depth++; else if (masked[i] === ')') depth--; i++; }
+      var j = i; while (j < masked.length && /\s/.test(masked[j])) j++;
+      if (masked[j] === '{') ins.push(j + 1);
+    }
+    for (var k = ins.length - 1; k >= 0; k--) code = code.slice(0, ins[k]) + ' __pdeGuard();' + code.slice(ins[k]);
+    return code;
+  }
+
+  // ---------- Завантаження Processing.js ----------
+  var pjsPromise = null;
+  function loadPjs(srcs) {
+    if (window.Processing) return Promise.resolve();
+    if (pjsPromise) return pjsPromise;
+    pjsPromise = new Promise(function (resolve, reject) {
+      var i = 0;
+      (function next() {
+        if (i >= srcs.length) { pjsPromise = null; reject(new Error('load')); return; }
+        var s = document.createElement('script');
+        s.src = srcs[i++];
+        if (/^https?:/.test(s.src)) s.crossOrigin = 'anonymous';
+        s.onload = function () { window.Processing ? resolve() : next(); };
+        s.onerror = next;
+        document.head.appendChild(s);
+      })();
+    });
+    return pjsPromise;
+  }
+
+  // ---------- Пояснення помилок українською ----------
+  function explain(msg) {
+    var m;
+    if ((m = msg.match(/(\w+) is not defined/))) return 'Не знайдено змінну чи функцію «' + m[1] + '». Перевірте назву (регістр літер!) і чи оголошено її.';
+    if ((m = msg.match(/([\w.$]+) is not a function/))) return '«' + m[1].replace(/^\$p\./, '') + '» — не функція або такої функції немає. Перевірте назву й кількість аргументів.';
+    if (/Cannot read propert(y|ies) of (null|undefined)/.test(msg)) return 'Звернення до об’єкта, якого ще не створено (у Java — NullPointerException). Чи не забули ви new? Чи завантажено файл?';
+    if (/Cannot set propert(y|ies) of (null|undefined)/.test(msg)) return 'Запис у неіснуючий об’єкт або елемент масиву (NullPointerException / вихід за межі масиву).';
+    if (/__pdeLoop/.test(msg)) return 'Цикл виконується занадто довго — схоже на нескінченний цикл. Перевірте, чи змінюється змінна в умові while/for.';
+    if (/Unexpected token|Unexpected identifier|missing \) after|Unexpected end/.test(msg)) return 'Синтаксична помилка: перевірте крапки з комою, дужки й лапки.';
+    if (/Maximum call stack/.test(msg)) return 'Функція викликає сама себе без кінця (нескінченна рекурсія). Додайте умову зупинки.';
+    return 'Помилка під час виконання: ' + msg;
+  }
+
+  // ---------- Середовище ----------
+  function PDE(root, opts) {
+    this.root = root;
+    this.opts = opts;
+    this.key = 'pde:' + opts.key;
+    this.initial = JSON.parse(JSON.stringify(opts.tabs));
+    var saved = store.get(this.key);
+    this.state = saved && saved.tabs && saved.tabs.length ? saved : { tabs: JSON.parse(JSON.stringify(opts.tabs)), files: {} };
+    if (!this.state.files) this.state.files = {};
+    this.active = 0;
+    this.fontSize = 0;
+    this.inst = null;
+    this.prevState = null;
+    this.build();
+    this.selectTab(0);
+    this.status(saved ? 'Відновлено ваш збережений код. Натисніть ▶, щоб запустити.' : 'Готово. Натисніть ▶ (або ' + MOD + 'R), щоб запустити скетч.');
+  }
+
+  PDE.prototype.build = function () {
+    var self = this, r = this.root;
+    r.classList.add('pde');
+    r.innerHTML = '';
+    // меню
+    var bar = el('div', { class: 'pde-menubar', role: 'menubar' });
+    var menus = [
+      ['Файл', [
+        ['Новий скетч', 'newSketch'], ['Відкрити .pde…', 'openFile'], ['sep'],
+        ['Зберегти', 'save', MOD + 'S'], ['Завантажити як .pde', 'download'], ['Копіювати весь код', 'copyAll'], ['sep'],
+        ['Повернути початковий код уроку', 'reset']
+      ]],
+      ['Редагування', [
+        ['Скасувати', 'undo', MOD + 'Z'], ['Повторити', 'redo', IS_MAC ? '⇧⌘Z' : 'Ctrl+Y'], ['sep'],
+        ['Виділити все', 'selectAll', MOD + 'A'], ['Коментувати / розкоментувати', 'comment', MOD + '/'],
+        ['Збільшити відступ', 'indent', 'Tab'], ['Зменшити відступ', 'outdent', '⇧Tab'], ['sep'],
+        ['Більший шрифт', 'fontUp'], ['Менший шрифт', 'fontDown']
+      ]],
+      ['Скетч', [
+        ['Запустити', 'run', MOD + 'R'], ['Презентувати (на весь екран)', 'present', IS_MAC ? '⇧⌘R' : 'Ctrl+Shift+R'], ['Зупинити', 'stop'], ['sep'],
+        ['Нова вкладка', 'addTab'], ['Перейменувати вкладку', 'renameTab'], ['Видалити вкладку', 'deleteTab'], ['sep'],
+        ['Додати файл (зображення) у data…', 'addFile']
+      ]],
+      ['Інструменти', [
+        ['Автоформатування', 'format', MOD + 'T'], ['Вибір кольору…', 'colorPicker'], ['Зберегти кадр', 'saveFrame']
+      ]],
+      ['Приклади', 'examples'],
+      ['Довідка', [
+        ['Знайти слово в довіднику Processing', 'reference'], ['Довідник курсу', 'courseRef'], ['sep'],
+        ['Гарячі клавіші', 'keys'], ['Про онлайн-середовище', 'about']
+      ]]
+    ];
+    menus.forEach(function (m) {
+      var wrap = el('div', { class: 'pde-menu' });
+      var btn = el('button', { type: 'button', 'aria-haspopup': 'true', 'aria-expanded': 'false', text: m[0] });
+      var list = el('ul', { class: 'pde-menu-list', role: 'menu', hidden: '' });
+      if (m[1] === 'examples') self.fillExamples(list);
+      else m[1].forEach(function (it) {
+        var li = el('li');
+        if (it[0] === 'sep') { li.className = 'sep'; li.setAttribute('role', 'separator'); }
+        else {
+          var b = el('button', { type: 'button', role: 'menuitem', 'data-cmd': it[1] }, esc(it[0]) + (it[2] ? '<kbd>' + esc(it[2]) + '</kbd>' : ''));
+          li.appendChild(b);
+        }
+        list.appendChild(li);
+      });
+      btn.addEventListener('click', function (e) { e.stopPropagation(); self.toggleMenu(wrap); });
+      wrap.appendChild(btn); wrap.appendChild(list); bar.appendChild(wrap);
+    });
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-cmd]');
+      if (b) { self.closeMenus(); self.cmd(b.getAttribute('data-cmd'), b); }
+    });
+    document.addEventListener('click', function (e) { if (!r.contains(e.target)) self.closeMenus(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') self.closeMenus(); });
+    r.appendChild(bar);
+
+    // панель інструментів
+    var tb = el('div', { class: 'pde-toolbar' });
+    tb.innerHTML = '<button type="button" class="pde-btn-round run" title="Запустити (' + MOD + 'R)" aria-label="Запустити"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg></button>' +
+      '<button type="button" class="pde-btn-round stop" title="Зупинити" aria-label="Зупинити"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1" fill="currentColor"/></svg></button>' +
+      '<span class="pde-sketchname"></span><span class="pde-mode" title="Код виконується в браузері за допомогою Processing.js">Java · онлайн</span>';
+    tb.querySelector('.run').addEventListener('click', function () { self.run(); });
+    tb.querySelector('.stop').addEventListener('click', function () { self.stop(); });
+    r.appendChild(tb);
+    this.nameEl = tb.querySelector('.pde-sketchname');
+
+    this.tabsEl = el('div', { class: 'pde-tabs', role: 'tablist' });
+    r.appendChild(this.tabsEl);
+    this.filesEl = el('div', { class: 'pde-files', hidden: '' });
+    r.appendChild(this.filesEl);
+
+    // редактор
+    var ed = el('div', { class: 'pde-editor' });
+    this.gutter = el('pre', { class: 'pde-gutter', 'aria-hidden': 'true' });
+    var code = el('div', { class: 'pde-code' });
+    this.hl = el('pre', { class: 'pde-hl', 'aria-hidden': 'true' });
+    this.input = el('textarea', { class: 'pde-input', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', autocorrect: 'off', wrap: 'off', 'aria-label': 'Редактор коду Processing', id: 'pde-input-' + this.opts.key });
+    code.appendChild(this.hl); code.appendChild(this.input);
+    ed.appendChild(this.gutter); ed.appendChild(code);
+    r.appendChild(ed);
+    this.input.addEventListener('input', function () { self.onEdit(); });
+    this.input.addEventListener('scroll', function () { self.syncScroll(); });
+    this.input.addEventListener('keydown', function (e) { self.onKey(e); });
+
+    // рядок стану і консоль
+    this.statusEl = el('div', { class: 'pde-status', role: 'status', 'aria-live': 'polite' }, '<span class="msg"></span>');
+    r.appendChild(this.statusEl);
+    var cw = el('div', { class: 'pde-console-wrap' });
+    var ch = el('div', { class: 'pde-console-head' }, '<span>Консоль</span><button type="button">Очистити</button>');
+    ch.querySelector('button').addEventListener('click', function () { self.consoleEl.innerHTML = ''; });
+    this.consoleEl = el('pre', { class: 'pde-console', 'aria-live': 'polite' });
+    cw.appendChild(ch); cw.appendChild(this.consoleEl);
+    r.appendChild(cw);
+
+    // вікно скетчу
+    this.win = el('div', { class: 'pde-window' });
+    this.win.innerHTML = '<div class="pde-window-bar"><span class="title">Вікно скетчу</span>' +
+      '<button type="button" data-w="frame">Зберегти кадр</button><button type="button" data-w="present">На весь екран</button></div>' +
+      '<div class="pde-stage"><p class="idle">Тут з’явиться вікно програми. Натисніть ▶ «Запустити».</p></div>' +
+      '<div class="pde-window-foot"><span class="xy">mouseX: — · mouseY: —</span><span class="fps"></span><span>Клацніть на полотні, щоб керувати з клавіатури</span></div>';
+    this.win.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-w]');
+      if (!b) return;
+      if (b.getAttribute('data-w') === 'frame') self.cmd('saveFrame'); else self.cmd('present');
+    });
+    r.parentNode.insertBefore(this.win, r.nextSibling);
+    this.stage = this.win.querySelector('.pde-stage');
+    this.xyEl = this.win.querySelector('.xy');
+    this.fpsEl = this.win.querySelector('.fps');
+
+    this.fileInput = el('input', { type: 'file', accept: '.pde,.txt,.java', hidden: '' });
+    this.imgInput = el('input', { type: 'file', accept: 'image/*', hidden: '', multiple: '' });
+    r.appendChild(this.fileInput); r.appendChild(this.imgInput);
+    this.fileInput.addEventListener('change', function () { self.readPde(this.files[0]); this.value = ''; });
+    this.imgInput.addEventListener('change', function () { self.readImages(this.files); this.value = ''; });
+    this.renderFiles();
+  };
+
+  PDE.prototype.fillExamples = function (list) {
+    var self = this, groups = {};
+    (this.opts.examples || []).forEach(function (ex) { (groups[ex.lesson] = groups[ex.lesson] || []).push(ex); });
+    Object.keys(groups).sort(function (a, b) { return a - b; }).forEach(function (n) {
+      list.appendChild(el('li', { class: 'grp', text: 'Урок ' + n }));
+      groups[n].forEach(function (ex) {
+        var li = el('li');
+        var b = el('button', { type: 'button', role: 'menuitem', text: ex.name });
+        b.addEventListener('click', function () { self.closeMenus(); self.loadExample(ex); });
+        li.appendChild(b); list.appendChild(li);
+      });
+    });
+  };
+  PDE.prototype.toggleMenu = function (wrap) {
+    var list = wrap.querySelector('.pde-menu-list'), btn = wrap.querySelector('button');
+    var open = list.hidden;
+    this.closeMenus();
+    if (open) { list.hidden = false; btn.setAttribute('aria-expanded', 'true'); var f = list.querySelector('button'); if (f) f.focus(); }
+  };
+  PDE.prototype.closeMenus = function () {
+    this.root.querySelectorAll('.pde-menu-list').forEach(function (l) { l.hidden = true; });
+    this.root.querySelectorAll('.pde-menu > button').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+  };
+
+  // ---------- Вкладки ----------
+  PDE.prototype.renderTabs = function () {
+    var self = this;
+    this.tabsEl.innerHTML = '';
+    this.state.tabs.forEach(function (t, i) {
+      var tab = el('div', { class: 'pde-tab' + (i === self.active ? ' active' : ''), role: 'presentation' });
+      var b = el('button', { type: 'button', role: 'tab', 'aria-selected': i === self.active ? 'true' : 'false', text: t.name, title: 'Двічі клацніть, щоб перейменувати' });
+      b.addEventListener('click', function () { self.selectTab(i); });
+      b.addEventListener('dblclick', function () { self.renameTab(i); });
+      tab.appendChild(b);
+      if (i > 0) {
+        var x = el('button', { type: 'button', class: 'x', 'aria-label': 'Видалити вкладку ' + t.name, text: '×' });
+        x.addEventListener('click', function () { self.deleteTab(i); });
+        tab.appendChild(x);
+      }
+      self.tabsEl.appendChild(tab);
+    });
+    var add = el('button', { type: 'button', class: 'pde-addtab', title: 'Нова вкладка', 'aria-label': 'Нова вкладка', text: '+' });
+    add.addEventListener('click', function () { self.addTab(); });
+    this.tabsEl.appendChild(add);
+    this.nameEl.textContent = this.state.tabs[0].name;
+  };
+  PDE.prototype.selectTab = function (i) {
+    this.active = i;
+    this.renderTabs();
+    this.input.value = this.state.tabs[i].code;
+    this.errLine = null;
+    this.refresh();
+    this.input.scrollTop = 0; this.input.scrollLeft = 0; this.syncScroll();
+  };
+  PDE.prototype.addTab = function () {
+    var self = this;
+    this.dialog('Нова вкладка', '<p>Назва вкладки — зазвичай назва класу, наприклад <code>Ball</code>.</p><div class="row"><input id="pde-tabname" type="text" value="Tab' + (this.state.tabs.length) + '" style="flex:1;padding:8px;font:inherit;border:1px solid var(--rule);border-radius:5px;background:var(--panel);color:var(--ink)"></div>',
+      [['Скасувати'], ['Створити', function (d) {
+        var n = self.cleanName(d.querySelector('#pde-tabname').value);
+        if (!n) return false;
+        self.state.tabs.push({ name: n, code: '// Вкладка ' + n + '\n' });
+        self.save(true); self.selectTab(self.state.tabs.length - 1); self.input.focus();
+      }, true]], '#pde-tabname');
+  };
+  PDE.prototype.cleanName = function (n) { n = (n || '').trim().replace(/\.pde$/, '').replace(/[^\w]/g, '_'); return /^[A-Za-z_]\w*$/.test(n) ? n : ''; };
+  PDE.prototype.renameTab = function (i) {
+    var self = this; if (i == null) i = this.active;
+    var t = this.state.tabs[i];
+    this.dialog('Перейменувати вкладку', '<p>Лише латинські літери, цифри та «_»; не з цифри.</p><div class="row"><input id="pde-tabname" type="text" value="' + esc(t.name) + '" style="flex:1;padding:8px;font:inherit;border:1px solid var(--rule);border-radius:5px;background:var(--panel);color:var(--ink)"></div>',
+      [['Скасувати'], ['Перейменувати', function (d) {
+        var n = self.cleanName(d.querySelector('#pde-tabname').value);
+        if (!n) return false;
+        t.name = n; self.save(true); self.renderTabs();
+      }, true]], '#pde-tabname');
+  };
+  PDE.prototype.deleteTab = function (i) {
+    var self = this; if (i == null) i = this.active;
+    if (i === 0) { this.status('Головну вкладку видалити не можна.', true); return; }
+    this.dialog('Видалити вкладку «' + esc(this.state.tabs[i].name) + '»?', '<p>Код цієї вкладки буде втрачено.</p>',
+      [['Скасувати'], ['Видалити', function () { self.state.tabs.splice(i, 1); self.save(true); self.selectTab(0); }, true]]);
+  };
+
+  // ---------- Редактор ----------
+  PDE.prototype.onEdit = function () {
+    this.state.tabs[this.active].code = this.input.value;
+    this.errLine = null;
+    this.refresh();
+    var self = this;
+    clearTimeout(this.saveT);
+    this.saveT = setTimeout(function () { self.save(true); }, 600);
+  };
+  PDE.prototype.refresh = function () {
+    var v = this.input.value;
+    this.hl.innerHTML = highlight(v) + '\n ';
+    var n = v.split('\n').length, out = '';
+    for (var i = 1; i <= n; i++) out += (i === this.errLine ? '<span class="err">' + i + '</span>' : i) + '\n';
+    this.gutter.innerHTML = out + ' ';
+    this.syncScroll();
+  };
+  PDE.prototype.syncScroll = function () {
+    this.hl.scrollTop = this.input.scrollTop;
+    this.hl.scrollLeft = this.input.scrollLeft;
+    this.gutter.scrollTop = this.input.scrollTop;
+  };
+  PDE.prototype.insert = function (text, selStart, selEnd) {
+    var ta = this.input;
+    ta.focus();
+    if (selStart != null) ta.setSelectionRange(selStart, selEnd);
+    var ok = false;
+    try { ok = document.execCommand('insertText', false, text); } catch (e) {}
+    if (!ok) { ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, 'end'); this.onEdit(); }
+  };
+  PDE.prototype.lineRange = function () {
+    var ta = this.input, v = ta.value;
+    var s = v.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+    var eIdx = ta.selectionEnd;
+    if (eIdx > ta.selectionStart && v[eIdx - 1] === '\n') eIdx--;
+    var e = v.indexOf('\n', eIdx); if (e < 0) e = v.length;
+    return { s: s, e: e, text: v.slice(s, e) };
+  };
+  PDE.prototype.onKey = function (e) {
+    var ta = this.input, mod = e.ctrlKey || e.metaKey;
+    if (e.key === 'Escape') { this.tabEscape = true; return; }
+    if (e.key === 'Tab' && !mod && !e.altKey) {
+      if (this.tabEscape) { this.tabEscape = false; return; }   // Esc, потім Tab — вийти з редактора
+      e.preventDefault();
+      if (e.shiftKey) this.cmd('outdent');
+      else if (ta.selectionStart !== ta.selectionEnd && ta.value.slice(ta.selectionStart, ta.selectionEnd).indexOf('\n') >= 0) this.cmd('indent');
+      else this.insert('  ');
+      return;
+    }
+    this.tabEscape = false;
+    if (e.key === 'Enter' && !mod) {
+      e.preventDefault();
+      var v = ta.value, p = ta.selectionStart;
+      var ls = v.lastIndexOf('\n', p - 1) + 1;
+      var line = v.slice(ls, p);
+      var indent = line.match(/^\s*/)[0];
+      var before = v.slice(ls, p).trim(), after = v.slice(p, v.indexOf('\n', p) < 0 ? v.length : v.indexOf('\n', p)).trim();
+      if (/\{$/.test(before)) {
+        if (after[0] === '}') { this.insert('\n' + indent + '  \n' + indent); ta.setSelectionRange(p + indent.length + 3, p + indent.length + 3); return; }
+        indent += '  ';
+      }
+      this.insert('\n' + indent);
+      return;
+    }
+    if (e.key === '}' && !mod) {
+      var v2 = ta.value, p2 = ta.selectionStart, ls2 = v2.lastIndexOf('\n', p2 - 1) + 1;
+      if (/^\s+$/.test(v2.slice(ls2, p2))) {
+        e.preventDefault();
+        var ind = v2.slice(ls2, p2).replace(/ {1,2}$/, '');
+        this.insert(ind + '}', ls2, p2);
+        return;
+      }
+    }
+    if (mod && !e.altKey) {
+      var k = e.key.toLowerCase();
+      if (k === 'r') { e.preventDefault(); if (e.shiftKey) this.cmd('present'); else this.run(); }
+      else if (k === 's') { e.preventDefault(); this.cmd('save'); }
+      else if (k === '/') { e.preventDefault(); this.cmd('comment'); }
+      else if (k === 't') { e.preventDefault(); this.cmd('format'); }
+    }
+  };
+
+  // ---------- Команди меню ----------
+  PDE.prototype.cmd = function (c, src) {
+    var self = this, ta = this.input;
+    switch (c) {
+      case 'run': return this.run();
+      case 'stop': return this.stop();
+      case 'present': return this.present();
+      case 'save': this.save(); return;
+      case 'newSketch':
+        this.remember();
+        this.state = { tabs: [{ name: 'sketch', code: 'void setup() {\n  size(400, 400);\n}\n\nvoid draw() {\n  background(255);\n  \n}\n' }], files: {} };
+        this.save(true); this.renderFiles(); this.selectTab(0);
+        this.status('Створено новий скетч.', false, true);
+        return;
+      case 'openFile': this.fileInput.click(); return;
+      case 'addFile': this.imgInput.click(); return;
+      case 'download': return this.download();
+      case 'copyAll': return this.copyAll();
+      case 'reset':
+        this.dialog('Повернути початковий код?', '<p>Ваші зміни в усіх вкладках буде замінено кодом, з якого починається практикум цього уроку.</p>',
+          [['Скасувати'], ['Повернути', function () {
+            self.remember();
+            self.state = { tabs: JSON.parse(JSON.stringify(self.initial)), files: {} };
+            self.save(true); self.renderFiles(); self.selectTab(0);
+            self.status('Початковий код повернуто.', false, true);
+          }, true]]);
+        return;
+      case 'undo': ta.focus(); try { document.execCommand('undo'); } catch (e) {} return;
+      case 'redo': ta.focus(); try { document.execCommand('redo'); } catch (e) {} return;
+      case 'selectAll': ta.focus(); ta.select(); return;
+      case 'comment': {
+        var r = this.lineRange(), lines = r.text.split('\n');
+        var all = lines.every(function (l) { return !l.trim() || /^\s*\/\//.test(l); });
+        var out = lines.map(function (l) {
+          if (!l.trim()) return l;
+          return all ? l.replace(/^(\s*)\/\/ ?/, '$1') : l.replace(/^(\s*)/, '$1// ');
+        }).join('\n');
+        this.insert(out, r.s, r.e); ta.setSelectionRange(r.s, r.s + out.length);
+        return;
+      }
+      case 'indent': case 'outdent': {
+        var r2 = this.lineRange();
+        var o2 = r2.text.split('\n').map(function (l) { return c === 'indent' ? '  ' + l : l.replace(/^ {1,2}/, ''); }).join('\n');
+        this.insert(o2, r2.s, r2.e); ta.setSelectionRange(r2.s, r2.s + o2.length);
+        return;
+      }
+      case 'fontUp': case 'fontDown':
+        this.fontSize = Math.max(-3, Math.min(6, this.fontSize + (c === 'fontUp' ? 1 : -1)));
+        var base = window.matchMedia('(max-width: 900px)').matches ? 16 : 14;
+        [this.input, this.hl, this.gutter].forEach(function (x) { x.style.fontSize = (base + self.fontSize) + 'px'; x.style.lineHeight = Math.round((base + self.fontSize) * 1.45) + 'px'; });
+        this.syncScroll();
+        return;
+      case 'format': {
+        var depth = 0, res = [], m = mask(ta.value).split('\n'), raw = ta.value.split('\n');
+        for (var i = 0; i < raw.length; i++) {
+          var t = raw[i].trim(), mt = m[i].trim();
+          var lead = (mt.match(/^[}\])]+/) || [''])[0].length;
+          var d = Math.max(0, depth - lead);
+          res.push(t ? new Array(d + 1).join('  ') + t : '');
+          for (var j = 0; j < mt.length; j++) { if ('{(['.indexOf(mt[j]) >= 0) depth++; else if ('})]'.indexOf(mt[j]) >= 0) depth = Math.max(0, depth - 1); }
+        }
+        var txt = res.join('\n');
+        if (txt !== ta.value) { this.insert(txt, 0, ta.value.length); ta.setSelectionRange(0, 0); ta.scrollTop = 0; this.syncScroll(); }
+        this.status('Автоформатування виконано.');
+        return;
+      }
+      case 'colorPicker': return this.colorPicker();
+      case 'saveFrame': return this.saveFrame();
+      case 'addTab': return this.addTab();
+      case 'renameTab': return this.renameTab();
+      case 'deleteTab': return this.deleteTab();
+      case 'reference': return this.reference();
+      case 'courseRef': window.open(this.opts.courseRef || 'dovidnyk.html', '_blank'); return;
+      case 'keys':
+        this.dialog('Гарячі клавіші', '<table>' + [
+          [MOD + 'R', 'запустити скетч'], [IS_MAC ? '⇧⌘R' : 'Ctrl+Shift+R', 'презентувати на весь екран'], [MOD + 'S', 'зберегти (у браузері)'],
+          [MOD + '/', 'закоментувати рядки'], [MOD + 'T', 'автоформатування'], ['Tab / Shift+Tab', 'відступ'],
+          [MOD + 'Z / ' + (IS_MAC ? '⇧⌘Z' : 'Ctrl+Y'), 'скасувати / повторити'], ['Esc, потім Tab', 'вийти з редактора клавіатурою']
+        ].map(function (r) { return '<tr><td><kbd>' + esc(r[0]) + '</kbd></td><td>' + r[1] + '</td></tr>'; }).join('') + '</table>', [['Закрити', null, true]]);
+        return;
+      case 'about':
+        this.dialog('Про онлайн-середовище', '<p>Це навчальна копія середовища Processing. Код виконується прямо в браузері бібліотекою Processing.js, тож встановлювати нічого не потрібно.</p>' +
+          '<ul><li>Код зберігається автоматично в цьому браузері для кожного уроку окремо.</li>' +
+          '<li>Вкладки об’єднуються в одну програму, як у справжньому Processing.</li>' +
+          '<li>Ділення цілих чисел (<code>7 / 2 = 3</code>) і пропущені <code>;</code> перевіряються так само, як у Processing.</li>' +
+          '<li>Зображення для <code>loadImage()</code> додайте через «Скетч → Додати файл».</li>' +
+          '<li>Відмінності від настільного Processing: немає бібліотек (Sound, Video); <code>saveFrame()</code> показує кадр у вікні замість запису у файл; текстові файли не читаються; не перевіряються типи змінних і вихід за межі масиву (у Processing це помилки).</li>' +
+          '<li>Перевірене рішення запустіть у настільному Processing: «Файл → Завантажити як .pde» або «Копіювати весь код».</li></ul>', [['Зрозуміло', null, true]]);
+        return;
+    }
+  };
+
+  PDE.prototype.save = function (quiet) {
+    var ok = store.set(this.key, this.state);
+    if (!quiet) this.status(ok ? 'Збережено в цьому браузері.' : 'Не вдалося зберегти в браузері (приватний режим?). Скопіюйте код: «Файл → Копіювати весь код».', !ok);
+  };
+  PDE.prototype.remember = function () { this.prevState = JSON.parse(JSON.stringify(this.state)); };
+  PDE.prototype.restorePrev = function () {
+    if (!this.prevState) return;
+    this.state = this.prevState; this.prevState = null;
+    this.save(true); this.renderFiles(); this.selectTab(0);
+    this.status('Ваш попередній код повернуто.');
+  };
+  PDE.prototype.loadExample = function (ex) {
+    this.stop(true);
+    this.remember();
+    this.state = { tabs: ex.files.map(function (f) { return { name: f.name.replace(/\.pde$/, ''), code: f.code }; }), files: this.state.files || {} };
+    this.save(true); this.selectTab(0);
+    this.status('Відкрито приклад ' + ex.name + '. Натисніть ▶.', false, true);
+  };
+  PDE.prototype.loadCode = function (code, name) {
+    this.stop(true);
+    this.remember();
+    var tabs = Array.isArray(code) ? code.map(function (t) { return { name: t[0], code: t[1] }; }) : [{ name: name || 'sketch', code: code }];
+    this.state = { tabs: tabs, files: this.state.files || {} };
+    this.save(true); this.selectTab(0);
+    this.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.status('Код прикладу перенесено в редактор. Змінюйте його й запускайте ▶.', false, true);
+  };
+
+  PDE.prototype.allCode = function () {
+    return this.state.tabs.map(function (t, i) { return (i ? '// ===== Вкладка ' + t.name + ' =====\n' : '') + t.code; }).join('\n\n');
+  };
+  PDE.prototype.download = function () {
+    var name = this.state.tabs[0].name + '.pde';
+    try {
+      var blob = new Blob([this.allCode()], { type: 'text/plain;charset=utf-8' });
+      var a = el('a', { href: URL.createObjectURL(blob), download: name });
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) {}
+    this.status('Файл ' + name + ' завантажено. Якщо завантаження заблоковане, скористайтеся «Копіювати весь код». Зберігайте скетч у папці з такою самою назвою.');
+  };
+  PDE.prototype.copyAll = function () {
+    var self = this, text = this.allCode();
+    function fallback() {
+      self.dialog('Копіювати код', '<p>Виділіть текст нижче й скопіюйте (' + MOD + 'C).</p><textarea id="pde-copytext" readonly style="width:100%;height:220px;font:13px var(--f-mono);background:var(--code-bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:8px">' + esc(text) + '</textarea>', [['Закрити', null, true]], '#pde-copytext');
+      var t = document.getElementById('pde-copytext'); if (t) t.select();
+    }
+    try { navigator.clipboard.writeText(text).then(function () { self.status('Код усіх вкладок скопійовано. Вставте його в Processing.'); }, fallback); } catch (e) { fallback(); }
+  };
+  PDE.prototype.readPde = function (file) {
+    if (!file) return;
+    var self = this, fr = new FileReader();
+    fr.onload = function () {
+      self.remember();
+      var name = self.cleanName(file.name.replace(/\.\w+$/, '')) || 'sketch';
+      self.state.tabs = [{ name: name, code: String(fr.result) }];
+      self.save(true); self.selectTab(0);
+      self.status('Відкрито файл ' + file.name + '.', false, true);
+    };
+    fr.readAsText(file);
+  };
+  PDE.prototype.readImages = function (files) {
+    var self = this;
+    Array.prototype.forEach.call(files || [], function (file) {
+      var fr = new FileReader();
+      fr.onload = function () {
+        self.state.files[file.name] = String(fr.result);
+        if (!store.set(self.key, self.state)) {
+          self.status('Файл ' + file.name + ' додано, але він завеликий, щоб зберегтися після перезавантаження сторінки.', true);
+        } else self.status('Файл ' + file.name + ' додано в data. Використовуйте: loadImage("' + file.name + '")');
+        self.renderFiles();
+      };
+      fr.readAsDataURL(file);
+    });
+  };
+  PDE.prototype.renderFiles = function () {
+    var self = this, names = Object.keys(this.state.files || {});
+    this.filesEl.hidden = !names.length;
+    this.filesEl.innerHTML = 'data/ ' + names.map(function (n) { return '<span class="f">' + esc(n) + ' <button type="button" data-del="' + esc(n) + '" aria-label="Видалити файл ' + esc(n) + '">×</button></span>'; }).join(' ');
+    this.filesEl.querySelectorAll('[data-del]').forEach(function (b) {
+      b.addEventListener('click', function () { delete self.state.files[b.getAttribute('data-del')]; self.save(true); self.renderFiles(); });
+    });
+  };
+
+  PDE.prototype.reference = function () {
+    var ta = this.input, v = ta.value, p = ta.selectionStart;
+    var s = p, e = p;
+    while (s > 0 && /\w/.test(v[s - 1])) s--;
+    while (e < v.length && /\w/.test(v[e])) e++;
+    var w = v.slice(s, e);
+    var url = 'https://processing.org/reference/';
+    if (w) {
+      if (kwSet[w] || tySet[w] || /^[A-Z_]+$/.test(w) || /^(mouseX|mouseY|pmouseX|pmouseY|width|height|frameCount|key|keyCode|mousePressed|keyPressed)$/.test(w) && v[e] !== '(') url += w + '.html';
+      else url += w + '_.html';
+    }
+    this.dialog('Довідка Processing', w ? '<p>Слово під курсором: <code>' + esc(w) + '</code>. Довідка відкриється на сайті processing.org (англійською).</p>' : '<p>Поставте курсор на назву функції, наприклад <code>ellipse</code>, і повторіть. Або відкрийте весь довідник.</p>',
+      [['Закрити'], ['<a class="btn" href="' + url + '" target="_blank" rel="noopener">Відкрити довідку ↗</a>']]);
+  };
+
+  PDE.prototype.colorPicker = function () {
+    var self = this;
+    var d = this.dialog('Вибір кольору', '<div class="row"><input id="pde-col" type="color" value="#2242d6"><div class="pde-swatch" id="pde-sw"></div><div id="pde-vals" style="font:14px var(--f-mono)"></div></div>' +
+      '<p>Оберіть колір і вставте його в код у потрібному форматі.</p>',
+      [['Закрити'], ['Вставити #hex', function (dd) { self.insertColor(dd, 'hex'); }], ['Вставити r, g, b', function (dd) { self.insertColor(dd, 'rgb'); }, true]]);
+    var inp = d.querySelector('#pde-col');
+    function upd() {
+      var h = inp.value, r = parseInt(h.substr(1, 2), 16), g = parseInt(h.substr(3, 2), 16), b = parseInt(h.substr(5, 2), 16);
+      d.querySelector('#pde-sw').style.background = h;
+      var mx = Math.max(r, g, b) / 255, mn = Math.min(r, g, b) / 255, c = mx - mn, hh = 0;
+      if (c) { var R = r / 255, G = g / 255, B = b / 255; hh = mx === R ? ((G - B) / c) % 6 : mx === G ? (B - R) / c + 2 : (R - G) / c + 4; hh = Math.round(hh * 60); if (hh < 0) hh += 360; }
+      d.querySelector('#pde-vals').innerHTML = 'RGB: ' + r + ', ' + g + ', ' + b + '<br>HEX: ' + h.toUpperCase() + '<br>HSB: ' + hh + '°, ' + Math.round(mx ? c / mx * 100 : 0) + '%, ' + Math.round(mx * 100) + '%';
+    }
+    inp.addEventListener('input', upd); upd();
+  };
+  PDE.prototype.insertColor = function (d, fmt) {
+    var h = d.querySelector('#pde-col').value;
+    var t = fmt === 'hex' ? h.toUpperCase() : parseInt(h.substr(1, 2), 16) + ', ' + parseInt(h.substr(3, 2), 16) + ', ' + parseInt(h.substr(5, 2), 16);
+    var ta = this.input;
+    var self = this;
+    setTimeout(function () { self.insert(t, ta.selectionStart, ta.selectionEnd); }, 0);
+  };
+
+  PDE.prototype.saveFrame = function () {
+    var cv = this.stage.querySelector('canvas');
+    if (!cv) { this.status('Спочатку запустіть скетч.', true); return; }
+    var url;
+    try { url = cv.toDataURL('image/png'); } catch (e) { this.status('Не вдалося зберегти кадр.', true); return; }
+    this.showFrame(url, this.state.tabs[0].name + '-' + ('000' + (this.frameN = (this.frameN || 0) + 1)).slice(-4) + '.png');
+  };
+  PDE.prototype.showFrame = function (url, name) {
+    this.dialog('Збережений кадр', '<img src="' + url + '" alt="Кадр скетчу"><p>Щоб зберегти: клацніть правою кнопкою (на телефоні — утримуйте палець) і виберіть «Зберегти зображення». Або натисніть «Завантажити».</p>',
+      [['Закрити'], ['<a class="btn primary" href="' + url + '" download="' + esc(name) + '">Завантажити ' + esc(name) + '</a>']]);
+  };
+
+  // ---------- Діалоги ----------
+  PDE.prototype.dialog = function (title, body, buttons, focusSel) {
+    var ov = el('div', { class: 'pde-overlay' });
+    var d = el('div', { class: 'pde-dialog', role: 'dialog', 'aria-modal': 'true', 'aria-label': title.replace(/<[^>]+>/g, '') });
+    d.innerHTML = '<h3>' + title + '</h3>' + body;
+    var act = el('div', { class: 'actions' });
+    var prevFocus = document.activeElement;
+    function close() { ov.remove(); document.removeEventListener('keydown', onKey, true); if (prevFocus && prevFocus.focus) prevFocus.focus(); }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); close(); }
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') { var p = act.querySelector('.primary'); if (p) { e.preventDefault(); p.click(); } }
+    }
+    (buttons || []).forEach(function (b) {
+      if (/^<a /.test(b[0])) { var wrap = el('span', null, b[0]); act.appendChild(wrap.firstChild); return; }
+      var btn = el('button', { type: 'button', class: b[2] ? 'primary' : '', text: b[0] });
+      btn.addEventListener('click', function () { if (b[1] && b[1](d) === false) return; close(); });
+      act.appendChild(btn);
+    });
+    d.appendChild(act);
+    ov.appendChild(d);
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(ov);
+    var f = focusSel ? d.querySelector(focusSel) : act.querySelector('.primary') || act.querySelector('button');
+    if (f) { f.focus(); if (f.select) f.select(); }
+    return d;
+  };
+
+  // ---------- Рядок стану і консоль ----------
+  PDE.prototype.status = function (msg, isErr, canUndo) {
+    var self = this;
+    this.statusEl.classList.toggle('err', !!isErr);
+    this.statusEl.innerHTML = '<span class="msg"></span>';
+    this.statusEl.querySelector('.msg').textContent = msg;
+    if (canUndo && this.prevState) {
+      var b = el('button', { type: 'button', text: 'Повернути мій код' });
+      b.addEventListener('click', function () { self.restorePrev(); });
+      this.statusEl.appendChild(b);
+    }
+  };
+  // Вивід у консоль збирається в буфер і показується раз на кадр — так println() у циклі не гальмує сторінку
+  PDE.prototype.log = function (text, cls) {
+    var self = this;
+    this.logBuf = this.logBuf || [];
+    var last = this.logBuf[this.logBuf.length - 1];
+    if (last && last.cls === cls && last.text.length < 4000) last.text += text; else this.logBuf.push({ text: text, cls: cls });
+    if (this.logBuf.length > 12) this.logBuf.shift();          // у буфері — не більше ~48 000 останніх символів
+    if (!this.logPending) { this.logPending = true; (window.requestAnimationFrame || setTimeout)(function () { self.flushLog(); }); }
+  };
+  PDE.prototype.flushLog = function () {
+    var c = this.consoleEl, buf = this.logBuf || [];
+    this.logBuf = []; this.logPending = false;
+    buf.forEach(function (b) { var s = el('span', b.cls ? { class: b.cls } : null); s.textContent = b.text; c.appendChild(s); });
+    var total = c.textContent.length;
+    while (c.firstChild && total > 50000) { total -= c.firstChild.textContent.length; c.removeChild(c.firstChild); }
+    c.scrollTop = c.scrollHeight;
+  };
+  PDE.prototype.showError = function (tabIndex, line, msg) {
+    if (tabIndex != null && tabIndex !== this.active) this.selectTab(tabIndex);
+    this.errLine = line || null;
+    this.refresh();
+    if (line) {
+      var lh = parseFloat(getComputedStyle(this.input).lineHeight) || 21;
+      this.input.scrollTop = Math.max(0, (line - 4) * lh);
+      this.syncScroll();
+    }
+    var where = (tabIndex != null ? 'Вкладка ' + this.state.tabs[tabIndex].name : '') + (line ? ', рядок ' + line : '');
+    this.status((where ? where + ': ' : '') + msg, true);
+    this.log((where ? '[' + where + '] ' : '') + msg + '\n', 'e');
+  };
+
+  // ---------- Запуск ----------
+  PDE.prototype.stop = function (silent) {
+    var inst = this.inst;
+    this.inst = null;
+    PDE.current = PDE.current === this ? null : PDE.current;
+    this.root.classList.remove('running');
+    cancelAnimationFrame(this.raf);
+    if (inst) { try { inst.exit(); } catch (e) {} }
+    if (this.blobUrls) { this.blobUrls.forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} }); this.blobUrls = null; }
+    if (!silent && inst) this.status('Скетч зупинено.');
+    this.fpsEl.textContent = '';
+  };
+  PDE.prototype.present = function () {
+    var self = this;
+    this.run().then(function () {
+      var w = self.win;
+      try {
+        var p = w.requestFullscreen ? w.requestFullscreen() : (w.webkitRequestFullscreen ? w.webkitRequestFullscreen() : null);
+        if (p && p.catch) p.catch(function () { self.status('Повноекранний режим недоступний у цьому браузері.'); });
+      } catch (e) {}
+    });
+  };
+  PDE.prototype.run = function () {
+    var self = this;
+    this.closeMenus();
+    this.state.tabs[this.active].code = this.input.value;
+    this.save(true);
+    this.stop(true);
+    this.errLine = null;
+    this.refresh();
+    this.consoleEl.innerHTML = '';
+    this.logBuf = [];
+
+    // 1. Перевірка синтаксису по вкладках
+    for (var i = 0; i < this.state.tabs.length; i++) {
+      var t = this.state.tabs[i];
+      var err = checkBrackets(t) || checkSemicolons(t);
+      if (err) { this.showError(i, err.line, err.msg); return Promise.resolve(); }
+    }
+    var warns = [];
+    this.state.tabs.forEach(function (t, i) { lint(t).forEach(function (w) { warns.push('[' + t.name + ', рядок ' + w.line + '] ' + w.msg); }); });
+
+    this.status('Завантаження…');
+    return loadPjs(this.opts.pjs).then(function () {
+      warns.forEach(function (w) { self.log('Увага: ' + w + '\n', 'w'); });
+      self.start();
+    }, function () {
+      self.status('Не вдалося завантажити Processing.js. Перевірте підключення до інтернету.', true);
+    });
+  };
+  PDE.prototype.start = function () {
+    var self = this;
+    var code = this.state.tabs.map(function (t) { return t.code; }).join('\n\n');
+
+    // 2. Файли з папки data → тимчасові адреси
+    var files = this.state.files || {}, preload = [];
+    this.blobUrls = [];
+    Object.keys(files).forEach(function (name) {
+      try {
+        var parts = files[name].split(','), mime = parts[0].replace(/^data:|;base64$/g, '');
+        var bin = atob(parts[1]), arr = new Uint8Array(bin.length);
+        for (var k = 0; k < bin.length; k++) arr[k] = bin.charCodeAt(k);
+        var url = URL.createObjectURL(new Blob([arr], { type: mime }));
+        self.blobUrls.push(url);
+        var re = new RegExp('"' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"', 'g');
+        if (re.test(code)) { code = code.replace(re, '"' + url + '"'); preload.push(url); }
+      } catch (e) {}
+    });
+    var missing = mask(code).match(/loadImage\s*\(\s*"[^"]*"/g);
+    if (missing) {
+      var raw = code.match(/loadImage\s*\(\s*"([^"]*)"/g) || [];
+      raw.forEach(function (s) { var f = s.match(/"([^"]*)"/)[1]; if (!/^blob:|^https?:|^data:/.test(f)) self.log('Увага: файл «' + f + '» не додано в data (Скетч → Додати файл). Зображення не завантажиться.\n', 'w'); });
+    }
+
+    // 3. Перетворення: ціле ділення і захист циклів
+    code = addLoopGuards(rewriteIntDivision(code));
+    if (preload.length) code = '/* @pjs preload="' + preload.join(',') + '"; */\n' + code;
+
+    // 4. Полотно
+    this.stage.innerHTML = '';
+    var cv = el('canvas', { tabindex: '0', 'aria-label': 'Вікно скетчу ' + this.state.tabs[0].name });
+    this.stage.appendChild(cv);
+    this.win.querySelector('.title').textContent = this.state.tabs[0].name;
+
+    var errored = false;
+    function fail(msg) {
+      if (errored) return;
+      errored = true;
+      self.stop(true);
+      self.showError(null, null, explain(msg));
+    }
+    Processing.logger = {
+      println: function (m) { self.log((m === undefined ? '' : fmt(m)) + '\n'); },
+      print: function (m) { self.log(fmt(m)); },
+      log: function (m) { self.log(fmt(m) + '\n'); }
+    };
+    function fmt(m) {
+      if (m === null) return 'null';
+      if (typeof m === 'number') return String(Math.round(m * 1e6) / 1e6);
+      if (m && m.toString && m.toString !== Object.prototype.toString) return String(m);
+      return String(m);
+    }
+
+    // захист від зависань: лічильник ітерацій скидається щокадру
+    // захист від зависань: якщо цикл триває понад 3 с без нового кадру, скетч зупиняється
+    var guard = 0, frameStart = performance.now();
+    window.__pdeGuard = function () {
+      if ((++guard & 1023) === 0 && performance.now() - frameStart > 3000) { guard = 0; frameStart = performance.now(); throw new Error('__pdeLoop'); }
+    };
+    window.__pdeIdiv = function (a, b) {
+      if (typeof a === 'number' && typeof b === 'number' && a % 1 === 0 && b % 1 === 0) {
+        if (b === 0) throw new Error('Ділення на нуль (ArithmeticException: / by zero).');
+        var q = a / b; return q < 0 ? Math.ceil(q) : Math.floor(q);
+      }
+      return a / b;
+    };
+    var frames = 0, lastT = performance.now();
+    function tick(now) {
+      guard = 0; frameStart = performance.now();
+      if (!self.inst) return;
+      frames++;
+      if (now - lastT > 500) {
+        self.fpsEl.textContent = 'кадрів/с: ' + Math.round(frames * 1000 / (now - lastT)) + ' · frameCount: ' + (self.inst.frameCount || 0);
+        frames = 0; lastT = now;
+      }
+      self.raf = requestAnimationFrame(tick);
+    }
+
+    var sketch;
+    try { sketch = Processing.compile(code); }
+    catch (e) { fail(e && e.message ? e.message : String(e)); return; }
+    var attach = sketch.attach;
+    sketch.attach = function (p, scope) {
+      p.saveFrame = function (file) {
+        var n = (file || self.state.tabs[0].name + '-####.png').replace(/#+/, function (h) { return ('0000' + p.frameCount).slice(-h.length); });
+        self.log('saveFrame(): кадр «' + n + '» показано у вікні «Збережений кадр».\n', 's');
+        var url = p.externals.canvas.toDataURL('image/png');
+        setTimeout(function () { self.showFrame(url, n); }, 0);
+      };
+      p.save = function (file) { p.saveFrame(file || 'image.png'); };
+      p.link = function (url) { window.open(url, '_blank'); };
+      // char у Java при склеюванні з рядком дає літеру: "key " + key → "key a" (а не код символу)
+      var Ch = p.Character;
+      if (Ch && Ch.prototype && !Ch.prototype.__pde && typeof Symbol !== 'undefined' && Symbol.toPrimitive) {
+        Ch.prototype[Symbol.toPrimitive] = function (hint) { return hint === 'number' ? this.code : String.fromCharCode(this.code); };
+        Ch.prototype.__pde = true;
+      }
+      var res = attach.call(this, p, scope);
+      // Помилки у функціях скетчу перехоплюємо тут: так видно справжнє повідомлення,
+      // навіть якщо бібліотеку завантажено з іншого сайту.
+      ['setup', 'draw', 'mousePressed', 'mouseReleased', 'mouseClicked', 'mouseDragged', 'mouseMoved', 'mouseWheel',
+        'keyPressed', 'keyReleased', 'keyTyped'].forEach(function (fn) {
+        var orig = p[fn];
+        if (typeof orig !== 'function') return;
+        p[fn] = function () {
+          try { return orig.apply(this, arguments); }
+          catch (e) { if (fn === 'setup') throw e; fail(e && e.message ? e.message : String(e)); }
+        };
+      });
+      return res;
+    };
+
+    var onErr = function (ev) {
+      if (!self.inst && !starting) return;
+      var msg = ev && (ev.error && ev.error.message || ev.message) || '';
+      if (/ResizeObserver/.test(msg)) return;
+      if (/^Script error\.?$/.test(msg)) msg = 'помилка в коді скетчу. Перевірте останні зміни або запустіть код у настільному Processing, щоб побачити точний рядок.';
+      ev.preventDefault && ev.preventDefault();
+      fail(msg);
+    };
+    window.removeEventListener('error', PDE._onErr || function () {});
+    PDE._onErr = onErr;
+    window.addEventListener('error', onErr);
+
+    var starting = true;
+    PDE.current = this;
+    try {
+      this.inst = new Processing(cv, sketch);
+    } catch (e) {
+      starting = false;
+      fail(e && e.message ? e.message : String(e));
+      return;
+    }
+    starting = false;
+    if (errored) return;
+    this.root.classList.add('running');
+    this.status('Скетч працює. ' + (cv.width > this.stage.clientWidth - 28 ? 'Вікно ширше за екран — гортайте його вбік. ' : '') + 'Зупинити — ■.');
+    this.raf = requestAnimationFrame(tick);
+    cv.addEventListener('mousemove', function () {
+      if (self.inst) self.xyEl.textContent = 'mouseX: ' + Math.round(self.inst.mouseX) + ' · mouseY: ' + Math.round(self.inst.mouseY);
+    });
+    cv.addEventListener('pointerdown', function () { cv.focus({ preventScroll: true }); });
+  };
+
+  // ---------- Публічний інтерфейс ----------
+  window.PDE = {
+    mount: function (elOrSel, opts) {
+      var node = typeof elOrSel === 'string' ? document.querySelector(elOrSel) : elOrSel;
+      var inst = new PDE(node, opts);
+      window.PDE.main = inst;
+      return inst;
+    },
+    // для тестів
+    _rewrite: function (c) { return addLoopGuards(rewriteIntDivision(c)); },
+    _check: function (code) { var t = { name: 't', code: code }; return checkBrackets(t) || checkSemicolons(t); }
+  };
+})();
+
+(function () {
+  var data = JSON.parse(document.getElementById('pde-data').textContent);
+  var ide = PDE.mount('#pde', {
+    key: data.key, tabs: data.tabs, examples: data.examples, courseRef: 'dovidnyk.html',
+    pjs: ['ide/processing.min.js', 'https://cdn.jsdelivr.net/npm/processing-js@1.6.6/processing.min.js']
+  });
+  var snippets = data.snippets || [];
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-try], [data-open-ex]');
+    if (!t) return;
+    if (t.hasAttribute('data-try')) { ide.loadCode(snippets[+t.getAttribute('data-try')], 'Pryklad'); return; }
+    var name = t.getAttribute('data-open-ex');
+    data.examples.forEach(function (ex) { if (ex.name === name) ide.loadExample(ex); });
+    document.getElementById('praktykum').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();
 </script>
 </body>
 </html>

@@ -1,0 +1,154 @@
+/* Онлайн-середовище Processing (PDE): меню, панель інструментів, вкладки, редактор, рядок стану, консоль, вікно скетчу */
+:root {
+  --pde-bar: #1d2b3e;
+  --pde-bar-ink: #e8eef6;
+  --pde-bar-muted: #9fb0c4;
+  --pde-run: #3ddc84;
+  --pde-editor: #ffffff;
+  --pde-gutter: #f2f5f8;
+  --pde-gutter-ink: #9aa7b4;
+  --pde-status: #2d5a8c;
+  --pde-status-ink: #ffffff;
+  --pde-err: #b3261e;
+  --pde-err-ink: #ffffff;
+  --pde-warn: #8a5a00;
+  --pde-console: #0e1621;
+  --pde-console-ink: #d6e0ea;
+  --pde-console-err: #ff8f87;
+  --pde-console-warn: #ffd27a;
+  --pde-menu: #ffffff;
+  --pde-menu-hover: #e8ecfd;
+  --pde-shadow: 0 10px 30px rgba(15, 25, 40, 0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pde-bar: #0b121c; --pde-bar-ink: #e3e9ef; --pde-bar-muted: #8596a8; --pde-run: #3ddc84;
+    --pde-editor: #111922; --pde-gutter: #0d141c; --pde-gutter-ink: #5d6d7d;
+    --pde-status: #1f4673; --pde-status-ink: #ffffff; --pde-err: #a3221b; --pde-err-ink: #ffffff; --pde-warn: #ffcf70;
+    --pde-console: #070c12; --pde-console-ink: #d6e0ea; --pde-console-err: #ff8f87; --pde-console-warn: #ffd27a;
+    --pde-menu: #18222d; --pde-menu-hover: #1b2447; --pde-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme="dark"] {
+  --pde-bar: #0b121c; --pde-bar-ink: #e3e9ef; --pde-bar-muted: #8596a8; --pde-run: #3ddc84;
+  --pde-editor: #111922; --pde-gutter: #0d141c; --pde-gutter-ink: #5d6d7d;
+  --pde-status: #1f4673; --pde-status-ink: #ffffff; --pde-err: #a3221b; --pde-err-ink: #ffffff; --pde-warn: #ffcf70;
+  --pde-console: #070c12; --pde-console-ink: #d6e0ea; --pde-console-err: #ff8f87; --pde-console-warn: #ffd27a;
+  --pde-menu: #18222d; --pde-menu-hover: #1b2447; --pde-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.pde-section { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 14px; min-width: 0; }
+.pde-section > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.pde-section > p { margin: 0; color: var(--muted); max-width: 68ch; }
+
+.pde { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 8px; overflow: visible; background: var(--pde-editor); min-width: 0; position: relative; }
+.pde button { font: inherit; }
+
+/* Меню */
+.pde-menubar { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px 6px; background: var(--panel); border-bottom: 1px solid var(--rule); border-radius: 8px 8px 0 0; font-size: 0.86rem; }
+.pde-menu { position: relative; }
+.pde-menu > button { background: none; border: 0; color: var(--ink); padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+.pde-menu > button:hover, .pde-menu > button[aria-expanded="true"] { background: var(--pde-menu-hover); }
+.pde-menu-list { position: absolute; top: calc(100% + 2px); left: 0; z-index: 30; min-width: 250px; max-width: min(320px, 86vw); max-height: 60vh; overflow-y: auto; margin: 0; padding: 6px; list-style: none; background: var(--pde-menu); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--pde-shadow); }
+.pde-menu-list li button, .pde-menu-list li a { display: flex; justify-content: space-between; gap: 16px; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 4px; color: var(--ink); cursor: pointer; text-decoration: none; font-size: 0.88rem; }
+.pde-menu-list li button:hover, .pde-menu-list li a:hover, .pde-menu-list li button:focus-visible { background: var(--pde-menu-hover); }
+.pde-menu-list kbd { font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); white-space: nowrap; }
+.pde-menu-list .sep { height: 1px; background: var(--rule); margin: 5px 4px; }
+.pde-menu-list .grp { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 8px 10px 2px; }
+
+/* Панель інструментів */
+.pde-toolbar { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--pde-bar); color: var(--pde-bar-ink); }
+.pde-btn-round { width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; background: #2a3c55; color: var(--pde-bar-ink); flex: none; }
+.pde-btn-round svg { width: 16px; height: 16px; }
+.pde-btn-round.run:hover, .pde.running .pde-btn-round.run { background: var(--pde-run); color: #0b1a10; }
+.pde-btn-round.stop:hover { background: #e0533d; color: #fff; }
+.pde-btn-round:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.pde-sketchname { font-family: var(--f-mono); font-size: 0.88rem; color: var(--pde-bar-ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pde-mode { margin-left: auto; font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--pde-bar-muted); border: 1px solid #3b4d66; border-radius: 4px; padding: 3px 7px; flex: none; }
+
+/* Вкладки */
+.pde-tabs { display: flex; align-items: flex-end; gap: 2px; padding: 6px 8px 0; background: var(--pde-bar); overflow-x: auto; }
+.pde-tab { display: flex; align-items: center; gap: 2px; background: #2a3c55; color: var(--pde-bar-muted); border-radius: 5px 5px 0 0; flex: none; }
+.pde-tab.active { background: var(--pde-editor); color: var(--ink); }
+.pde-tab > button { background: none; border: 0; color: inherit; padding: 7px 10px; font-family: var(--f-mono); font-size: 0.8rem; cursor: pointer; }
+.pde-tab .x { padding: 7px 8px 7px 2px; opacity: 0.6; }
+.pde-tab .x:hover { opacity: 1; color: var(--mark); }
+.pde-tab input { width: 12ch; font-family: var(--f-mono); font-size: 0.8rem; padding: 4px 6px; margin: 2px 4px; border: 1px solid var(--accent); border-radius: 3px; background: var(--pde-editor); color: var(--ink); }
+.pde-addtab { background: none; border: 0; color: var(--pde-bar-muted); padding: 6px 10px; cursor: pointer; font-size: 1rem; flex: none; }
+.pde-addtab:hover { color: var(--pde-bar-ink); }
+.pde-files { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; background: var(--pde-gutter); border-bottom: 1px solid var(--rule); font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted); }
+.pde-files span.f { background: var(--panel); border: 1px solid var(--rule); border-radius: 3px; padding: 1px 6px; color: var(--ink); }
+.pde-files button { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 0 2px; }
+
+/* Редактор */
+.pde-editor { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); height: 380px; background: var(--pde-editor); resize: vertical; overflow: hidden; min-height: 160px; }
+.pde-gutter { margin: 0; padding: 12px 8px 12px 10px; background: var(--pde-gutter); color: var(--pde-gutter-ink); font-family: var(--f-mono); font-size: 14px; line-height: 21px; text-align: right; overflow: hidden; user-select: none; min-width: 3.2em; white-space: pre; }
+.pde-gutter .err { color: var(--pde-err-ink); background: var(--pde-err); border-radius: 3px; padding: 0 3px; }
+.pde-code { position: relative; min-width: 0; overflow: hidden; }
+.pde-hl, .pde-input { position: absolute; inset: 0; margin: 0; padding: 12px 14px; border: 0; font-family: var(--f-mono); font-size: 14px; line-height: 21px; tab-size: 2; white-space: pre; overflow: auto; letter-spacing: 0; word-spacing: 0; font-variant-ligatures: none; }
+.pde-hl { color: var(--code-ink); pointer-events: none; overflow: hidden; }
+.pde-input { background: transparent; color: transparent; caret-color: var(--ink); resize: none; outline: none; -webkit-text-fill-color: transparent; }
+.pde-input::selection { background: rgba(34, 66, 214, 0.25); -webkit-text-fill-color: transparent; }
+.pde-input:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+
+/* Рядок стану і консоль */
+.pde-status { display: flex; align-items: center; gap: 10px; min-height: 34px; padding: 6px 12px; background: var(--pde-status); color: var(--pde-status-ink); font-size: 0.86rem; line-height: 1.35; }
+.pde-status.err { background: var(--pde-err); color: var(--pde-err-ink); }
+.pde-status .msg { flex: 1; min-width: 0; }
+.pde-status button { background: rgba(255, 255, 255, 0.16); color: inherit; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 0.8rem; flex: none; }
+.pde-console-wrap { background: var(--pde-console); border-radius: 0 0 8px 8px; }
+.pde-console-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pde-bar-muted); border-bottom: 1px solid #1c2735; }
+.pde-console-head button { background: none; border: 0; color: var(--pde-bar-muted); cursor: pointer; font-family: var(--f-mono); font-size: 0.72rem; }
+.pde-console { margin: 0; padding: 8px 12px; height: 120px; overflow: auto; color: var(--pde-console-ink); font-family: var(--f-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.pde-console .e { color: var(--pde-console-err); }
+.pde-console .w { color: var(--pde-console-warn); }
+.pde-console .s { color: var(--pde-bar-muted); }
+
+/* Вікно скетчу */
+.pde-window { margin-top: 14px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); overflow: hidden; min-width: 0; }
+.pde-window-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 10px; background: var(--pde-gutter); border-bottom: 1px solid var(--rule); font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.pde-window-bar .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pde-window-bar button { background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 8px; color: var(--ink); cursor: pointer; font-family: var(--f-mono); font-size: 0.74rem; }
+.pde-window-bar button:hover { border-color: var(--accent); color: var(--accent); }
+.pde-stage { overflow: auto; padding: 14px; background-color: var(--paper); min-height: 140px; display: flex; -webkit-overflow-scrolling: touch; }
+.pde-stage canvas { display: block; margin: auto; box-shadow: 0 0 0 1px var(--rule); background: #c8c8c8; outline: none; touch-action: none; }
+.pde-stage canvas:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+.pde-stage .idle { margin: auto; color: var(--muted); font-size: 0.9rem; text-align: center; max-width: 40ch; }
+.pde-window-foot { padding: 6px 12px; font-family: var(--f-mono); font-size: 0.74rem; color: var(--muted); border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 4px 18px; font-variant-numeric: tabular-nums; }
+.pde-window:fullscreen { display: flex; flex-direction: column; border-radius: 0; background: #1b1b1b; }
+.pde-window:fullscreen .pde-stage { flex: 1; background: #1b1b1b; }
+
+/* Діалоги */
+.pde-overlay { position: fixed; inset: 0; z-index: 60; background: rgba(10, 16, 24, 0.55); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.pde-dialog { background: var(--panel); color: var(--ink); border-radius: 8px; box-shadow: var(--pde-shadow); width: min(520px, 100%); max-height: 100%; overflow: auto; padding: 18px 20px; display: grid; gap: 12px; }
+.pde-dialog h3 { margin: 0; font-size: 1.1rem; }
+.pde-dialog p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.pde-dialog .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pde-dialog .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.pde-dialog button, .pde-dialog a.btn { background: var(--panel); border: 1px solid var(--rule); color: var(--ink); border-radius: 5px; padding: 7px 12px; cursor: pointer; font-size: 0.9rem; text-decoration: none; }
+.pde-dialog button.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.pde-dialog input[type="color"] { width: 64px; height: 44px; border: 1px solid var(--rule); border-radius: 6px; padding: 2px; background: var(--panel); }
+.pde-dialog input[type="range"] { width: 100%; }
+.pde-dialog code, .pde-dialog kbd { font-family: var(--f-mono); font-size: 0.85rem; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+.pde-dialog img { display: block; max-width: 100%; border: 1px solid var(--rule); border-radius: 4px; }
+.pde-dialog table { border-collapse: collapse; font-size: 0.88rem; width: 100%; }
+.pde-dialog td { padding: 5px 6px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.pde-dialog ul { margin: 0; padding-left: 1.2em; color: var(--ink); font-size: 0.92rem; }
+.pde-swatch { width: 44px; height: 44px; border-radius: 6px; border: 1px solid var(--rule); }
+
+/* Кнопки «Спробувати» біля прикладів */
+.try { display: inline-flex; align-items: center; gap: 6px; margin: -0.4em 0 1em; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); border-radius: 5px; padding: 5px 12px; font: 600 0.84rem var(--f-body); cursor: pointer; }
+.try:hover { background: var(--accent); color: var(--panel); }
+
+@media (max-width: 900px) {
+  .pde-editor { height: 340px; }
+  .pde-gutter, .pde-hl, .pde-input { font-size: 15px; line-height: 22px; }
+  .pde-input { font-size: 16px; }
+  .pde-hl { font-size: 16px; }
+  .pde-gutter { font-size: 16px; }
+}
+@media (max-width: 520px) {
+  .pde-menubar { flex-wrap: nowrap; overflow-x: auto; }
+  .pde-menu-list { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-width: none; max-height: 70vh; }
+  .pde-console { height: 110px; }
+}

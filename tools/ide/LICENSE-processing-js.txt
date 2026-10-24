@@ -1,0 +1,3 @@
+Processing.js 1.6.6 — https://github.com/processing-js/processing-js
+Ліцензія: MIT (див. поле "license" у package.json пакета processing-js на npm).
+Copyright (c) Processing.js contributors.
