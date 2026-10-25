@@ -191,6 +191,23 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
   .doc th, .doc td { padding: 6px 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* ---------- Перемикач «Урок / Детальна теорія / Практикум» ---------- */
+.switch { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 14px; padding: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; width: fit-content; max-width: 100%; }
+.switch a { padding: 7px 14px; border-radius: 5px; text-decoration: none; color: var(--ink); font-size: 0.92rem; font-weight: 500; }
+.switch a:hover { background: var(--accent-soft); }
+.switch a[aria-current="page"] { background: var(--accent); color: var(--panel); }
+.theory-callout { margin: 0 0 14px; padding: 10px 14px; background: var(--accent-soft); border-radius: 6px; font-size: 0.92rem; max-width: 80ch; }
+
+/* ---------- Відповіді, що розгортаються ---------- */
+.doc details.answers { margin: 1.2em 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--code-bg); }
+.doc details.answers > summary { cursor: pointer; padding: 10px 14px; font-weight: 600; color: var(--accent); }
+.doc details.answers[open] > summary { border-bottom: 1px solid var(--rule); }
+.doc details.answers > :not(summary) { margin-left: 14px; margin-right: 14px; }
+@media (max-width: 520px) {
+  .switch { width: 100%; }
+  .switch a { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px 6px; font-size: 0.86rem; line-height: 1.25; }
+}
 </style>
 </head>
 <body>
@@ -244,9 +261,10 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 <h2>Структура репозиторію</h2>
 <pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-fn">README</span>.md                ← програма курсу (цей файл)
 index.html               ← вебверсія: головна сторінка курсу
-storinky/                ← вебверсія: окрема сторінка для кожного уроку, довідник, онлайн-середовище
+storinky/                ← вебверсія: сторінки уроків (urok-<span class="t-fn">NN</span>), детальної теорії (teoriya-<span class="t-fn">NN</span>), довідник, онлайн-середовище
 dovidnyk.md              ← шпаргалка з функцій і словник термінів
 uroky/                   ← <span class="t-num">16</span> уроків (теорія, приклади, практика, питання)
+teoriya/                 ← детальна теорія до кожного уроку: функції, аргументи, приклади, самоперевірка
 skechi/                  ← <span class="t-num">25</span> готових скетчів до уроків (відкривати в Processing)
 test/processing_test.html← підсумковий інтерактивний тест (<span class="t-num">25</span> питань, <span class="t-num">12</span> балів)
 code_artifact.html       ← тест з попередніх тем інформатики <span class="t-num">9</span> класу
@@ -255,6 +273,14 @@ tools/ide/               ← онлайн-середовище Processing (pde.j
 <p>Кожен скетч лежить в окремій папці з тією самою назвою, як вимагає Processing: <code>skechi/L07_Vidskok/L07_Vidskok.pde</code>. Щоб запустити, відкрийте <code>.pde</code>-файл у Processing і натисніть ▶ <strong>Run</strong>.</p>
 <h2>Вебверсія</h2>
 <p>Відкрийте <code>index.html</code> у браузері: звідти є посилання на окрему сторінку кожного уроку (<code>storinky/urok-01.html</code> … <code>urok-16.html</code>). Сторінки однаково зручні на комп'ютері й на телефоні і працюють без інтернету. Після змін в <code>uroky/</code> чи <code>skechi/</code> оновіть їх командою <code>python3 tools/zibraty_sait.py</code> (потрібен пакет <code>markdown</code>: <code>pip install markdown</code>).</p>
+<h2>Детальна теорія до уроків</h2>
+<p>До кожного уроку є окреме детальне пояснення (<code>teoriya/</code>, у вебверсії — <code>storinky/teoriya-NN.html</code>, перемикач «Урок / Детальна теорія / Практикум» угорі сторінки). Воно написане для учнів 9 класу простою мовою й містить:
+- головну ідею уроку з аналогіями з життя;
+- розбір <strong>кожної функції</strong>: як записується, таблиця аргументів (що означає, тип, приклад), що повертає, як змінює поведінку режим чи налаштування;
+- покрокові таблиці трасування (як виконується цикл, умова, таймер);
+- типові помилки й повідомлення Processing із поясненням, що їх спричинило;
+- шпаргалку та питання «Перевір себе» з відповідями, які розгортаються по кліку;
+- приклади, які можна одразу запустити в онлайн-середовищі на тій самій сторінці.</p>
 <h2>Онлайн-середовище Processing</h2>
 <p>У кожному уроці вебверсії є розділ <strong>«Практикум в онлайн-середовищі Processing»</strong>. Це навчальна копія вікна Processing, яка працює в браузері на комп'ютері й телефоні без встановлення. Окрема пісочниця: <code>storinky/seredovyshche.html</code>.</p>
 <ul>

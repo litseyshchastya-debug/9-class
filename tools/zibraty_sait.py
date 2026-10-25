@@ -79,10 +79,10 @@ def code_block(src):
 
 
 # ---------- Markdown → HTML ----------
-FENCE = re.compile(r"^```[\w-]*\n(.*?)^```\s*$", re.S | re.M)
+FENCE = re.compile(r"^```([\w-]*)\n(.*?)^```\s*$", re.S | re.M)
 
 
-RUNNABLE = re.compile(r"\bsize\s*\(|\bvoid\s+setup\s*\(")
+RUNNABLE = re.compile(r"(?<![.\w])size\s*\(|\bvoid\s+setup\s*\(")
 
 
 CLASS_DEF = re.compile(r"^class\s+(\w+)[^{]*\{", re.M)
@@ -91,7 +91,7 @@ CLASS_DEF = re.compile(r"^class\s+(\w+)[^{]*\{", re.M)
 def class_sources(text):
     """Класи з фрагментів коду уроку та зі скетчів курсу: назва → (код класу, кількість параметрів конструктора)."""
     found = {}
-    sources = [m.group(1) for m in FENCE.finditer(text)]
+    sources = [m.group(2) for m in FENCE.finditer(text)]
     sources += [f["code"] for e in EXAMPLES for f in e["files"]]
     for src in sources:
         for m in CLASS_DEF.finditer(src):
@@ -144,9 +144,9 @@ def md_to_html(text, root, snippets=None):
     blocks = []
 
     def stash(m):
-        code = m.group(1)
+        lang, code = m.group(1), m.group(2)
         block = code_block(code)
-        tabs = runnable_tabs(code, text) if snippets is not None else None
+        tabs = runnable_tabs(code, text) if snippets is not None and lang != "text" else None
         if tabs:
             snippets.append(tabs)
             block += (f'<button class="try" type="button" data-try="{len(snippets) - 1}">'
@@ -155,7 +155,8 @@ def md_to_html(text, root, snippets=None):
         return f"\n\nCODEBLOCK{len(blocks) - 1}\n\n"
 
     text = FENCE.sub(stash, text)
-    out = markdown.markdown(text, extensions=["tables", "sane_lists"])
+    text = text.replace("<details>", '<details class="answers" markdown="1">')
+    out = markdown.markdown(text, extensions=["tables", "sane_lists", "md_in_html"])
     out = re.sub(r"<p>CODEBLOCK(\d+)</p>", lambda m: blocks[int(m.group(1))], out)
     out = out.replace("\\|", "|")
     out = out.replace("<table>", '<div class="tbl"><table>').replace("</table>", "</table></div>")
@@ -178,6 +179,7 @@ def md_to_html(text, root, snippets=None):
 
 
 # ---------- Дані курсу ----------
+THEORY = {int(re.match(r"(\d+)", f.name).group(1)): read(f) for f in sorted((ROOT / "teoriya").glob("*.md"))}
 lessons = []
 for f in sorted((ROOT / "uroky").glob("*.md")):
     text = read(f)
@@ -317,6 +319,56 @@ def full_page(head_html, body_html):
             f"{head_html}\n</head>\n<body>\n{body_html}\n</body>\n</html>\n")
 
 
+# ---------- Перемикач «Урок / Детальна теорія / Практикум» ----------
+def switch(n, current):
+    items = [("lesson", f"urok-{n:02d}.html", "Урок")]
+    if n in THEORY:
+        items.append(("theory", f"teoriya-{n:02d}.html", "Детальна теорія"))
+    items.append(("practice", "#praktykum", "Практикум ↓"))
+    links = "".join(
+        f'<a href="{href}"' + (' aria-current="page"' if key == current else "") + f">{label}</a>"
+        for key, href, label in items)
+    return f'<nav class="switch" aria-label="Розділи уроку">{links}</nav>'
+
+
+THEORY_INTRO = ("Пробуйте приклади з пояснення: кнопка «▶ Спробувати в онлайн-середовищі» під прикладом переносить "
+                "його сюди. Змінюйте числа й аргументи та дивіться, що зміниться.")
+THEORY_START = [("Teoriya", """// Тут можна запускати приклади з пояснення.
+// Натисніть «▶ Спробувати в онлайн-середовищі» під будь-яким прикладом вище.
+
+void setup() {
+  size(400, 300);
+}
+
+void draw() {
+  background(255);
+  fill(0);
+  text("mouseX = " + mouseX + ", mouseY = " + mouseY, 20, 30);
+  ellipse(mouseX, mouseY, 30, 30);
+}
+""")]
+
+
+def theory_page(l, prev, nxt):
+    root = "../"
+    n = l["n"]
+    snippets = []
+    doc_html = md_to_html(THEORY[n], root, snippets)
+    ide_html, ide_js = ide_block(f"teoriya-{n:02d}", THEORY_START, THEORY_INTRO, "Спробуйте приклади в онлайн-середовищі")
+    word = "Уроки" if n == 16 else "Урок"
+    p = (f'<a href="teoriya-{prev["n"]:02d}.html"><small>← Теорія {prev["label"]}</small>{html.escape(prev["short"])}</a>'
+         if prev else f'<a href="urok-{n:02d}.html"><small>← До уроку</small>{html.escape(l["short"])}</a>')
+    nx = (f'<a class="next" href="urok-{n:02d}.html"><small>До уроку {l["label"]} і практикуму →</small>{html.escape(l["short"])}</a>')
+    main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / <a href="urok-{n:02d}.html">{word} {l["label"]}</a> / Детальна теорія</p>'
+                 + switch(n, "theory")
+                 + f'<article><div class="doc">{doc_html}</div>{ide_html}</article>'
+                 f'<nav class="pager" aria-label="Навігація">{p}{nx}</nav>'
+                 + ide_data(f"teoriya-{n:02d}", THEORY_START, snippets))
+    title = f"Теорія: {word.lower()} {l['label']}. {l['short']}"
+    return full_page(head(title, f"{COURSE}: детальна теорія до уроку {l['label']}", PDE_CSS),
+                     body(root, f"urok-{n}", main_html, ide_js))
+
+
 # ---------- Сторінка уроку ----------
 def lesson_page(l, prev, nxt):
     root = "../"
@@ -356,8 +408,11 @@ def lesson_page(l, prev, nxt):
         tabs = STARTERY[l["n"]]
     ide_html, ide_js = ide_block(f"urok-{l['n']:02d}", tabs, IDE_INTRO)
     main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / {"Уроки" if l["n"] == 16 else "Урок"} {l["label"]} з 17'
-                 ' · <a href="#praktykum">до практикуму ↓</a></p>'
-                 f'<article><div class="doc">{doc_html}</div>{ide_html}{sk_html}</article>'
+                 '</p>' + switch(l["n"], "lesson")
+                 + (f'<p class="theory-callout">Не все зрозуміло? На сторінці <a href="teoriya-{l["n"]:02d}.html">«Детальна теорія»</a> '
+                    "кожну функцію цього уроку розібрано докладно: що означає кожен аргумент, що вона повертає, "
+                    "типові помилки і приклади, які можна одразу запустити.</p>" if l["n"] in THEORY else "")
+                 + f'<article><div class="doc">{doc_html}</div>{ide_html}{sk_html}</article>'
                  f'<nav class="pager" aria-label="Попередній і наступний урок">{p}{nx}</nav>'
                  + ide_data(f"urok-{l['n']:02d}", tabs, snippets))
     title = f'{"Уроки" if l["n"] == 16 else "Урок"} {l["label"]}. {l["short"]}'
@@ -426,6 +481,8 @@ for i, l in enumerate(lessons):
     prev = lessons[i - 1] if i > 0 else None
     nxt = lessons[i + 1] if i + 1 < len(lessons) else None
     (OUT / f"urok-{l['n']:02d}.html").write_text(lesson_page(l, prev, nxt), encoding="utf-8")
+    if l["n"] in THEORY:
+        (OUT / f"teoriya-{l['n']:02d}.html").write_text(theory_page(l, prev, nxt), encoding="utf-8")
 (OUT / "dovidnyk.html").write_text(dovidnyk_page(), encoding="utf-8")
 (OUT / "seredovyshche.html").write_text(ide_page(), encoding="utf-8")
 (OUT / "ide").mkdir(exist_ok=True)
@@ -438,4 +495,4 @@ h, b = index_parts()
 if len(sys.argv) > 2 and sys.argv[1] == "--artifact":
     pathlib.Path(sys.argv[2]).write_text(h + "\n" + b + "\n", encoding="utf-8")
 
-print(f"Зібрано: index.html, {len(lessons)} сторінок уроків, довідник і онлайн-середовище у {OUT.relative_to(ROOT)}/")
+print(f"Зібрано: index.html, {len(lessons)} сторінок уроків, {len(THEORY)} сторінок теорії, довідник і онлайн-середовище у {OUT.relative_to(ROOT)}/")

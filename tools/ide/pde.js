@@ -229,6 +229,10 @@
       while (j >= 0 && /\s/.test(m[j])) j--;
       if (j >= 0 && (m[j] === '*' || m[j] === '%') && m[j - 1] !== '/' && m[j + 1] !== '/') { j--; continue; }
       if (j >= 0 && (m[j] === '/' || m[j] === '.')) return null;   // a / b / c — спершу перетворюється ліве ділення
+      if (j >= 0 && m[j] === ')') {                                 // (float) a / b — приведення типу: ділення дробове
+        var cg = matchBack(m, j, '(', ')');
+        if (cg >= 0 && /^\s*(float|double)\s*$/.test(m.slice(cg + 1, j))) return null;
+      }
       return { s: s, isInt: isInt };
     }
   }
