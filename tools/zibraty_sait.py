@@ -399,6 +399,7 @@ def switch(n, current):
         items.append(("theory", f"teoriya-{n:02d}.html", "Детальна теорія"))
     items.append(("test", f"urok-{n:02d}.html#test" if current != "lesson" else "#test", "Тест"))
     items.append(("practice", f"urok-{n:02d}.html#praktykum" if current != "lesson" else "#praktykum", "Практикум"))
+    items.append(("dz", f"urok-{n:02d}.html#dz" if current != "lesson" else "#dz", "ДЗ"))
     items.append(("submit", f"urok-{n:02d}.html#zdacha" if current != "lesson" else "#zdacha", "Здати роботу"))
     links = "".join(
         f'<a href="{href}"' + (' aria-current="page"' if key == current else "") + f">{label}</a>"
@@ -481,6 +482,7 @@ def lesson_page(l, prev, nxt):
     if quiz:
         doc_html = doc_html.replace("<p>QUIZBLOCK</p>",
                                     f'<h2 id="test">Перевір себе</h2><p>{quiz["intro"]}</p><div class="kv" id="kviz"></div>')
+    doc_html = doc_html.replace("<h2>Домашнє завдання</h2>", '<h2 id="dz">Домашнє завдання</h2>')
     tabs = starter_tabs(l["n"])
     ide_html, ide_js = ide_block(f"urok-{l['n']:02d}", tabs, IDE_INTRO)
     zd_html = ('<section class="zd-section" id="zdacha"><h2>Здати роботу на перевірку</h2>'
