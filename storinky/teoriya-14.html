@@ -362,14 +362,70 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
   .pde-menu-list { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-width: none; max-height: 70vh; }
   .pde-console { height: 110px; }
 }
+
+/* ---------- Здача роботи й автоперевірка ---------- */
+.zd-section { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 14px; min-width: 0; }
+.zd-section > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.zd-section p, .zd-page p { margin: 0; max-width: 70ch; }
+.zd-crit { border: 1px solid var(--rule); border-radius: 6px; background: var(--code-bg); padding: 0 14px; }
+.zd-crit > summary { cursor: pointer; padding: 10px 0; font-weight: 600; color: var(--accent); }
+.zd-crit[open] { padding-bottom: 10px; }
+.zd-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.zd-form label, .zd-paste label, .zd-filters label { display: grid; gap: 4px; font-size: 0.88rem; font-weight: 600; }
+.zd-form input, .zd-paste textarea, .zd-linkrow input, .zd-filters select { font: 16px var(--f-body); padding: 9px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); min-width: 0; width: 100%; }
+.zd-paste textarea { font-family: var(--f-mono); font-size: 14px; resize: vertical; }
+.zd-form input:focus-visible, .zd-paste textarea:focus-visible, .zd-linkrow input:focus-visible, .zd-filters select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.zd-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.zd-btn { font: 600 0.92rem var(--f-body); padding: 10px 16px; border-radius: 6px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); cursor: pointer; }
+.zd-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.zd-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.zd-btn.primary:hover:not(:disabled) { color: var(--panel); filter: brightness(1.1); }
+.zd-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.zd-linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
+.zd-wait { color: var(--muted); font-style: italic; }
+.zd-note { padding: 10px 14px; border-radius: 6px; background: var(--accent-soft); font-size: 0.92rem; }
+.zd-small { font-size: 0.86rem; color: var(--muted); }
+.zd-result, .zd-card { display: grid; gap: 8px; min-width: 0; }
+.zd-grade { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; padding: 14px 16px; border-radius: 8px; background: var(--code-bg); border: 1px solid var(--rule); }
+.zd-grade .n { font-family: var(--f-display); font-size: 2.6rem; font-weight: 700; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.zd-grade .of { font-weight: 600; }
+.zd-grade .lvl { color: var(--muted); font-size: 0.9rem; }
+.zd-result h4, .zd-card h4, .zd-crit h4, .zd-share h4 { margin: 10px 0 2px; font-family: var(--f-mono); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.zd-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.zd-list li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 6px 10px; border-radius: 5px; background: var(--panel); border: 1px solid var(--rule); font-size: 0.92rem; }
+.zd-list.plain li { grid-template-columns: minmax(0, 1fr) auto; }
+.zd-list li.ok .mark { color: #2b8a3e; font-weight: 700; }
+.zd-list li.no .mark { color: var(--mark); font-weight: 700; }
+.zd-list li.no .t { color: var(--muted); }
+.zd-list .p { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.zd-share { display: grid; gap: 8px; padding: 14px 16px; border: 2px solid var(--accent); border-radius: 8px; background: var(--panel); }
+.zd-linkrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.zd-linkrow input { font-family: var(--f-mono); font-size: 13px; }
+.zd-paste { display: grid; gap: 8px; }
+.zd-head h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); }
+.zd-head .cls { font-family: var(--f-mono); font-size: 0.9rem; color: var(--muted); }
+.zd-card { padding: 16px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+.zd-journal { display: grid; gap: 10px; margin-top: 2em; padding-top: 1.2em; border-top: 2px solid var(--ink); }
+.zd-journal h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); }
+.zd-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.zd-filters select { width: auto; }
+.zd-journal table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.zd-journal th, .zd-journal td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.zd-journal th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.zd-journal td.g { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.zd-journal td.act { text-align: right; }
+@media (max-width: 520px) {
+  .zd-linkrow { grid-template-columns: minmax(0, 1fr); }
+  .zd-grade .n { font-size: 2.2rem; }
+}
 </style>
 </head>
 <body>
 <div class="shell">
-  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html" aria-current="page"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html" aria-current="page"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../storinky/perevirka.html">Перевірка робіт (для вчителя)</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
   <main>
-    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html" aria-current="page"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
-<p class="crumbs"><a href="../index.html">Програма</a> / <a href="urok-14.html">Урок 14</a> / Детальна теорія</p><nav class="switch" aria-label="Розділи уроку"><a href="urok-14.html">Урок</a><a href="teoriya-14.html" aria-current="page">Детальна теорія</a><a href="#praktykum">Практикум ↓</a></nav><article><div class="doc"><h1>Детальна теорія до уроку 14. Зображення, пікселі й текст</h1>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html" aria-current="page"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../storinky/perevirka.html">Перевірка робіт (для вчителя)</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / <a href="urok-14.html">Урок 14</a> / Детальна теорія</p><nav class="switch" aria-label="Розділи уроку"><a href="urok-14.html">Урок</a><a href="teoriya-14.html" aria-current="page">Детальна теорія</a><a href="urok-14.html#praktykum">Практикум</a><a href="urok-14.html#zdacha">Здати роботу</a></nav><article><div class="doc"><h1>Детальна теорія до уроку 14. Зображення, пікселі й текст</h1>
 <blockquote>
 <p>Тут пояснено, як завантажити й показати зображення, як працюють <code>tint()</code> і <code>filter()</code>, як прочитати та змінити окремі пікселі, а також усі функції для тексту: шрифти, розмір, вирівнювання, ширину й методи рядків.</p>
 </blockquote>
@@ -1022,6 +1078,23 @@ document.addEventListener('click', function (e) {
     return null;
   }
 
+  // Імена JavaScript, яких немає в Processing, але через які код міг би втрутитися в сторінку
+  // (наприклад, змінити журнал оцінок учителя). Такий код не запускається.
+  var FORBIDDEN = toSet('window document localStorage sessionStorage indexedDB cookie eval Function constructor prototype ' +
+    '__proto__ globalThis location fetch XMLHttpRequest WebSocket importScripts postMessage opener frames navigator ' +
+    'setTimeout setInterval defineProperty getOwnPropertyDescriptor setPrototypeOf getPrototypeOf Reflect Proxy ' +
+    'PDE ZDACHA PDE_GRADE PDE_RUBRICS PDE_GRADE_OPTS Processing __pdeGuard __pdeIdiv $p');
+  function forbidden(code) {
+    var m = mask(code), found = {}, re = /[A-Za-z_$][\w$]*/g, x;
+    while ((x = re.exec(m))) if (FORBIDDEN[x[0]]) found[x[0]] = 1;
+    var noCom = code.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+    if (/\[\s*"/.test(noCom)) found['[" "]'] = 1;
+    if (noCom.indexOf('`') >= 0) found['`'] = 1;
+    var names = Object.keys(found);
+    return names.length ? 'У коді є конструкції JavaScript, яких немає в Processing: ' + names.join(', ') +
+      '. Такий код не запускається в навчальному середовищі. Приберіть їх.' : null;
+  }
+
   // Попередження (програма запускається, але вчитель Java-синтаксису їх би підкреслив)
   function lint(tab) {
     var out = [], m = mask(tab.code).split('\n');
@@ -1214,8 +1287,9 @@ document.addEventListener('click', function (e) {
     this.root = root;
     this.opts = opts;
     this.key = 'pde:' + opts.key;
+    this.persist = opts.persist !== false;      // false — нічого не зберігати в браузері (сторінка вчителя)
     this.initial = JSON.parse(JSON.stringify(opts.tabs));
-    var saved = store.get(this.key);
+    var saved = this.persist ? store.get(this.key) : null;
     this.state = saved && saved.tabs && saved.tabs.length ? saved : { tabs: JSON.parse(JSON.stringify(opts.tabs)), files: {} };
     if (!this.state.files) this.state.files = {};
     this.active = 0;
@@ -1603,6 +1677,7 @@ document.addEventListener('click', function (e) {
   };
 
   PDE.prototype.save = function (quiet) {
+    if (!this.persist) return;
     var ok = store.set(this.key, this.state);
     if (!quiet) this.status(ok ? 'Збережено в цьому браузері.' : 'Не вдалося зберегти в браузері (приватний режим?). Скопіюйте код: «Файл → Копіювати весь код».', !ok);
   };
@@ -1668,7 +1743,7 @@ document.addEventListener('click', function (e) {
       var fr = new FileReader();
       fr.onload = function () {
         self.state.files[file.name] = String(fr.result);
-        if (!store.set(self.key, self.state)) {
+        if (self.persist && !store.set(self.key, self.state)) {
           self.status('Файл ' + file.name + ' додано, але він завеликий, щоб зберегтися після перезавантаження сторінки.', true);
         } else self.status('Файл ' + file.name + ' додано в data. Використовуйте: loadImage("' + file.name + '")');
         self.renderFiles();
@@ -1845,6 +1920,8 @@ document.addEventListener('click', function (e) {
       var err = checkBrackets(t) || checkSemicolons(t);
       if (err) { this.showError(i, err.line, err.msg); return Promise.resolve(); }
     }
+    var bad = forbidden(this.state.tabs.map(function (t) { return t.code; }).join('\n'));
+    if (bad) { this.showError(null, null, bad); return Promise.resolve(); }
     var warns = [];
     this.state.tabs.forEach(function (t, i) { lint(t).forEach(function (w) { warns.push('[' + t.name + ', рядок ' + w.line + '] ' + w.msg); }); });
 
@@ -2000,6 +2077,182 @@ document.addEventListener('click', function (e) {
     cv.addEventListener('pointerdown', function () { cv.focus({ preventScroll: true }); });
   };
 
+
+  // ---------- Невидимий запуск для автоперевірки ----------
+  // Скетч виконується без показу: записуються виклики функцій малювання, вивід у консоль,
+  // кадри при різних положеннях миші, кліку, перетягуванні й натисканні клавіш.
+  var LOGGED = ('point line rect ellipse circle square triangle quad arc beginShape vertex endShape text image ' +
+    'background fill noFill stroke noStroke strokeWeight rectMode ellipseMode colorMode textSize textAlign textFont ' +
+    'translate rotate scale pushMatrix popMatrix push pop tint filter frameRate').split(' ');
+  var COUNTED = ('random randomSeed noise noiseSeed dist map constrain atan2 millis second minute hour ' +
+    'loadImage createFont loadPixels updatePixels get saveFrame save createImage lerpColor').split(' ');
+  var SHAPES = toSet('point line rect ellipse circle square triangle quad arc vertex text image');
+
+  function simpleArg(v) {
+    if (v == null) return v;
+    if (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean') return v;
+    if (v && typeof v.code === 'number') return String.fromCharCode(v.code);    // char
+    if (v && typeof v.width === 'number' && typeof v.height === 'number') return '[PImage ' + v.width + 'x' + v.height + ']';
+    return String(v);
+  }
+
+  function headless(tabs, opts) {
+    opts = opts || {};
+    var report = { ok: false, stage: null, error: null, errorTab: null, errorLine: null, w: 100, h: 100,
+      log: [], counts: {}, out: '', phases: {}, order: [], frames: 0, isStatic: false, K: {},
+      tabs: tabs, code: tabs.map(function (t) { return t.code; }).join('\n\n') };
+    report.masked = mask(report.code);
+    for (var i = 0; i < tabs.length; i++) {
+      var err = checkBrackets(tabs[i]) || checkSemicolons(tabs[i]);
+      if (err) { report.stage = 'syntax'; report.error = err.msg; report.errorTab = tabs[i].name; report.errorLine = err.line; return Promise.resolve(report); }
+    }
+    var bad = forbidden(report.code);
+    if (bad) { report.stage = 'forbidden'; report.error = bad; return Promise.resolve(report); }
+    return loadPjs(opts.pjs || []).then(function () { return runHidden(report, opts); },
+      function () { report.stage = 'load'; report.error = 'Не вдалося завантажити Processing.js (немає інтернету?).'; return report; });
+  }
+
+  function runHidden(report, opts) {
+    var holder = document.createElement('div');
+    holder.style.cssText = 'position:absolute;left:-20000px;top:0;width:10px;height:10px;overflow:hidden';
+    var cv = document.createElement('canvas');
+    holder.appendChild(cv);
+    document.body.appendChild(holder);
+    var frame = 0, phase = 'setup', fillKey = '255', noFillOn = false, logFull = false, perFrame = 0, lastFr = -1;
+    var p = null, oldGuard = window.__pdeGuard, oldIdiv = window.__pdeIdiv, oldLogger = window.Processing && Processing.logger;
+    var guard = 0, phaseStart = performance.now();
+    window.__pdeGuard = function () {
+      if ((++guard & 1023) === 0 && performance.now() - phaseStart > 3000) throw new Error('__pdeLoop');
+    };
+    window.__pdeIdiv = function (a, b) {
+      if (typeof a === 'number' && typeof b === 'number' && a % 1 === 0 && b % 1 === 0) {
+        if (b === 0) throw new Error('Ділення на нуль (ArithmeticException: / by zero).');
+        var q = a / b; return q < 0 ? Math.ceil(q) : Math.floor(q);
+      }
+      return a / b;
+    };
+    var outParts = [];
+    Processing.logger = {
+      println: function (m) { if (outParts.length < 2000) outParts.push(String(simpleArg(m)) + '\n'); },
+      print: function (m) { if (outParts.length < 2000) outParts.push(String(simpleArg(m))); },
+      log: function (m) { if (outParts.length < 2000) outParts.push(String(m) + '\n'); }
+    };
+    function finish() {
+      report.out = outParts.join('');
+      report.frames = frame;
+      try { if (p) p.exit(); } catch (e) {}
+      holder.remove();
+      window.__pdeGuard = oldGuard; window.__pdeIdiv = oldIdiv;
+      if (oldLogger) Processing.logger = oldLogger;
+      return report;
+    }
+    function fail(stage, e) {
+      report.stage = stage;
+      var msg = e && e.message ? e.message : String(e);
+      report.error = explain(msg);
+      return finish();
+    }
+    var code = addLoopGuards(rewriteIntDivision(report.code));
+    var sketch;
+    try { sketch = Processing.compile(code); } catch (e) { return fail('compile', e); }
+    var attach = sketch.attach;
+    sketch.attach = function (pp, scope) {
+      p = pp;
+      ['CLOSE', 'PIE', 'CHORD', 'OPEN', 'CENTER', 'CORNER', 'CORNERS', 'RADIUS', 'HSB', 'RGB', 'LEFT', 'RIGHT',
+        'TOP', 'BOTTOM', 'GRAY', 'INVERT', 'THRESHOLD', 'BLUR', 'POSTERIZE', 'ROUND', 'SQUARE', 'PROJECT'].forEach(function (k) { report.K[k] = pp[k]; });
+      var Ch = pp.Character;
+      if (Ch && Ch.prototype && !Ch.prototype.__pde && typeof Symbol !== 'undefined' && Symbol.toPrimitive) {
+        Ch.prototype[Symbol.toPrimitive] = function (hint) { return hint === 'number' ? this.code : String.fromCharCode(this.code); };
+        Ch.prototype.__pde = true;
+      }
+      pp.saveFrame = function () { report.counts.saveFrame = (report.counts.saveFrame || 0) + 1; };
+      pp.save = function () { report.counts.save = (report.counts.save || 0) + 1; };
+      pp.link = function () {};
+      // Processing.js після size() перепризначає функції малювання, тому обгортаємо через властивість:
+      // будь-яке нове призначення теж потрапляє в обгортку.
+      function hook(fn, makeWrapper) {
+        var orig = pp[fn];
+        if (typeof orig !== 'function') return;
+        var wrapped = makeWrapper(function () { return orig; });
+        try {
+          Object.defineProperty(pp, fn, { configurable: true, enumerable: true,
+            get: function () { return wrapped; },
+            set: function (v) { orig = v; } });
+        } catch (e) { pp[fn] = wrapped; }
+      }
+      LOGGED.forEach(function (fn) {
+        hook(fn, function (getOrig) {
+          return function () {
+            if (fn === 'fill') { fillKey = Array.prototype.map.call(arguments, simpleArg).join(','); noFillOn = false; }
+            else if (fn === 'noFill') noFillOn = true;
+            if (frame !== lastFr) { lastFr = frame; perFrame = 0; }
+            if (!logFull && ++perFrame <= 1500) {            // не більше 1500 записів на кадр
+              report.log.push({ f: fn, a: Array.prototype.map.call(arguments, simpleArg), fr: frame, ph: phase, fill: noFillOn ? null : fillKey });
+              if (report.log.length > 250000) logFull = true;
+            }
+            return getOrig().apply(this, arguments);
+          };
+        });
+      });
+      COUNTED.forEach(function (fn) {
+        hook(fn, function (getOrig) {
+          return function () { report.counts[fn] = (report.counts[fn] || 0) + 1; return getOrig().apply(this, arguments); };
+        });
+      });
+      pp.randomSeed(7);
+      return attach.call(this, pp, scope);
+    };
+    try { new Processing(cv, sketch); } catch (e) { return fail('runtime', e); }
+    try { p.noLoop(); } catch (e) {}
+    report.w = p.width; report.h = p.height;
+    report.isStatic = typeof p.draw !== 'function';
+    report.userFns = {};
+    ['mousePressed', 'mouseReleased', 'mouseClicked', 'mouseDragged', 'mouseMoved', 'keyPressed', 'keyReleased', 'keyTyped'].forEach(function (fn) {
+      report.userFns[fn] = typeof p[fn] === 'function';
+    });
+    var ctx = cv.getContext('2d');
+    function snap(name, from) {
+      var data = null;
+      try { data = ctx.getImageData(0, 0, cv.width, cv.height); } catch (e) {}
+      report.phases[name] = { from: from, to: frame, img: data };
+      report.order.push(name);
+    }
+    function frames(n) {
+      if (report.isStatic) return;
+      for (var i = 0; i < n; i++) { frame++; guard = 0; phaseStart = performance.now(); p.redraw(); }
+    }
+    function mouse(x, y) { p.mouseX = Math.round(x); p.mouseY = Math.round(y); }
+    function call(fn) { if (typeof p[fn] === 'function') { guard = 0; phaseStart = performance.now(); p[fn](); } }
+    var W = p.width, H = p.height;
+    try {
+      snap('setup', 0);
+      phase = 'start'; mouse(W / 2, H / 2); var f0 = frame + 1; frames(3); snap('start', f0);
+      phase = 'anim'; f0 = frame + 1; frames(opts.frames || 150); snap('anim', f0);
+      phase = 'mouseTL'; f0 = frame + 1; mouse(W * 0.25, H * 0.25); call('mouseMoved'); frames(3); snap('mouseTL', f0);
+      phase = 'mouseBR'; f0 = frame + 1; mouse(W * 0.75, H * 0.75); call('mouseMoved'); frames(3); snap('mouseBR', f0);
+      phase = 'click'; f0 = frame + 1;
+      p.mouseButton = p.LEFT; p.__mousePressed = true; call('mousePressed'); frames(1);
+      p.__mousePressed = false; call('mouseReleased'); call('mouseClicked'); frames(2); snap('click', f0);
+      phase = 'click2'; f0 = frame + 1;
+      mouse(W * 0.3, H * 0.6); p.__mousePressed = true; call('mousePressed'); frames(1);
+      p.__mousePressed = false; call('mouseReleased'); call('mouseClicked'); frames(2); snap('click2', f0);
+      phase = 'drag'; f0 = frame + 1; mouse(W * 0.2, H * 0.5); frames(1);
+      p.__mousePressed = true; call('mousePressed');
+      for (var d = 1; d <= 8; d++) { mouse(W * (0.2 + d * 0.07), H * (0.5 + 0.3 * Math.sin(d))); call('mouseDragged'); frames(1); }
+      p.__mousePressed = false; call('mouseReleased'); frames(1); snap('drag', f0);
+      (opts.keys || ['a', ' ', 'UP', 'RIGHT']).forEach(function (k) {
+        phase = 'key:' + k; f0 = frame + 1;
+        if (/^[A-Z]{2,}$/.test(k)) { p.key = new p.Character(p.CODED); p.keyCode = p[k]; }
+        else { p.key = new p.Character(k); p.keyCode = k.toUpperCase().charCodeAt(0); }
+        p.__keyPressed = true; call('keyPressed'); call('keyTyped'); frames(1);
+        p.__keyPressed = false; call('keyReleased'); frames(1);
+        snap('key:' + k, f0);
+      });
+      report.ok = true;
+    } catch (e) { return fail('runtime', e); }
+    return finish();
+  }
+
   // ---------- Публічний інтерфейс ----------
   window.PDE = {
     mount: function (elOrSel, opts) {
@@ -2008,6 +2261,11 @@ document.addEventListener('click', function (e) {
       window.PDE.main = inst;
       return inst;
     },
+    headless: headless,
+    loadPjs: loadPjs,
+    highlight: highlight,
+    mask: mask,
+    SHAPES: SHAPES,
     // для тестів
     _rewrite: function (c) { return addLoopGuards(rewriteIntDivision(c)); },
     _check: function (code) { var t = { name: 't', code: code }; return checkBrackets(t) || checkSemicolons(t); }

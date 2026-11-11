@@ -28,6 +28,9 @@ sys.path.insert(0, str(TOOLS / "ide"))
 from startery import STARTERY, STARTER_FROM_SKETCH, PISOCHNYTSIA  # noqa: E402
 
 PJS_CDN = "https://cdn.jsdelivr.net/npm/processing-js@1.6.6/processing.min.js"
+# Публічна адреса курсу (опублікована сторінка). З неї будуються посилання на роботи учнів,
+# коли курс відкрито на claude.ai; в інших місцях (диск, власний сайт) адреса визначається автоматично.
+PUBLIC_URL = "https://claude.ai/artifact/BiVZocBGjHd7pJpyGaUJbR"
 
 COURSE = "Креативне програмування в Processing"
 MODULES = [
@@ -204,6 +207,27 @@ def sketches_for(n):
 CSS = read(TOOLS / "stil.css")
 PDE_CSS = read(TOOLS / "ide" / "pde.css")
 PDE_JS = read(TOOLS / "ide" / "pde.js")
+GRADE_JS = read(TOOLS / "ide" / "kryterii.js") + "\n" + read(TOOLS / "ide" / "zdacha.js")
+PJS_LIST = "['ide/processing.min.js', '" + PJS_CDN + "']"
+COURSE_URL_JS = """function () {
+  if (location.protocol !== 'file:' && /claude|anthropic/.test(location.hostname)) return '""" + PUBLIC_URL + """';
+  return new URL('../index.html', location.href).href.split('#')[0];
+}"""
+
+
+# Посилання на роботу учня веде на головну (адреса курсу + #код); звідти — на сторінку перевірки.
+REDIRECT_JS = """(function () {
+  var m = (location.hash || '').match(/pde1[zu][A-Za-z0-9_-]{10,}/);
+  if (m) location.replace('storinky/perevirka.html#' + m[0]);
+})();
+"""
+
+
+def starter_tabs(n):
+    if n in STARTER_FROM_SKETCH:
+        ex = next(e for e in EXAMPLES if e["name"] == STARTER_FROM_SKETCH[n])
+        return [(f["name"][:-4], f["code"]) for f in ex["files"]]
+    return STARTERY.get(n, [])
 
 
 def all_examples():
@@ -284,6 +308,7 @@ def toc(root, current):
     parts.append('<div class="solo"><h4>Матеріали</h4><ol>'
                  + link(f"{root}storinky/seredovyshche.html", "ide", "Онлайн-середовище Processing")
                  + link(f"{root}storinky/dovidnyk.html", "dovidnyk", "Довідник і словник термінів")
+                 + link(f"{root}storinky/perevirka.html", "perevirka", "Перевірка робіт (для вчителя)")
                  + f'<li><a href="{root}test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li>'
                  + "</ol></div>")
     return "".join(parts)
@@ -324,7 +349,8 @@ def switch(n, current):
     items = [("lesson", f"urok-{n:02d}.html", "Урок")]
     if n in THEORY:
         items.append(("theory", f"teoriya-{n:02d}.html", "Детальна теорія"))
-    items.append(("practice", "#praktykum", "Практикум ↓"))
+    items.append(("practice", f"urok-{n:02d}.html#praktykum" if current != "lesson" else "#praktykum", "Практикум"))
+    items.append(("submit", f"urok-{n:02d}.html#zdacha" if current != "lesson" else "#zdacha", "Здати роботу"))
     links = "".join(
         f'<a href="{href}"' + (' aria-current="page"' if key == current else "") + f">{label}</a>"
         for key, href, label in items)
@@ -401,22 +427,69 @@ def lesson_page(l, prev, nxt):
 
     snippets = []
     doc_html = md_to_html(l["md"], root, snippets)
-    if l["n"] in STARTER_FROM_SKETCH:
-        ex = next(e for e in EXAMPLES if e["name"] == STARTER_FROM_SKETCH[l["n"]])
-        tabs = [(f["name"][:-4], f["code"]) for f in ex["files"]]
-    else:
-        tabs = STARTERY[l["n"]]
+    tabs = starter_tabs(l["n"])
     ide_html, ide_js = ide_block(f"urok-{l['n']:02d}", tabs, IDE_INTRO)
+    zd_html = ('<section class="zd-section" id="zdacha"><h2>Здати роботу на перевірку</h2>'
+               '<div id="zd"></div></section>')
+    ide_js += "\n" + GRADE_JS + """
+(function () {
+  var data = JSON.parse(document.getElementById('pde-data').textContent);
+  ZDACHA.mountSubmit(document.getElementById('zd'), {
+    lesson: """ + str(l["n"]) + """,
+    ide: function () { return PDE.main; },
+    starter: data.tabs,
+    pjs: """ + PJS_LIST + """,
+    courseUrl: """ + COURSE_URL_JS + """
+  });
+})();"""
     main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / {"Уроки" if l["n"] == 16 else "Урок"} {l["label"]} з 17'
                  '</p>' + switch(l["n"], "lesson")
                  + (f'<p class="theory-callout">Не все зрозуміло? На сторінці <a href="teoriya-{l["n"]:02d}.html">«Детальна теорія»</a> '
                     "кожну функцію цього уроку розібрано докладно: що означає кожен аргумент, що вона повертає, "
                     "типові помилки і приклади, які можна одразу запустити.</p>" if l["n"] in THEORY else "")
-                 + f'<article><div class="doc">{doc_html}</div>{ide_html}{sk_html}</article>'
+                 + f'<article><div class="doc">{doc_html}</div>{ide_html}{zd_html}{sk_html}</article>'
                  f'<nav class="pager" aria-label="Попередній і наступний урок">{p}{nx}</nav>'
                  + ide_data(f"urok-{l['n']:02d}", tabs, snippets))
     title = f'{"Уроки" if l["n"] == 16 else "Урок"} {l["label"]}. {l["short"]}'
     return full_page(head(title, f"{COURSE}: {l['title']}", PDE_CSS), body(root, f"urok-{l['n']}", main_html, ide_js))
+
+
+def teacher_page():
+    root = "../"
+    starters = {n: [{"name": a, "code": c} for a, c in starter_tabs(n)] for n in range(1, 17)}
+    titles = {l["n"]: l["title"] for l in lessons}
+    ide_html, ide_js = ide_block("perevirka", [("Robota", "// Тут з'явиться код учня, коли ви перевірите роботу.\n")],
+                                 "Код учня відкривається тут: запустіть його ▶, перегляньте вкладки й консоль.",
+                                 "Код роботи")
+    ide_js = ide_js.replace("key: data.key, tabs: data.tabs,", "key: data.key, tabs: data.tabs, persist: false,")
+    ide_js += "\n" + GRADE_JS + """
+(function () {
+  var extra = JSON.parse(document.getElementById('zd-data').textContent);
+  ZDACHA.mountTeacher(document.getElementById('pv'), {
+    pjs: """ + PJS_LIST + """,
+    starters: extra.starters,
+    lessonTitles: extra.titles,
+    onWork: function (tabs, d) {
+      var ide = PDE.main;
+      ide.stop(true);
+      ide.state = { tabs: tabs.map(function (t) { return { name: t.name, code: t.code }; }), files: {} };
+      ide.selectTab(0);
+      ide.status('Робота: ' + d.name + (d.cls ? ', ' + d.cls : '') + '. Натисніть ▶, щоб запустити.');
+    }
+  });
+})();"""
+    main_html = (f'<p class="crumbs"><a href="{root}index.html">Програма</a> / Перевірка робіт</p>'
+                 '<article class="zd-page"><div class="doc"><h1>Перевірка робіт учнів</h1>'
+                 "<p>Учні здають практикум кожного уроку кнопкою «Здати роботу на перевірку». Вони отримують посилання, "
+                 "у якому запаковано їхній код. Коли ви відкриваєте посилання, сторінка <strong>заново запускає й оцінює</strong> код "
+                 "за критеріями уроку (рівень 1 — до 6 балів, рівень 2 — до 9, рівень 3 — до 12), тож оцінку не можна підробити. "
+                 "Перевірена робота потрапляє в журнал нижче.</p></div>"
+                 '<div id="pv"></div>'
+                 f"{ide_html}</article>"
+                 + json_script("zd-data", {"starters": starters, "titles": titles})
+                 + ide_data("perevirka", [("Robota", "// Тут з'явиться код учня, коли ви перевірите роботу.\n")]))
+    return full_page(head("Перевірка робіт", "Автоматична перевірка робіт учнів і журнал оцінок", PDE_CSS),
+                     body(root, "perevirka", main_html, ide_js))
 
 
 def ide_page():
@@ -473,7 +546,7 @@ def index_parts():
     <article><div class="doc">{md_to_html(read(ROOT / "README.md"), root)}</div></article>
     <nav class="pager"><span></span><a class="next" href="storinky/urok-01.html"><small>Почати →</small>Урок 1. Знайомство з Processing</a></nav>"""
     return (head("Processing у 9 класі", f"{COURSE}: програма курсу для 9 класу"),
-            body(root, "home", main_html, read(TOOLS / "polotno.js")))
+            body(root, "home", main_html, REDIRECT_JS + read(TOOLS / "polotno.js")))
 
 
 OUT.mkdir(exist_ok=True)
@@ -485,6 +558,7 @@ for i, l in enumerate(lessons):
         (OUT / f"teoriya-{l['n']:02d}.html").write_text(theory_page(l, prev, nxt), encoding="utf-8")
 (OUT / "dovidnyk.html").write_text(dovidnyk_page(), encoding="utf-8")
 (OUT / "seredovyshche.html").write_text(ide_page(), encoding="utf-8")
+(OUT / "perevirka.html").write_text(teacher_page(), encoding="utf-8")
 (OUT / "ide").mkdir(exist_ok=True)
 shutil.copy(TOOLS / "ide" / "processing.min.js", OUT / "ide" / "processing.min.js")
 shutil.copy(TOOLS / "ide" / "LICENSE-processing-js.txt", OUT / "ide" / "LICENSE-processing-js.txt")

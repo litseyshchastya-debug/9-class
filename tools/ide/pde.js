@@ -138,6 +138,23 @@
     return null;
   }
 
+  // Імена JavaScript, яких немає в Processing, але через які код міг би втрутитися в сторінку
+  // (наприклад, змінити журнал оцінок учителя). Такий код не запускається.
+  var FORBIDDEN = toSet('window document localStorage sessionStorage indexedDB cookie eval Function constructor prototype ' +
+    '__proto__ globalThis location fetch XMLHttpRequest WebSocket importScripts postMessage opener frames navigator ' +
+    'setTimeout setInterval defineProperty getOwnPropertyDescriptor setPrototypeOf getPrototypeOf Reflect Proxy ' +
+    'PDE ZDACHA PDE_GRADE PDE_RUBRICS PDE_GRADE_OPTS Processing __pdeGuard __pdeIdiv $p');
+  function forbidden(code) {
+    var m = mask(code), found = {}, re = /[A-Za-z_$][\w$]*/g, x;
+    while ((x = re.exec(m))) if (FORBIDDEN[x[0]]) found[x[0]] = 1;
+    var noCom = code.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+    if (/\[\s*"/.test(noCom)) found['[" "]'] = 1;
+    if (noCom.indexOf('`') >= 0) found['`'] = 1;
+    var names = Object.keys(found);
+    return names.length ? 'У коді є конструкції JavaScript, яких немає в Processing: ' + names.join(', ') +
+      '. Такий код не запускається в навчальному середовищі. Приберіть їх.' : null;
+  }
+
   // Попередження (програма запускається, але вчитель Java-синтаксису їх би підкреслив)
   function lint(tab) {
     var out = [], m = mask(tab.code).split('\n');
@@ -330,8 +347,9 @@
     this.root = root;
     this.opts = opts;
     this.key = 'pde:' + opts.key;
+    this.persist = opts.persist !== false;      // false — нічого не зберігати в браузері (сторінка вчителя)
     this.initial = JSON.parse(JSON.stringify(opts.tabs));
-    var saved = store.get(this.key);
+    var saved = this.persist ? store.get(this.key) : null;
     this.state = saved && saved.tabs && saved.tabs.length ? saved : { tabs: JSON.parse(JSON.stringify(opts.tabs)), files: {} };
     if (!this.state.files) this.state.files = {};
     this.active = 0;
@@ -719,6 +737,7 @@
   };
 
   PDE.prototype.save = function (quiet) {
+    if (!this.persist) return;
     var ok = store.set(this.key, this.state);
     if (!quiet) this.status(ok ? 'Збережено в цьому браузері.' : 'Не вдалося зберегти в браузері (приватний режим?). Скопіюйте код: «Файл → Копіювати весь код».', !ok);
   };
@@ -784,7 +803,7 @@
       var fr = new FileReader();
       fr.onload = function () {
         self.state.files[file.name] = String(fr.result);
-        if (!store.set(self.key, self.state)) {
+        if (self.persist && !store.set(self.key, self.state)) {
           self.status('Файл ' + file.name + ' додано, але він завеликий, щоб зберегтися після перезавантаження сторінки.', true);
         } else self.status('Файл ' + file.name + ' додано в data. Використовуйте: loadImage("' + file.name + '")');
         self.renderFiles();
@@ -961,6 +980,8 @@
       var err = checkBrackets(t) || checkSemicolons(t);
       if (err) { this.showError(i, err.line, err.msg); return Promise.resolve(); }
     }
+    var bad = forbidden(this.state.tabs.map(function (t) { return t.code; }).join('\n'));
+    if (bad) { this.showError(null, null, bad); return Promise.resolve(); }
     var warns = [];
     this.state.tabs.forEach(function (t, i) { lint(t).forEach(function (w) { warns.push('[' + t.name + ', рядок ' + w.line + '] ' + w.msg); }); });
 
@@ -1116,6 +1137,182 @@
     cv.addEventListener('pointerdown', function () { cv.focus({ preventScroll: true }); });
   };
 
+
+  // ---------- Невидимий запуск для автоперевірки ----------
+  // Скетч виконується без показу: записуються виклики функцій малювання, вивід у консоль,
+  // кадри при різних положеннях миші, кліку, перетягуванні й натисканні клавіш.
+  var LOGGED = ('point line rect ellipse circle square triangle quad arc beginShape vertex endShape text image ' +
+    'background fill noFill stroke noStroke strokeWeight rectMode ellipseMode colorMode textSize textAlign textFont ' +
+    'translate rotate scale pushMatrix popMatrix push pop tint filter frameRate').split(' ');
+  var COUNTED = ('random randomSeed noise noiseSeed dist map constrain atan2 millis second minute hour ' +
+    'loadImage createFont loadPixels updatePixels get saveFrame save createImage lerpColor').split(' ');
+  var SHAPES = toSet('point line rect ellipse circle square triangle quad arc vertex text image');
+
+  function simpleArg(v) {
+    if (v == null) return v;
+    if (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean') return v;
+    if (v && typeof v.code === 'number') return String.fromCharCode(v.code);    // char
+    if (v && typeof v.width === 'number' && typeof v.height === 'number') return '[PImage ' + v.width + 'x' + v.height + ']';
+    return String(v);
+  }
+
+  function headless(tabs, opts) {
+    opts = opts || {};
+    var report = { ok: false, stage: null, error: null, errorTab: null, errorLine: null, w: 100, h: 100,
+      log: [], counts: {}, out: '', phases: {}, order: [], frames: 0, isStatic: false, K: {},
+      tabs: tabs, code: tabs.map(function (t) { return t.code; }).join('\n\n') };
+    report.masked = mask(report.code);
+    for (var i = 0; i < tabs.length; i++) {
+      var err = checkBrackets(tabs[i]) || checkSemicolons(tabs[i]);
+      if (err) { report.stage = 'syntax'; report.error = err.msg; report.errorTab = tabs[i].name; report.errorLine = err.line; return Promise.resolve(report); }
+    }
+    var bad = forbidden(report.code);
+    if (bad) { report.stage = 'forbidden'; report.error = bad; return Promise.resolve(report); }
+    return loadPjs(opts.pjs || []).then(function () { return runHidden(report, opts); },
+      function () { report.stage = 'load'; report.error = 'Не вдалося завантажити Processing.js (немає інтернету?).'; return report; });
+  }
+
+  function runHidden(report, opts) {
+    var holder = document.createElement('div');
+    holder.style.cssText = 'position:absolute;left:-20000px;top:0;width:10px;height:10px;overflow:hidden';
+    var cv = document.createElement('canvas');
+    holder.appendChild(cv);
+    document.body.appendChild(holder);
+    var frame = 0, phase = 'setup', fillKey = '255', noFillOn = false, logFull = false, perFrame = 0, lastFr = -1;
+    var p = null, oldGuard = window.__pdeGuard, oldIdiv = window.__pdeIdiv, oldLogger = window.Processing && Processing.logger;
+    var guard = 0, phaseStart = performance.now();
+    window.__pdeGuard = function () {
+      if ((++guard & 1023) === 0 && performance.now() - phaseStart > 3000) throw new Error('__pdeLoop');
+    };
+    window.__pdeIdiv = function (a, b) {
+      if (typeof a === 'number' && typeof b === 'number' && a % 1 === 0 && b % 1 === 0) {
+        if (b === 0) throw new Error('Ділення на нуль (ArithmeticException: / by zero).');
+        var q = a / b; return q < 0 ? Math.ceil(q) : Math.floor(q);
+      }
+      return a / b;
+    };
+    var outParts = [];
+    Processing.logger = {
+      println: function (m) { if (outParts.length < 2000) outParts.push(String(simpleArg(m)) + '\n'); },
+      print: function (m) { if (outParts.length < 2000) outParts.push(String(simpleArg(m))); },
+      log: function (m) { if (outParts.length < 2000) outParts.push(String(m) + '\n'); }
+    };
+    function finish() {
+      report.out = outParts.join('');
+      report.frames = frame;
+      try { if (p) p.exit(); } catch (e) {}
+      holder.remove();
+      window.__pdeGuard = oldGuard; window.__pdeIdiv = oldIdiv;
+      if (oldLogger) Processing.logger = oldLogger;
+      return report;
+    }
+    function fail(stage, e) {
+      report.stage = stage;
+      var msg = e && e.message ? e.message : String(e);
+      report.error = explain(msg);
+      return finish();
+    }
+    var code = addLoopGuards(rewriteIntDivision(report.code));
+    var sketch;
+    try { sketch = Processing.compile(code); } catch (e) { return fail('compile', e); }
+    var attach = sketch.attach;
+    sketch.attach = function (pp, scope) {
+      p = pp;
+      ['CLOSE', 'PIE', 'CHORD', 'OPEN', 'CENTER', 'CORNER', 'CORNERS', 'RADIUS', 'HSB', 'RGB', 'LEFT', 'RIGHT',
+        'TOP', 'BOTTOM', 'GRAY', 'INVERT', 'THRESHOLD', 'BLUR', 'POSTERIZE', 'ROUND', 'SQUARE', 'PROJECT'].forEach(function (k) { report.K[k] = pp[k]; });
+      var Ch = pp.Character;
+      if (Ch && Ch.prototype && !Ch.prototype.__pde && typeof Symbol !== 'undefined' && Symbol.toPrimitive) {
+        Ch.prototype[Symbol.toPrimitive] = function (hint) { return hint === 'number' ? this.code : String.fromCharCode(this.code); };
+        Ch.prototype.__pde = true;
+      }
+      pp.saveFrame = function () { report.counts.saveFrame = (report.counts.saveFrame || 0) + 1; };
+      pp.save = function () { report.counts.save = (report.counts.save || 0) + 1; };
+      pp.link = function () {};
+      // Processing.js після size() перепризначає функції малювання, тому обгортаємо через властивість:
+      // будь-яке нове призначення теж потрапляє в обгортку.
+      function hook(fn, makeWrapper) {
+        var orig = pp[fn];
+        if (typeof orig !== 'function') return;
+        var wrapped = makeWrapper(function () { return orig; });
+        try {
+          Object.defineProperty(pp, fn, { configurable: true, enumerable: true,
+            get: function () { return wrapped; },
+            set: function (v) { orig = v; } });
+        } catch (e) { pp[fn] = wrapped; }
+      }
+      LOGGED.forEach(function (fn) {
+        hook(fn, function (getOrig) {
+          return function () {
+            if (fn === 'fill') { fillKey = Array.prototype.map.call(arguments, simpleArg).join(','); noFillOn = false; }
+            else if (fn === 'noFill') noFillOn = true;
+            if (frame !== lastFr) { lastFr = frame; perFrame = 0; }
+            if (!logFull && ++perFrame <= 1500) {            // не більше 1500 записів на кадр
+              report.log.push({ f: fn, a: Array.prototype.map.call(arguments, simpleArg), fr: frame, ph: phase, fill: noFillOn ? null : fillKey });
+              if (report.log.length > 250000) logFull = true;
+            }
+            return getOrig().apply(this, arguments);
+          };
+        });
+      });
+      COUNTED.forEach(function (fn) {
+        hook(fn, function (getOrig) {
+          return function () { report.counts[fn] = (report.counts[fn] || 0) + 1; return getOrig().apply(this, arguments); };
+        });
+      });
+      pp.randomSeed(7);
+      return attach.call(this, pp, scope);
+    };
+    try { new Processing(cv, sketch); } catch (e) { return fail('runtime', e); }
+    try { p.noLoop(); } catch (e) {}
+    report.w = p.width; report.h = p.height;
+    report.isStatic = typeof p.draw !== 'function';
+    report.userFns = {};
+    ['mousePressed', 'mouseReleased', 'mouseClicked', 'mouseDragged', 'mouseMoved', 'keyPressed', 'keyReleased', 'keyTyped'].forEach(function (fn) {
+      report.userFns[fn] = typeof p[fn] === 'function';
+    });
+    var ctx = cv.getContext('2d');
+    function snap(name, from) {
+      var data = null;
+      try { data = ctx.getImageData(0, 0, cv.width, cv.height); } catch (e) {}
+      report.phases[name] = { from: from, to: frame, img: data };
+      report.order.push(name);
+    }
+    function frames(n) {
+      if (report.isStatic) return;
+      for (var i = 0; i < n; i++) { frame++; guard = 0; phaseStart = performance.now(); p.redraw(); }
+    }
+    function mouse(x, y) { p.mouseX = Math.round(x); p.mouseY = Math.round(y); }
+    function call(fn) { if (typeof p[fn] === 'function') { guard = 0; phaseStart = performance.now(); p[fn](); } }
+    var W = p.width, H = p.height;
+    try {
+      snap('setup', 0);
+      phase = 'start'; mouse(W / 2, H / 2); var f0 = frame + 1; frames(3); snap('start', f0);
+      phase = 'anim'; f0 = frame + 1; frames(opts.frames || 150); snap('anim', f0);
+      phase = 'mouseTL'; f0 = frame + 1; mouse(W * 0.25, H * 0.25); call('mouseMoved'); frames(3); snap('mouseTL', f0);
+      phase = 'mouseBR'; f0 = frame + 1; mouse(W * 0.75, H * 0.75); call('mouseMoved'); frames(3); snap('mouseBR', f0);
+      phase = 'click'; f0 = frame + 1;
+      p.mouseButton = p.LEFT; p.__mousePressed = true; call('mousePressed'); frames(1);
+      p.__mousePressed = false; call('mouseReleased'); call('mouseClicked'); frames(2); snap('click', f0);
+      phase = 'click2'; f0 = frame + 1;
+      mouse(W * 0.3, H * 0.6); p.__mousePressed = true; call('mousePressed'); frames(1);
+      p.__mousePressed = false; call('mouseReleased'); call('mouseClicked'); frames(2); snap('click2', f0);
+      phase = 'drag'; f0 = frame + 1; mouse(W * 0.2, H * 0.5); frames(1);
+      p.__mousePressed = true; call('mousePressed');
+      for (var d = 1; d <= 8; d++) { mouse(W * (0.2 + d * 0.07), H * (0.5 + 0.3 * Math.sin(d))); call('mouseDragged'); frames(1); }
+      p.__mousePressed = false; call('mouseReleased'); frames(1); snap('drag', f0);
+      (opts.keys || ['a', ' ', 'UP', 'RIGHT']).forEach(function (k) {
+        phase = 'key:' + k; f0 = frame + 1;
+        if (/^[A-Z]{2,}$/.test(k)) { p.key = new p.Character(p.CODED); p.keyCode = p[k]; }
+        else { p.key = new p.Character(k); p.keyCode = k.toUpperCase().charCodeAt(0); }
+        p.__keyPressed = true; call('keyPressed'); call('keyTyped'); frames(1);
+        p.__keyPressed = false; call('keyReleased'); frames(1);
+        snap('key:' + k, f0);
+      });
+      report.ok = true;
+    } catch (e) { return fail('runtime', e); }
+    return finish();
+  }
+
   // ---------- Публічний інтерфейс ----------
   window.PDE = {
     mount: function (elOrSel, opts) {
@@ -1124,6 +1321,11 @@
       window.PDE.main = inst;
       return inst;
     },
+    headless: headless,
+    loadPjs: loadPjs,
+    highlight: highlight,
+    mask: mask,
+    SHAPES: SHAPES,
     // для тестів
     _rewrite: function (c) { return addLoopGuards(rewriteIntDivision(c)); },
     _check: function (code) { var t = { name: 't', code: code }; return checkBrackets(t) || checkSemicolons(t); }

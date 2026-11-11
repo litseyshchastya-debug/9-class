@@ -152,3 +152,59 @@
   .pde-menu-list { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-width: none; max-height: 70vh; }
   .pde-console { height: 110px; }
 }
+
+/* ---------- Здача роботи й автоперевірка ---------- */
+.zd-section { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 14px; min-width: 0; }
+.zd-section > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.zd-section p, .zd-page p { margin: 0; max-width: 70ch; }
+.zd-crit { border: 1px solid var(--rule); border-radius: 6px; background: var(--code-bg); padding: 0 14px; }
+.zd-crit > summary { cursor: pointer; padding: 10px 0; font-weight: 600; color: var(--accent); }
+.zd-crit[open] { padding-bottom: 10px; }
+.zd-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.zd-form label, .zd-paste label, .zd-filters label { display: grid; gap: 4px; font-size: 0.88rem; font-weight: 600; }
+.zd-form input, .zd-paste textarea, .zd-linkrow input, .zd-filters select { font: 16px var(--f-body); padding: 9px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); min-width: 0; width: 100%; }
+.zd-paste textarea { font-family: var(--f-mono); font-size: 14px; resize: vertical; }
+.zd-form input:focus-visible, .zd-paste textarea:focus-visible, .zd-linkrow input:focus-visible, .zd-filters select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.zd-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.zd-btn { font: 600 0.92rem var(--f-body); padding: 10px 16px; border-radius: 6px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); cursor: pointer; }
+.zd-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.zd-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.zd-btn.primary:hover:not(:disabled) { color: var(--panel); filter: brightness(1.1); }
+.zd-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.zd-linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
+.zd-wait { color: var(--muted); font-style: italic; }
+.zd-note { padding: 10px 14px; border-radius: 6px; background: var(--accent-soft); font-size: 0.92rem; }
+.zd-small { font-size: 0.86rem; color: var(--muted); }
+.zd-result, .zd-card { display: grid; gap: 8px; min-width: 0; }
+.zd-grade { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; padding: 14px 16px; border-radius: 8px; background: var(--code-bg); border: 1px solid var(--rule); }
+.zd-grade .n { font-family: var(--f-display); font-size: 2.6rem; font-weight: 700; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.zd-grade .of { font-weight: 600; }
+.zd-grade .lvl { color: var(--muted); font-size: 0.9rem; }
+.zd-result h4, .zd-card h4, .zd-crit h4, .zd-share h4 { margin: 10px 0 2px; font-family: var(--f-mono); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.zd-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.zd-list li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 6px 10px; border-radius: 5px; background: var(--panel); border: 1px solid var(--rule); font-size: 0.92rem; }
+.zd-list.plain li { grid-template-columns: minmax(0, 1fr) auto; }
+.zd-list li.ok .mark { color: #2b8a3e; font-weight: 700; }
+.zd-list li.no .mark { color: var(--mark); font-weight: 700; }
+.zd-list li.no .t { color: var(--muted); }
+.zd-list .p { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.zd-share { display: grid; gap: 8px; padding: 14px 16px; border: 2px solid var(--accent); border-radius: 8px; background: var(--panel); }
+.zd-linkrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.zd-linkrow input { font-family: var(--f-mono); font-size: 13px; }
+.zd-paste { display: grid; gap: 8px; }
+.zd-head h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); }
+.zd-head .cls { font-family: var(--f-mono); font-size: 0.9rem; color: var(--muted); }
+.zd-card { padding: 16px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+.zd-journal { display: grid; gap: 10px; margin-top: 2em; padding-top: 1.2em; border-top: 2px solid var(--ink); }
+.zd-journal h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); }
+.zd-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.zd-filters select { width: auto; }
+.zd-journal table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.zd-journal th, .zd-journal td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.zd-journal th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.zd-journal td.g { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.zd-journal td.act { text-align: right; }
+@media (max-width: 520px) {
+  .zd-linkrow { grid-template-columns: minmax(0, 1fr); }
+  .zd-grade .n { font-size: 2.2rem; }
+}

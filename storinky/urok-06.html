@@ -362,14 +362,70 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
   .pde-menu-list { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-width: none; max-height: 70vh; }
   .pde-console { height: 110px; }
 }
+
+/* ---------- Здача роботи й автоперевірка ---------- */
+.zd-section { margin-top: 2.6em; padding-top: 1.4em; border-top: 2px solid var(--ink); display: grid; gap: 14px; min-width: 0; }
+.zd-section > h2 { font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); margin: 0; }
+.zd-section p, .zd-page p { margin: 0; max-width: 70ch; }
+.zd-crit { border: 1px solid var(--rule); border-radius: 6px; background: var(--code-bg); padding: 0 14px; }
+.zd-crit > summary { cursor: pointer; padding: 10px 0; font-weight: 600; color: var(--accent); }
+.zd-crit[open] { padding-bottom: 10px; }
+.zd-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.zd-form label, .zd-paste label, .zd-filters label { display: grid; gap: 4px; font-size: 0.88rem; font-weight: 600; }
+.zd-form input, .zd-paste textarea, .zd-linkrow input, .zd-filters select { font: 16px var(--f-body); padding: 9px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); min-width: 0; width: 100%; }
+.zd-paste textarea { font-family: var(--f-mono); font-size: 14px; resize: vertical; }
+.zd-form input:focus-visible, .zd-paste textarea:focus-visible, .zd-linkrow input:focus-visible, .zd-filters select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.zd-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.zd-btn { font: 600 0.92rem var(--f-body); padding: 10px 16px; border-radius: 6px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); cursor: pointer; }
+.zd-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.zd-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.zd-btn.primary:hover:not(:disabled) { color: var(--panel); filter: brightness(1.1); }
+.zd-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.zd-linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
+.zd-wait { color: var(--muted); font-style: italic; }
+.zd-note { padding: 10px 14px; border-radius: 6px; background: var(--accent-soft); font-size: 0.92rem; }
+.zd-small { font-size: 0.86rem; color: var(--muted); }
+.zd-result, .zd-card { display: grid; gap: 8px; min-width: 0; }
+.zd-grade { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; padding: 14px 16px; border-radius: 8px; background: var(--code-bg); border: 1px solid var(--rule); }
+.zd-grade .n { font-family: var(--f-display); font-size: 2.6rem; font-weight: 700; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.zd-grade .of { font-weight: 600; }
+.zd-grade .lvl { color: var(--muted); font-size: 0.9rem; }
+.zd-result h4, .zd-card h4, .zd-crit h4, .zd-share h4 { margin: 10px 0 2px; font-family: var(--f-mono); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.zd-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.zd-list li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 6px 10px; border-radius: 5px; background: var(--panel); border: 1px solid var(--rule); font-size: 0.92rem; }
+.zd-list.plain li { grid-template-columns: minmax(0, 1fr) auto; }
+.zd-list li.ok .mark { color: #2b8a3e; font-weight: 700; }
+.zd-list li.no .mark { color: var(--mark); font-weight: 700; }
+.zd-list li.no .t { color: var(--muted); }
+.zd-list .p { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.zd-share { display: grid; gap: 8px; padding: 14px 16px; border: 2px solid var(--accent); border-radius: 8px; background: var(--panel); }
+.zd-linkrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.zd-linkrow input { font-family: var(--f-mono); font-size: 13px; }
+.zd-paste { display: grid; gap: 8px; }
+.zd-head h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); }
+.zd-head .cls { font-family: var(--f-mono); font-size: 0.9rem; color: var(--muted); }
+.zd-card { padding: 16px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+.zd-journal { display: grid; gap: 10px; margin-top: 2em; padding-top: 1.2em; border-top: 2px solid var(--ink); }
+.zd-journal h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: var(--step-2); }
+.zd-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.zd-filters select { width: auto; }
+.zd-journal table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.zd-journal th, .zd-journal td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.zd-journal th { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.zd-journal td.g { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.zd-journal td.act { text-align: right; }
+@media (max-width: 520px) {
+  .zd-linkrow { grid-template-columns: minmax(0, 1fr); }
+  .zd-grade .n { font-size: 2.2rem; }
+}
 </style>
 </head>
 <body>
 <div class="shell">
-  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html" aria-current="page"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
+  <aside class="side"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html" aria-current="page"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../storinky/perevirka.html">Перевірка робіт (для вчителя)</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></aside>
   <main>
-    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html" aria-current="page"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
-<p class="crumbs"><a href="../index.html">Програма</a> / Урок 6 з 17</p><nav class="switch" aria-label="Розділи уроку"><a href="urok-06.html" aria-current="page">Урок</a><a href="teoriya-06.html">Детальна теорія</a><a href="#praktykum">Практикум ↓</a></nav><p class="theory-callout">Не все зрозуміло? На сторінці <a href="teoriya-06.html">«Детальна теорія»</a> кожну функцію цього уроку розібрано докладно: що означає кожен аргумент, що вона повертає, типові помилки і приклади, які можна одразу запустити.</p><article><div class="doc"><h1>Урок 6. Взаємодія: миша і клавіатура</h1>
+    <div class="mobile-nav"><a class="brand" href="../index.html"><b>Креативне програмування в Processing</b><span>Курс для 9 класу · 17 уроків</span></a><details><summary>Зміст курсу</summary><nav class="toc" aria-label="Зміст курсу"><div class="solo"><ol><li><a href="../index.html">Програма курсу</a></li></ol></div><div><h4>Модуль 1. Малюємо кодом</h4><ol><li><a href="../storinky/urok-01.html"><span class="n">1</span><span>Знайомство з Processing. Піксель і система координат</span></a></li><li><a href="../storinky/urok-02.html"><span class="n">2</span><span>Геометричні фігури та атрибути малювання</span></a></li><li><a href="../storinky/urok-03.html"><span class="n">3</span><span>Колір: відтінки сірого, RGB, прозорість, HSB</span></a></li><li><a href="../storinky/urok-04.html"><span class="n">4</span><span>Змінні та типи даних. Арифметика</span></a></li></ol></div><div><h4>Модуль 2. Рух і взаємодія</h4><ol><li><a href="../storinky/urok-05.html"><span class="n">5</span><span>Потік програми: setup() і draw(). Анімація</span></a></li><li><a href="../storinky/urok-06.html" aria-current="page"><span class="n">6</span><span>Взаємодія: миша і клавіатура</span></a></li><li><a href="../storinky/urok-07.html"><span class="n">7</span><span>Умови: if / else, логічні оператори. Відскок м&#x27;яча</span></a></li><li><a href="../storinky/urok-08.html"><span class="n">8</span><span>Цикли while і for. Вкладені цикли та візерунки</span></a></li><li><a href="../storinky/urok-09.html"><span class="n">9</span><span>Випадковість і шум Перліна. Генеративне мистецтво</span></a></li></ol></div><div><h4>Модуль 3. Організація коду</h4><ol><li><a href="../storinky/urok-10.html"><span class="n">10</span><span>Власні функції: параметри та повернення значень</span></a></li><li><a href="../storinky/urok-11.html"><span class="n">11</span><span>Об&#x27;єкти та класи</span></a></li><li><a href="../storinky/urok-12.html"><span class="n">12</span><span>Масиви та масиви об&#x27;єктів. Системи частинок</span></a></li></ol></div><div><h4>Модуль 4. Математика і медіа</h4><ol><li><a href="../storinky/urok-13.html"><span class="n">13</span><span>Тригонометрія і трансформації: translate, rotate, scale</span></a></li><li><a href="../storinky/urok-14.html"><span class="n">14</span><span>Зображення, пікселі та текст</span></a></li><li><a href="../storinky/urok-15.html"><span class="n">15</span><span>Від ідеї до програми: алгоритм гри, час і налагодження</span></a></li></ol></div><div><h4>Модуль 5. Проєкт</h4><ol><li><a href="../storinky/urok-16.html"><span class="n">16–17</span><span>Підсумковий творчий проєкт</span></a></li></ol></div><div class="solo"><h4>Матеріали</h4><ol><li><a href="../storinky/seredovyshche.html">Онлайн-середовище Processing</a></li><li><a href="../storinky/dovidnyk.html">Довідник і словник термінів</a></li><li><a href="../storinky/perevirka.html">Перевірка робіт (для вчителя)</a></li><li><a href="../test/processing_test.html" target="_blank" rel="noopener">Підсумковий тест ↗</a></li></ol></div></nav></details></div>
+<p class="crumbs"><a href="../index.html">Програма</a> / Урок 6 з 17</p><nav class="switch" aria-label="Розділи уроку"><a href="urok-06.html" aria-current="page">Урок</a><a href="teoriya-06.html">Детальна теорія</a><a href="#praktykum">Практикум</a><a href="#zdacha">Здати роботу</a></nav><p class="theory-callout">Не все зрозуміло? На сторінці <a href="teoriya-06.html">«Детальна теорія»</a> кожну функцію цього уроку розібрано докладно: що означає кожен аргумент, що вона повертає, типові помилки і приклади, які можна одразу запустити.</p><article><div class="doc"><h1>Урок 6. Взаємодія: миша і клавіатура</h1>
 <blockquote>
 <p><strong>Джерела:</strong> Shiffman, <em>Learning Processing</em> — розд. 3 «Interaction» (Variation with the mouse, Mouse clicks and key presses); Reas &amp; Fry — розд. 7 «Interactivity».</p>
 </blockquote>
@@ -496,7 +552,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
 <li>Чим змінна <code>mousePressed</code> відрізняється від функції <code>mousePressed()</code>?</li>
 <li>Що поверне <code>map(50, 0, 100, 0, 255)</code>?</li>
 <li>Як зберегти малюнок у файл?</li>
-</ol></div><section class="pde-section" id="praktykum"><h2>Практикум в онлайн-середовищі Processing</h2><p>Виконуйте завдання уроку просто тут: пишіть код, натискайте ▶ і дивіться результат у вікні скетчу. Код зберігається в цьому браузері автоматично. Меню «Приклади» відкриває скетчі курсу, «Файл → Завантажити як .pde» допоможе перенести роботу в настільний Processing.</p><div id="pde"></div></section><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAF3AlgDASIAAhEBAxEB/8QAGgABAQEBAQEBAAAAAAAAAAAAAAcICQMFBP/EAD0QAQABAwICAwoLCQAAAAAAAAABAgMEBREGBxIT0QgVFhchMUFVdJE2N1JWYXGSk5SxshQiIzRRY4Gzw//EABkBAQADAQEAAAAAAAAAAAAAAAADBQYEAv/EACYRAQABBAEDAwUBAAAAAAAAAAABAgMFEQQSIVEUQdETMWFxgcH/2gAMAwEAAhEDEQA/ANUV1U0UVVV1RTTTG8zM7REPl+Eeh+udN/FUdpxZ8FdZ9ivfolzAB1Dx9d0nJvUWcfVMC7drnamijIoqqqn6IifK97+o4WPdm3kZmNauR56a7tNMx/iZc9eQPxy8J+20/lK489KYnmVqMzET/Cs+j+3CDkXvo09WtrXD42MjfmzNXTqN/bfvHy0r33031hh/f09r3uZmLasUX7mTZos17dG5VciKavqnzSxL0Kfkx7lp5iRHiK4RjaNulj/6a0mLq9dyKbE9t+7oz+HpxHHi9TX1bnxr5WrvvpvrDD+/p7XvjZmNl9L9lyLN7o7dLq64q2+vZiXoU/Jj3Lh3M0RHhHtER/L/APRpefgqeJYqvRXvWvb868sfx8hN65FHTray52qafgV0052di41VUb0xevU0TMfRvL83hHofrnTfxVHayr3b3wq4a9iufrZqZ1Zup2Hl42bZi9h5FnItTO3TtVxXTv8AXD2RXuQ/iaxvbb/5wtQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPncSWbmTw7qlixRNy9dxbtFFEeeqqaJiIc/PE1zD+aepfZjtdFAGH+TPK3jfRuaXDeo6pw3n42Fj5UV3b1dMdGinafLPlVvm9whxDq3HudmabpGVk4tdu1FN23EbTMURE+n+rQoivWYvU9MrDG5GvHXZvW4iZmNd/58MkeL7i31Bm+6ntVXjfhzWM3lBw1pmJp1+7qGPVYm9YpiOlRtarid/L6JmIWIe+BT6G9F6jvMeU2Yy93LWYs3aYiI8b/wBZI8X3FvqDN91ParfIPh7V9C7+d+NPv4fXdR1fWxH723Wb7bT6N496uC85ecu8qzNmqmIif352zdngUWa4riZ7Myd1rwNxNxZxFoN/hzRsrULNjFrouV2YiYpqmveInyoN4muYfzT1L7MdrooKV3JT3M2garw1ytsadr2Dewc2nKvVzZuxEVdGZjaVWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/2Q==" alt="Результат роботи скетчу L06_Malyuvalka" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L06_Malyuvalka</h3><button class="try" type="button" data-open-ex="L06_Malyuvalka">▶ Відкрити в онлайн-середовищі</button><details open><summary>L06_Malyuvalka.pde · 40 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 6. Малювалка</span>
+</ol></div><section class="pde-section" id="praktykum"><h2>Практикум в онлайн-середовищі Processing</h2><p>Виконуйте завдання уроку просто тут: пишіть код, натискайте ▶ і дивіться результат у вікні скетчу. Код зберігається в цьому браузері автоматично. Меню «Приклади» відкриває скетчі курсу, «Файл → Завантажити як .pde» допоможе перенести роботу в настільний Processing.</p><div id="pde"></div></section><section class="zd-section" id="zdacha"><h2>Здати роботу на перевірку</h2><div id="zd"></div></section><section class="sketches"><h2>Скетчі уроку</h2><p>Скопіюйте код у новий скетч Processing або відкрийте файл із папки <code>skechi/</code> репозиторію. Збережіть скетч під тією самою назвою, а класи покладіть в окремі вкладки.</p><div class="sk"><figure><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAF3AlgDASIAAhEBAxEB/8QAGgABAQEBAQEBAAAAAAAAAAAAAAcICQMFBP/EAD0QAQABAwICAwoLCQAAAAAAAAABAgMEBREGBxIT0QgVFhchMUFVdJE2N1JWYXGSk5SxshQiIzRRY4Gzw//EABkBAQADAQEAAAAAAAAAAAAAAAADBQYEAv/EACYRAQABBAEDAwUBAAAAAAAAAAABAgMFEQQSIVEUQdETMWFxgcH/2gAMAwEAAhEDEQA/ANUV1U0UVVV1RTTTG8zM7REPl+Eeh+udN/FUdpxZ8FdZ9ivfolzAB1Dx9d0nJvUWcfVMC7drnamijIoqqqn6IifK97+o4WPdm3kZmNauR56a7tNMx/iZc9eQPxy8J+20/lK489KYnmVqMzET/Cs+j+3CDkXvo09WtrXD42MjfmzNXTqN/bfvHy0r33031hh/f09r3uZmLasUX7mTZos17dG5VciKavqnzSxL0Kfkx7lp5iRHiK4RjaNulj/6a0mLq9dyKbE9t+7oz+HpxHHi9TX1bnxr5WrvvpvrDD+/p7XvjZmNl9L9lyLN7o7dLq64q2+vZiXoU/Jj3Lh3M0RHhHtER/L/APRpefgqeJYqvRXvWvb868sfx8hN65FHTray52qafgV0052di41VUb0xevU0TMfRvL83hHofrnTfxVHayr3b3wq4a9iufrZqZ1Zup2Hl42bZi9h5FnItTO3TtVxXTv8AXD2RXuQ/iaxvbb/5wtQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPncSWbmTw7qlixRNy9dxbtFFEeeqqaJiIc/PE1zD+aepfZjtdFAGH+TPK3jfRuaXDeo6pw3n42Fj5UV3b1dMdGinafLPlVvm9whxDq3HudmabpGVk4tdu1FN23EbTMURE+n+rQoivWYvU9MrDG5GvHXZvW4iZmNd/58MkeL7i31Bm+6ntVXjfhzWM3lBw1pmJp1+7qGPVYm9YpiOlRtarid/L6JmIWIe+BT6G9F6jvMeU2Yy93LWYs3aYiI8b/wBZI8X3FvqDN91ParfIPh7V9C7+d+NPv4fXdR1fWxH723Wb7bT6N496uC85ecu8qzNmqmIif352zdngUWa4riZ7Myd1rwNxNxZxFoN/hzRsrULNjFrouV2YiYpqmveInyoN4muYfzT1L7MdrooKV3JT3M2garw1ytsadr2Dewc2nKvVzZuxEVdGZjaVWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/2Q==" alt="Результат роботи скетчу L06_Malyuvalka" loading="lazy"><figcaption>Знімок вікна програми</figcaption></figure><div class="files"><h3>L06_Malyuvalka</h3><button class="try" type="button" data-open-ex="L06_Malyuvalka">▶ Відкрити в онлайн-середовищі</button><details open><summary>L06_Malyuvalka.pde · 40 рядків</summary><pre class="code"><button class="copy" type="button">Копіювати</button><code><span class="t-com">// Урок 6. Малювалка</span>
 <span class="t-com">// Мишею — малювати; 1, 2, 3 — колір; c — очистити; s — зберегти PNG.</span>
 
 <span class="t-type">color</span> brushColor;
@@ -534,7 +590,7 @@ pre.code code { background: none; padding: 0; font-size: inherit; white-space: p
   <span class="t-kw">if</span> (key == <span class="t-str">'3'</span>) brushColor = <span class="t-type">color</span>(<span class="t-num">30</span>, <span class="t-num">90</span>, <span class="t-num">220</span>);
   <span class="t-kw">if</span> (key == <span class="t-str">'c'</span>) <span class="t-fn">background</span>(<span class="t-num">255</span>);
   <span class="t-kw">if</span> (key == <span class="t-str">'s'</span>) <span class="t-fn">saveFrame</span>(<span class="t-str">"malyunok-####.png"</span>);
-}</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-05.html"><small>← Урок 5</small>Потік програми: setup() і draw(). Анімація</a><a class="next" href="urok-07.html"><small>Урок 7 →</small>Умови: if / else, логічні оператори. Відскок м&#x27;яча</a></nav><script type="application/json" id="pde-data">{"key": "urok-06", "tabs": [{"name": "Urok06", "code": "// Практикум до уроку 6\n// Рівень 1: персонаж слідує за мишею.\n// Рівень 2: колір очей залежить від mouseX, клацання — випадковий колір фону.\n// Рівень 3: «симетрична малювалка» — дзеркальна лінія (width - mouseX).\n\ncolor bg = color(255);\n\nvoid setup() {\n  size(400, 400);\n}\n\nvoid draw() {\n  background(bg);\n  rectMode(CENTER);\n  fill(150);\n  rect(mouseX, mouseY + 20, 20, 60);   // тіло\n  fill(255);\n  ellipse(mouseX, mouseY - 20, 50, 50); // голова\n}\n\nvoid mousePressed() {\n  // змініть bg на випадковий колір: color(random(255), random(255), random(255))\n}\n"}], "examples": [{"lesson": 1, "name": "L01_PershyiSketch", "files": [{"name": "L01_PershyiSketch.pde", "code": "// Урок 1. Мій перший скетч\n// Статичний режим: команди виконуються один раз, зверху вниз.\n\nsize(400, 300);             // розмір вікна: ширина 400, висота 300\nbackground(255);            // білий фон\n\nline(0, 0, 400, 300);       // лінія з лівого верхнього в правий нижній кут\nline(400, 0, 0, 300);       // друга діагональ\n\nrect(150, 100, 100, 60);    // прямокутник: x, y лівого верхнього кута, ширина, висота\nellipse(200, 130, 50, 50);  // коло: x, y центру, ширина, висота\npoint(20, 20);              // точка\n\nprintln(\"Привіт, Processing!\");   // повідомлення в консоль\n"}]}, {"lesson": 2, "name": "L02_Figury", "files": [{"name": "L02_Figury.pde", "code": "// Урок 2. Базові фігури та атрибути малювання\n\nsize(600, 400);\nbackground(240);\n\n// Рядок 1: базові фігури\nstrokeWeight(2);\nstroke(0);\nfill(255);\npoint(40, 60);\nline(70, 30, 150, 90);\nrect(180, 30, 100, 60);\nellipse(350, 60, 100, 60);\ntriangle(440, 90, 490, 30, 540, 90);\n\n// Рядок 2: режими CENTER — фігури вирівняні по одній осі\nrectMode(CENTER);\nfill(200);\nrect(100, 200, 120, 80);\nellipse(100, 200, 60, 60);\n\n// Товщина та форма кінців ліній\nstrokeWeight(12);\nstrokeCap(ROUND);   line(220, 170, 320, 170);\nstrokeCap(SQUARE);  line(220, 200, 320, 200);\nstrokeCap(PROJECT); line(220, 230, 320, 230);\n\n// Дуги: кути в радіанах\nstrokeWeight(2);\nfill(255, 220, 0);\narc(420, 200, 100, 100, QUARTER_PI, TWO_PI - QUARTER_PI, PIE);   // «Пакмен»\nnoFill();\narc(530, 200, 80, 80, 0, PI);                                    // нижня половина кола\n\n// Довільна фігура: зірка\nfill(255);\nbeginShape();\nvertex(300, 280);\nvertex(318, 330);\nvertex(370, 330);\nvertex(328, 360);\nvertex(345, 395);\nvertex(300, 372);\nvertex(255, 395);\nvertex(272, 360);\nvertex(230, 330);\nvertex(282, 330);\nendShape(CLOSE);\n"}]}, {"lesson": 2, "name": "L02_Personazh", "files": [{"name": "L02_Personazh.pde", "code": "// Урок 2. Персонаж Зуг (за прикладом Д. Шиффмана)\n\nsize(200, 200);\nbackground(255);\nrectMode(CENTER);\nellipseMode(CENTER);\n\n// Тіло\nstroke(0);\nfill(150);\nrect(100, 100, 20, 100);\n\n// Голова\nfill(255);\nellipse(100, 70, 60, 60);\n\n// Очі\nfill(0);\nellipse(81, 70, 16, 32);\nellipse(119, 70, 16, 32);\n\n// Ноги\nline(90, 150, 80, 160);\nline(110, 150, 120, 160);\n"}]}, {"lesson": 3, "name": "L03_Kolir", "files": [{"name": "L03_Kolir.pde", "code": "// Урок 3. Колір: HSB-веселка та змішування RGB з прозорістю\n\nsize(600, 400);\nbackground(255);\nnoStroke();\n\n// Веселка в моделі HSB: змінюється лише відтінок (Hue)\ncolorMode(HSB, 360, 100, 100);\nfloat stripeW = width / 7.0;\nfor (int i = 0; i < 7; i++) {\n  fill(i * 45, 90, 100);          // відтінок 0°, 45°, 90°, ...\n  rect(i * stripeW, 0, stripeW, 150);\n}\n\n// Змішування світла RGB з альфа-каналом\ncolorMode(RGB, 255);\nfill(255, 0, 0, 130);  ellipse(250, 260, 160, 160);\nfill(0, 255, 0, 130);  ellipse(350, 260, 160, 160);\nfill(0, 0, 255, 130);  ellipse(300, 330, 160, 160);\n\n// Колір у змінній та шістнадцятковий запис\ncolor orange = #FF8800;\nfill(orange);\nrect(500, 330, 60, 40);\nprintln(\"Червона складова: \" + red(orange) + \", зелена: \" + green(orange));\n"}]}, {"lesson": 4, "name": "L04_Zminni", "files": [{"name": "L04_Zminni.pde", "code": "// Урок 4. Змінні керують малюнком\n// Змініть zoogX, zoogY або zoogScale — і весь персонаж зміниться.\n\nint zoogX = 100;\nint zoogY = 100;\nfloat zoogScale = 1.0;\n\nsize(200, 200);\nbackground(255);\nrectMode(CENTER);\n\n// Тіло\nfill(150);\nrect(zoogX, zoogY, 20 * zoogScale, 100 * zoogScale);\n\n// Голова\nfill(255);\nellipse(zoogX, zoogY - 30 * zoogScale, 60 * zoogScale, 60 * zoogScale);\n\n// Очі\nfill(0);\nellipse(zoogX - 19 * zoogScale, zoogY - 30 * zoogScale, 16 * zoogScale, 32 * zoogScale);\nellipse(zoogX + 19 * zoogScale, zoogY - 30 * zoogScale, 16 * zoogScale, 32 * zoogScale);\n\n// Ноги\nline(zoogX - 10 * zoogScale, zoogY + 50 * zoogScale, zoogX - 20 * zoogScale, zoogY + 60 * zoogScale);\nline(zoogX + 10 * zoogScale, zoogY + 50 * zoogScale, zoogX + 20 * zoogScale, zoogY + 60 * zoogScale);\n\n// Пастка цілочисельного ділення\nprintln(\"7 / 2 = \" + (7 / 2));\nprintln(\"7.0 / 2 = \" + (7.0 / 2));\nprintln(\"7 % 2 = \" + (7 % 2));\nprintln(\"Відстань: \" + dist(0, 0, 3, 4));\n"}]}, {"lesson": 5, "name": "L05_Animatsiya", "files": [{"name": "L05_Animatsiya.pde", "code": "// Урок 5. Анімація: рух, зростання, шлейф\n// Натисніть будь-яку клавішу, щоб увімкнути/вимкнути шлейф.\n\nfloat x = 0;          // 1. Оголосили глобальні змінні\nfloat diameter = 10;\nfloat gray = 0;\nboolean trail = false;\n\nvoid setup() {\n  size(500, 300);     // 2. Початкові налаштування\n  background(255);\n}\n\nvoid draw() {\n  if (trail) {\n    noStroke();\n    fill(255, 20);    // напівпрозоре «стирання» — плавний шлейф\n    rect(0, 0, width, height);\n  } else {\n    background(255);\n  }\n\n  stroke(0);\n  fill(gray);\n  ellipse(x, height/2, diameter, diameter);   // 3. Використали змінні\n\n  x = x + 2;          // 4. Змінили змінні\n  diameter = diameter + 0.3;\n  gray = gray + 1;\n\n  if (x > width + diameter/2) {   // повертаємося на початок\n    x = -diameter/2;\n    diameter = 10;\n    gray = 0;\n  }\n}\n\nvoid keyPressed() {\n  trail = !trail;\n}\n"}]}, {"lesson": 6, "name": "L06_Malyuvalka", "files": [{"name": "L06_Malyuvalka.pde", "code": "// Урок 6. Малювалка\n// Мишею — малювати; 1, 2, 3 — колір; c — очистити; s — зберегти PNG.\n\ncolor brushColor;\n\nvoid setup() {\n  size(800, 500);\n  background(255);\n  brushColor = color(0);\n}\n\nvoid draw() {\n  if (mousePressed) {\n    // чим швидше рухається миша, тим тонша лінія\n    float speed = dist(pmouseX, pmouseY, mouseX, mouseY);\n    float w = map(speed, 0, 50, 12, 1);\n    strokeWeight(constrain(w, 1, 12));\n    stroke(brushColor);\n    line(pmouseX, pmouseY, mouseX, mouseY);\n  }\n  drawPalette();\n}\n\n// Підказка-палітра в лівому верхньому куті\nvoid drawPalette() {\n  noStroke();\n  fill(0);           rect(10, 10, 20, 20);\n  fill(220, 30, 30); rect(35, 10, 20, 20);\n  fill(30, 90, 220); rect(60, 10, 20, 20);\n  fill(brushColor);  rect(90, 10, 20, 20);\n}\n\nvoid keyPressed() {\n  if (key == '1') brushColor = color(0);\n  if (key == '2') brushColor = color(220, 30, 30);\n  if (key == '3') brushColor = color(30, 90, 220);\n  if (key == 'c') background(255);\n  if (key == 's') saveFrame(\"malyunok-####.png\");\n}\n"}]}, {"lesson": 7, "name": "L07_Knopka", "files": [{"name": "L07_Knopka.pde", "code": "// Урок 7. Кнопка-перемикач і підсвічування при наведенні\n\nint bx = 150, by = 120, bw = 200, bh = 80;\nboolean isOn = false;\n\nvoid setup() {\n  size(500, 320);\n  textAlign(CENTER, CENTER);\n  textSize(24);\n}\n\nvoid draw() {\n  if (isOn) background(255, 240, 150);\n  else      background(40);\n\n  boolean over = mouseX > bx && mouseX < bx + bw && mouseY > by && mouseY < by + bh;\n\n  if (over) fill(255, 160, 0);   // наведення\n  else      fill(200);\n  stroke(0);\n  rect(bx, by, bw, bh, 12);\n\n  fill(0);\n  if (isOn) text(\"ВИМКНУТИ\", bx + bw/2, by + bh/2);\n  else      text(\"УВІМКНУТИ\", bx + bw/2, by + bh/2);\n}\n\nvoid mousePressed() {\n  if (mouseX > bx && mouseX < bx + bw && mouseY > by && mouseY < by + bh) {\n    isOn = !isOn;\n  }\n}\n"}]}, {"lesson": 7, "name": "L07_Vidskok", "files": [{"name": "L07_Vidskok.pde", "code": "// Урок 7. М'яч відскакує від стінок і падає під дією гравітації\n\nfloat x = 100, y = 50;\nfloat xSpeed = 3, ySpeed = 0;\nfloat gravity = 0.3;\nfloat d = 40;\n\nvoid setup() {\n  size(500, 400);\n}\n\nvoid draw() {\n  background(255);\n\n  ySpeed += gravity;     // гравітація збільшує швидкість падіння\n  x += xSpeed;\n  y += ySpeed;\n\n  // відскок від бічних стінок\n  if (x > width - d/2 || x < d/2) {\n    xSpeed *= -1;\n  }\n  // відскок від підлоги з втратою енергії\n  if (y > height - d/2) {\n    y = height - d/2;\n    ySpeed *= -0.85;\n  }\n\n  fill(255, 120, 0);\n  ellipse(x, y, d, d);\n}\n\n// Клацання — підкинути м'яч заново\nvoid mousePressed() {\n  x = mouseX;\n  y = mouseY;\n  ySpeed = -8;\n}\n"}]}, {"lesson": 8, "name": "L08_Shakhy", "files": [{"name": "L08_Shakhy.pde", "code": "// Урок 8. Шахова дошка 8×8 — вкладені цикли та остача від ділення\n\nint n = 8;\n\nvoid setup() {\n  size(400, 400);\n  noStroke();\n}\n\nvoid draw() {\n  float cell = width / (float) n;\n  for (int i = 0; i < n; i++) {        // рядки\n    for (int j = 0; j < n; j++) {      // стовпці\n      if ((i + j) % 2 == 0) fill(240, 217, 181);\n      else                  fill(181, 136, 99);\n      rect(j * cell, i * cell, cell, cell);\n    }\n  }\n}\n"}]}, {"lesson": 8, "name": "L08_Tsykly", "files": [{"name": "L08_Tsykly.pde", "code": "// Урок 8. Цикли: інтерактивні лінії, кольорова сітка, концентричні кола\n// Клавіші 1, 2, 3 перемикають режим.\n\nint mode = 1;\n\nvoid setup() {\n  size(400, 400);\n}\n\nvoid draw() {\n  background(255);\n  if (mode == 1) drawLines();\n  else if (mode == 2) drawGrid();\n  else drawCircles();\n}\n\n// Лінії, що світлішають, коли далеко від курсора\nvoid drawLines() {\n  strokeWeight(3);\n  for (int x = 0; x < width; x += 10) {\n    float d = abs(mouseX - x);\n    stroke(constrain(d, 0, 255));\n    line(x, 0, x, height);\n  }\n}\n\n// Вкладені цикли: рядки × стовпці\nvoid drawGrid() {\n  stroke(255);\n  for (int y = 0; y < height; y += 40) {\n    for (int x = 0; x < width; x += 40) {\n      fill(x * 255 / width, y * 255 / height, 150);\n      rect(x, y, 40, 40);\n    }\n  }\n}\n\n// Концентричні кола, центр — у курсора\nvoid drawCircles() {\n  noFill();\n  stroke(0);\n  strokeWeight(1);\n  for (int d = 600; d > 0; d -= 20) {\n    ellipse(mouseX, mouseY, d, d);\n  }\n}\n\nvoid keyPressed() {\n  if (key == '1') mode = 1;\n  if (key == '2') mode = 2;\n  if (key == '3') mode = 3;\n}\n"}]}, {"lesson": 9, "name": "L09_Labirynt", "files": [{"name": "L09_Labirynt.pde", "code": "// Урок 9. «10 PRINT» — генеративний лабіринт\n// Клацання мишею — новий лабіринт.\n\nint step = 20;\n\nvoid setup() {\n  size(600, 400);\n  strokeWeight(3);\n  strokeCap(ROUND);\n  drawMaze();\n}\n\nvoid draw() {\n  // малюємо лише при клацанні\n}\n\nvoid drawMaze() {\n  background(30, 40, 90);\n  stroke(255);\n  for (int y = 0; y < height; y += step) {\n    for (int x = 0; x < width; x += step) {\n      if (random(1) < 0.5) {\n        line(x, y, x + step, y + step);   // діагональ «\\»\n      } else {\n        line(x + step, y, x, y + step);   // діагональ «/»\n      }\n    }\n  }\n}\n\nvoid mousePressed() {\n  drawMaze();\n}\n"}]}, {"lesson": 9, "name": "L09_Noise", "files": [{"name": "L09_Noise.pde", "code": "// Урок 9. Шум Перліна: гірський пейзаж і плавний блукач\n\nfloat t = 0;        // «час» для блукача\nfloat offset = 0;   // зсув пейзажу — гори «пливуть»\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(200, 225, 255);\n\n  // Три шари гір: що далі, то світліші\n  drawMountains(0.005, 180, color(150, 170, 200), offset * 0.3);\n  drawMountains(0.01, 250, color(90, 120, 150), offset * 0.6 + 100);\n  drawMountains(0.02, 320, color(40, 60, 80), offset + 200);\n  offset += 1;\n\n  // Блукач: плавний рух через noise()\n  float x = noise(t) * width;\n  float y = noise(t + 1000) * height * 0.5;\n  noStroke();\n  fill(255, 200, 0);\n  ellipse(x, y, 30, 30);\n  t += 0.005;\n}\n\n// Малює шар гір; scale — «зернистість» шуму, base — висота шару\nvoid drawMountains(float scale, float base, color c, float shift) {\n  stroke(c);\n  for (int x = 0; x < width; x++) {\n    float h = noise((x + shift) * scale) * 200;\n    line(x, height, x, base - h + 100);\n  }\n}\n"}]}, {"lesson": 10, "name": "L10_Funktsii", "files": [{"name": "L10_Funktsii.pde", "code": "// Урок 10. Власна функція з параметрами: машинки\n\nvoid setup() {\n  size(400, 300);\n}\n\nvoid draw() {\n  background(255);\n  drawCar(100, 100, color(255, 0, 0));\n  drawCar(250, 200, color(0, 0, 255));\n  drawCar(mouseX, mouseY, color(0, 200, 0));\n}\n\n// Малює машину з центром у (x, y) кольору c\nvoid drawCar(float x, float y, color c) {\n  rectMode(CENTER);\n  stroke(0);\n  fill(c);\n  rect(x, y, 80, 30);              // кузов\n  fill(200, 230, 255);\n  rect(x + 10, y - 22, 40, 16);    // кабіна\n  fill(0);\n  ellipse(x - 25, y + 15, 20, 20); // колеса\n  ellipse(x + 25, y + 15, 20, 20);\n}\n"}]}, {"lesson": 10, "name": "L10_Kvity", "files": [{"name": "L10_Kvity.pde", "code": "// Урок 10. Функції, що малюють і повертають значення: клумба квітів\n// Клацання мишею — посадити нову клумбу.\n\nvoid setup() {\n  size(600, 400);\n  noLoop();          // малюємо один кадр; redraw() — ще один\n}\n\nvoid draw() {\n  background(120, 190, 90);\n  for (int i = 0; i < 12; i++) {\n    float x = random(50, width - 50);\n    float y = random(50, height - 50);\n    drawFlower(x, y, random(30, 80), randomPetalColor());\n  }\n}\n\n// Малює квітку: центр (x, y), розмір s, колір пелюсток c\nvoid drawFlower(float x, float y, float s, color c) {\n  noStroke();\n  fill(c);\n  for (int i = 0; i < 6; i++) {\n    float a = TWO_PI / 6 * i;\n    ellipse(x + cos(a) * s / 3, y + sin(a) * s / 3, s / 2, s / 2);\n  }\n  fill(255, 210, 0);\n  ellipse(x, y, s / 3, s / 3);\n}\n\n// Повертає випадковий «квітковий» колір\ncolor randomPetalColor() {\n  color[] palette = { color(255, 90, 120), color(255, 255, 255), color(160, 110, 230), color(255, 150, 40) };\n  return palette[int(random(palette.length))];\n}\n\nvoid mousePressed() {\n  redraw();\n}\n"}]}, {"lesson": 11, "name": "L11_Myachi", "files": [{"name": "L11_Myachi.pde", "code": "// Урок 11. Клас Ball: три незалежні м'ячі\n\nBall b1, b2, b3;\n\nvoid setup() {\n  size(500, 350);\n  b1 = new Ball(100, 100, 40);\n  b2 = new Ball(250, 200, 60);\n  b3 = new Ball(400, 80, 25);\n}\n\nvoid draw() {\n  background(255);\n  b1.move();  b1.bounce();  b1.display();\n  b2.move();  b2.bounce();  b2.display();\n  b3.move();  b3.bounce();  b3.display();\n}\n\nclass Ball {\n  float x, y, d;\n  float xSpeed, ySpeed;\n  color c;\n\n  Ball(float tempX, float tempY, float tempD) {\n    x = tempX;\n    y = tempY;\n    d = tempD;\n    xSpeed = random(-4, 4);\n    ySpeed = random(-4, 4);\n    c = color(random(255), random(255), random(255));\n  }\n\n  void move() {\n    x += xSpeed;\n    y += ySpeed;\n  }\n\n  // Відскок від стінок + зміна кольору\n  void bounce() {\n    if (x > width - d/2 || x < d/2) {\n      xSpeed *= -1;\n      c = color(random(255), random(255), random(255));\n    }\n    if (y > height - d/2 || y < d/2) {\n      ySpeed *= -1;\n      c = color(random(255), random(255), random(255));\n    }\n  }\n\n  void display() {\n    stroke(0);\n    fill(c);\n    ellipse(x, y, d, d);\n  }\n\n  // Чи знаходиться курсор над м'ячем?\n  boolean isUnderMouse() {\n    return dist(mouseX, mouseY, x, y) < d/2;\n  }\n}\n\n// Клацання по м'ячу зупиняє його\nvoid mousePressed() {\n  if (b1.isUnderMouse()) { b1.xSpeed = 0; b1.ySpeed = 0; }\n  if (b2.isUnderMouse()) { b2.xSpeed = 0; b2.ySpeed = 0; }\n  if (b3.isUnderMouse()) { b3.xSpeed = 0; b3.ySpeed = 0; }\n}\n"}]}, {"lesson": 11, "name": "L11_Obyekty", "files": [{"name": "L11_Obyekty.pde", "code": "// Урок 11. Об'єкти: дві машини одного класу Car (клас — у вкладці Car)\n\nCar redCar;    // 1. Оголошуємо об'єкти\nCar blueCar;\n\nvoid setup() {\n  size(400, 200);\n  // 2. Створюємо об'єкти конструктором\n  redCar  = new Car(color(255, 0, 0), 0, 60, 2);\n  blueCar = new Car(color(0, 0, 255), 0, 140, 1);\n}\n\nvoid draw() {\n  background(255);\n  // 3. Викликаємо методи\n  redCar.move();\n  redCar.display();\n  blueCar.move();\n  blueCar.display();\n}\n"}, {"name": "Car.pde", "code": "// Клас Car — «формочка» для машин\n\nclass Car {\n  // Поля (дані)\n  color c;\n  float x, y;\n  float speed;\n\n  // Конструктор\n  Car(color tempC, float tempX, float tempY, float tempSpeed) {\n    c = tempC;\n    x = tempX;\n    y = tempY;\n    speed = tempSpeed;\n  }\n\n  // Метод: рух\n  void move() {\n    x += speed;\n    if (x > width + 20) {\n      x = -20;\n    }\n  }\n\n  // Метод: малювання\n  void display() {\n    rectMode(CENTER);\n    stroke(0);\n    fill(c);\n    rect(x, y, 40, 20);\n    fill(0);\n    ellipse(x - 12, y + 10, 10, 10);\n    ellipse(x + 12, y + 10, 10, 10);\n  }\n}\n"}]}, {"lesson": 12, "name": "L12_Chastynky", "files": [{"name": "L12_Chastynky.pde", "code": "// Урок 12. Система частинок з ArrayList: фонтан за курсором\n// Клацання — «вибух» із 100 частинок.\n\nArrayList<Particle> particles = new ArrayList<Particle>();\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(20);\n  // Щокадру додаємо дві нові частинки\n  particles.add(new Particle(mouseX, mouseY));\n  particles.add(new Particle(mouseX, mouseY));\n\n  // Перебираємо з кінця, щоб безпечно видаляти\n  for (int i = particles.size() - 1; i >= 0; i--) {\n    Particle p = particles.get(i);\n    p.update();\n    p.display();\n    if (p.isDead()) {\n      particles.remove(i);\n    }\n  }\n\n  fill(255);\n  text(\"Частинок: \" + particles.size(), 10, 20);\n}\n\nvoid mousePressed() {\n  for (int i = 0; i < 100; i++) {\n    particles.add(new Particle(mouseX, mouseY));\n  }\n}\n\nclass Particle {\n  float x, y;\n  float vx, vy;\n  float life = 255;     // «тривалість життя» = прозорість\n  color c;\n\n  Particle(float startX, float startY) {\n    x = startX;\n    y = startY;\n    float angle = random(TWO_PI);\n    float speed = random(1, 4);\n    vx = cos(angle) * speed;\n    vy = sin(angle) * speed - 2;\n    c = color(random(200, 255), random(80, 200), random(50));\n  }\n\n  void update() {\n    vy += 0.1;          // гравітація\n    x += vx;\n    y += vy;\n    life -= 3;\n  }\n\n  void display() {\n    noStroke();\n    fill(c, life);\n    ellipse(x, y, 8, 8);\n  }\n\n  boolean isDead() {\n    return life <= 0;\n  }\n}\n"}]}, {"lesson": 12, "name": "L12_Slid", "files": [{"name": "L12_Slid.pde", "code": "// Урок 12. Масиви: слід миші з 50 останніх положень\n\nint num = 50;\nint[] xs = new int[num];\nint[] ys = new int[num];\n\nvoid setup() {\n  size(500, 400);\n  noStroke();\n}\n\nvoid draw() {\n  background(255);\n\n  // Зсуваємо всі значення на одну позицію вліво\n  for (int i = 0; i < num - 1; i++) {\n    xs[i] = xs[i + 1];\n    ys[i] = ys[i + 1];\n  }\n  // Нове положення миші — в кінець масиву\n  xs[num - 1] = mouseX;\n  ys[num - 1] = mouseY;\n\n  // Малюємо: старіші точки — менші та світліші\n  for (int i = 0; i < num; i++) {\n    fill(255 - i * 5, 100, i * 5);\n    ellipse(xs[i], ys[i], i, i);\n  }\n}\n"}]}, {"lesson": 13, "name": "L13_Derevo", "files": [{"name": "L13_Derevo.pde", "code": "// Урок 13. Рекурсія + трансформації: фрактальне дерево\n// Кут розгалуження керується положенням миші по X.\n\nfloat theta;\n\nvoid setup() {\n  size(600, 450);\n}\n\nvoid draw() {\n  background(255);\n  stroke(60, 40, 20);\n  theta = map(mouseX, 0, width, 0, HALF_PI);\n  translate(width/2, height);   // стовбур росте від низу по центру\n  branch(120);\n}\n\n// Малює гілку довжини len і дві менші гілки на її кінці\nvoid branch(float len) {\n  strokeWeight(max(1, len / 12));\n  line(0, 0, 0, -len);\n  translate(0, -len);\n  if (len > 4) {               // умова зупинки рекурсії\n    pushMatrix();\n    rotate(theta);\n    branch(len * 0.67);\n    popMatrix();\n\n    pushMatrix();\n    rotate(-theta);\n    branch(len * 0.67);\n    popMatrix();\n  }\n}\n"}]}, {"lesson": 13, "name": "L13_Khvylya", "files": [{"name": "L13_Khvylya.pde", "code": "// Урок 13. Синус: хвиля та маятник\n// Миша по X змінює довжину хвилі, по Y — амплітуду.\n\nfloat angle = 0;\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(255);\n\n  float waveLen = map(mouseX, 0, width, 0.01, 0.15);\n  float amp = map(mouseY, 0, height, 10, 150);\n\n  // Хвиля з кружечків\n  noStroke();\n  fill(0, 120, 255);\n  for (int x = 0; x < width; x += 10) {\n    float y = height/2 + amp * sin(angle + x * waveLen);\n    ellipse(x, y, 10, 10);\n  }\n\n  // Маятник: кут коливається через sin()\n  float a = QUARTER_PI * sin(frameCount * 0.05);\n  float bx = 520 + 80 * sin(a);\n  float by = 20 + 80 * cos(a);\n  stroke(0);\n  line(520, 20, bx, by);\n  fill(255, 80, 80);\n  ellipse(bx, by, 20, 20);\n\n  angle += 0.05;\n}\n"}]}, {"lesson": 13, "name": "L13_Orbita", "files": [{"name": "L13_Orbita.pde", "code": "// Урок 13. Трансформації: Сонячна система (Сонце — Земля — Місяць, Марс)\n\nfloat earthAngle = 0;\nfloat moonAngle = 0;\nfloat marsAngle = 0;\n\nvoid setup() {\n  size(600, 600);\n}\n\nvoid draw() {\n  background(10, 10, 30);\n  translate(width/2, height/2);   // початок координат — у центрі\n\n  // Орбіти\n  noFill();\n  stroke(60);\n  ellipse(0, 0, 300, 300);\n  ellipse(0, 0, 480, 480);\n\n  // Сонце\n  noStroke();\n  fill(255, 200, 0);\n  ellipse(0, 0, 60, 60);\n\n  // Земля + Місяць\n  pushMatrix();                   // запам'ятали систему «Сонце»\n  rotate(earthAngle);\n  translate(150, 0);\n  fill(50, 120, 255);\n  ellipse(0, 0, 25, 25);\n  rotate(moonAngle);\n  translate(30, 0);               // Місяць — відносно Землі\n  fill(200);\n  ellipse(0, 0, 8, 8);\n  popMatrix();                    // повернулися до Сонця\n\n  // Марс\n  pushMatrix();\n  rotate(marsAngle);\n  translate(240, 0);\n  fill(220, 80, 40);\n  ellipse(0, 0, 18, 18);\n  popMatrix();\n\n  earthAngle += 0.01;\n  moonAngle += 0.05;\n  marsAngle += 0.006;\n}\n"}]}, {"lesson": 14, "name": "L14_Puantylizm", "files": [{"name": "L14_Puantylizm.pde", "code": "// Урок 14. Пікселі: пуантилізм\n// Програма створює зображення-джерело сама (градієнт і «сонце»),\n// тож працює без файлу. Щоб узяти фото: покладіть photo.jpg у папку data\n// і розкоментуйте рядок з loadImage().\n\nPImage img;\n\nvoid setup() {\n  size(600, 400);\n  img = makeSourceImage();\n  // img = loadImage(\"photo.jpg\"); img.resize(width, height);\n  background(255);\n  noStroke();\n}\n\nvoid draw() {\n  // Щокадру малюємо 50 «мазків» кольором пікселя з джерела\n  for (int i = 0; i < 50; i++) {\n    int x = int(random(img.width));\n    int y = int(random(img.height));\n    int index = x + y * img.width;   // індекс пікселя в масиві\n    color c = img.pixels[index];\n    fill(c, 150);\n    float d = map(mouseX, 0, width, 4, 24);\n    ellipse(x, y, d, d);\n  }\n}\n\n// Створює зображення попіксельно: небо, сонце, море\nPImage makeSourceImage() {\n  PImage src = createImage(width, height, RGB);\n  src.loadPixels();\n  for (int y = 0; y < src.height; y++) {\n    for (int x = 0; x < src.width; x++) {\n      int i = x + y * src.width;\n      if (dist(x, y, 420, 150) < 60) {\n        src.pixels[i] = color(255, 220, 60);                    // сонце\n      } else if (y < src.height * 0.6) {\n        src.pixels[i] = color(255, 150 + y / 4, 100 + y / 2);   // небо\n      } else {\n        src.pixels[i] = color(20, 80 + (y % 20) * 3, 160);      // море\n      }\n    }\n  }\n  src.updatePixels();\n  return src;\n}\n\nvoid keyPressed() {\n  if (key == 'c') background(255);\n  if (key == 's') saveFrame(\"puantylizm-####.png\");\n}\n"}]}, {"lesson": 14, "name": "L14_Tekst", "files": [{"name": "L14_Tekst.pde", "code": "// Урок 14. Кінетична типографіка: «хвиля» з літер\n\nString message = \"Привіт, Processing!\";\nPFont font;\n\nvoid setup() {\n  size(700, 300);\n  font = createFont(\"Arial\", 40);   // шрифт із кирилицею\n  textFont(font);\n  textAlign(LEFT, CENTER);\n}\n\nvoid draw() {\n  background(20, 30, 60);\n  float x = 40;\n  for (int i = 0; i < message.length(); i++) {\n    char letter = message.charAt(i);\n    float y = height/2 + 30 * sin(frameCount * 0.08 + i * 0.5);\n    fill(150 + 100 * sin(i * 0.4), 200, 255);\n    text(letter, x, y);\n    x += textWidth(letter);           // зсув на ширину літери\n  }\n\n  textSize(16);\n  fill(255);\n  text(\"Кадр: \" + frameCount, 10, height - 20);\n  textSize(40);\n}\n"}]}, {"lesson": 15, "name": "L15_Lovets", "files": [{"name": "L15_Lovets.pde", "code": "// Урок 15. Гра «Ловець крапель» (за ідеєю Д. Шиффмана, розд. 10)\n// Керування — мишею. Стани: 0 — меню, 1 — гра, 2 — кінець гри.\n\nint state = 0;\nCatcher catcher;\nArrayList<Drop> drops;\nTimer timer;\nint score;\nint lives;\nint best = 0;\n\nvoid setup() {\n  size(500, 600);\n  textAlign(CENTER, CENTER);\n  restart();\n}\n\nvoid restart() {\n  catcher = new Catcher(32);\n  drops = new ArrayList<Drop>();\n  timer = new Timer(1000);   // нова крапля щосекунди\n  timer.start();\n  score = 0;\n  lives = 3;\n}\n\nvoid draw() {\n  background(235, 245, 255);\n  if (state == 0)      drawMenu();\n  else if (state == 1) playGame();\n  else                 drawGameOver();\n}\n\nvoid drawMenu() {\n  fill(30, 60, 120);\n  textSize(40);\n  text(\"Ловець крапель\", width/2, height/2 - 40);\n  textSize(18);\n  text(\"Клацніть, щоб почати\", width/2, height/2 + 20);\n}\n\nvoid playGame() {\n  catcher.setLocation(mouseX, height - 60);\n  catcher.display();\n\n  if (timer.isFinished()) {\n    drops.add(new Drop(1 + score * 0.1));   // що більший рахунок, то швидше\n    timer.start();\n  }\n\n  for (int i = drops.size() - 1; i >= 0; i--) {\n    Drop d = drops.get(i);\n    d.move();\n    d.display();\n    if (catcher.intersect(d)) {\n      score++;\n      drops.remove(i);\n    } else if (d.reachedBottom()) {\n      lives--;\n      drops.remove(i);\n    }\n  }\n\n  fill(0);\n  textSize(18);\n  text(\"Рахунок: \" + score + \"    Життя: \" + lives, width/2, 20);\n\n  if (lives <= 0) {\n    best = max(best, score);\n    state = 2;\n  }\n}\n\nvoid drawGameOver() {\n  fill(180, 30, 30);\n  textSize(40);\n  text(\"Гру закінчено\", width/2, height/2 - 40);\n  fill(0);\n  textSize(20);\n  text(\"Рахунок: \" + score + \"   Рекорд: \" + best, width/2, height/2 + 10);\n  text(\"Клацніть, щоб грати ще\", width/2, height/2 + 50);\n}\n\nvoid mousePressed() {\n  if (state == 0) {\n    state = 1;\n  } else if (state == 2) {\n    restart();\n    state = 1;\n  }\n}\n"}, {"name": "Catcher.pde", "code": "// Ловець — коло, що рухається за мишею\n\nclass Catcher {\n  float r;\n  float x, y;\n\n  Catcher(float tempR) {\n    r = tempR;\n  }\n\n  void setLocation(float tempX, float tempY) {\n    x = tempX;\n    y = tempY;\n  }\n\n  void display() {\n    stroke(0);\n    fill(255, 170, 0);\n    ellipse(x, y, r * 2, r * 2);\n  }\n\n  // Зіткнення: відстань між центрами менша за суму радіусів\n  boolean intersect(Drop d) {\n    return dist(x, y, d.x, d.y) < r + d.r;\n  }\n}\n"}, {"name": "Drop.pde", "code": "// Крапля падає згори\n\nclass Drop {\n  float x, y;\n  float speed;\n  float r = 8;\n  color c = color(50, 100, 255);\n\n  Drop(float baseSpeed) {\n    x = random(r, width - r);\n    y = -r * 4;\n    speed = baseSpeed + random(1, 3);\n  }\n\n  void move() {\n    y += speed;\n  }\n\n  boolean reachedBottom() {\n    return y > height + r * 4;\n  }\n\n  // Крапля малюється стовпчиком кіл, що збільшуються донизу (як у Шиффмана)\n  void display() {\n    noStroke();\n    fill(c);\n    for (int i = 2; i < r; i++) {\n      ellipse(x, y + i * 4, i * 2, i * 2);\n    }\n  }\n}\n"}, {"name": "Timer.pde", "code": "// Таймер на основі millis()\n\nclass Timer {\n  int savedTime;\n  int totalTime;\n\n  Timer(int tempTotalTime) {\n    totalTime = tempTotalTime;\n  }\n\n  void start() {\n    savedTime = millis();\n  }\n\n  boolean isFinished() {\n    return millis() - savedTime > totalTime;\n  }\n}\n"}]}], "snippets": [[["Pryklad", "void setup() {\n  size(400, 400);\n}\nvoid draw() {\n  background(255);\n  ellipse(mouseX, mouseY, 40, 40);   // коло ходить за мишею\n}\n"]], [["Pryklad", "void setup() {\n  size(600, 400);\n  background(255);\n  strokeWeight(4);\n}\nvoid draw() {\n  // без background() — малюнок зберігається\n  line(pmouseX, pmouseY, mouseX, mouseY);\n}\n"]]]}</script>
+}</code></pre></details></div></div></section></article><nav class="pager" aria-label="Попередній і наступний урок"><a href="urok-05.html"><small>← Урок 5</small>Потік програми: setup() і draw(). Анімація</a><a class="next" href="urok-07.html"><small>Урок 7 →</small>Умови: if / else, логічні оператори. Відскок м&#x27;яча</a></nav><script type="application/json" id="pde-data">{"key": "urok-06", "tabs": [{"name": "Urok06", "code": "// Практикум до уроку 6\n// Рівень 1: персонаж слідує за мишею (mouseX, mouseY).\n// Рівень 2: колір залежить від mouseX; клацання (функція mousePressed()) — випадковий колір фону.\n// Рівень 3: «симетрична малювалка»: line(pmouseX, pmouseY, mouseX, mouseY) і дзеркальна лінія (width - mouseX).\n\nvoid setup() {\n  size(400, 400);\n}\n\nvoid draw() {\n  background(255);\n  rectMode(CENTER);\n  fill(150);\n  rect(200, 220, 20, 60);     // тіло — замініть числа на mouseX і mouseY\n  fill(255);\n  ellipse(200, 180, 50, 50);  // голова\n}\n"}], "examples": [{"lesson": 1, "name": "L01_PershyiSketch", "files": [{"name": "L01_PershyiSketch.pde", "code": "// Урок 1. Мій перший скетч\n// Статичний режим: команди виконуються один раз, зверху вниз.\n\nsize(400, 300);             // розмір вікна: ширина 400, висота 300\nbackground(255);            // білий фон\n\nline(0, 0, 400, 300);       // лінія з лівого верхнього в правий нижній кут\nline(400, 0, 0, 300);       // друга діагональ\n\nrect(150, 100, 100, 60);    // прямокутник: x, y лівого верхнього кута, ширина, висота\nellipse(200, 130, 50, 50);  // коло: x, y центру, ширина, висота\npoint(20, 20);              // точка\n\nprintln(\"Привіт, Processing!\");   // повідомлення в консоль\n"}]}, {"lesson": 2, "name": "L02_Figury", "files": [{"name": "L02_Figury.pde", "code": "// Урок 2. Базові фігури та атрибути малювання\n\nsize(600, 400);\nbackground(240);\n\n// Рядок 1: базові фігури\nstrokeWeight(2);\nstroke(0);\nfill(255);\npoint(40, 60);\nline(70, 30, 150, 90);\nrect(180, 30, 100, 60);\nellipse(350, 60, 100, 60);\ntriangle(440, 90, 490, 30, 540, 90);\n\n// Рядок 2: режими CENTER — фігури вирівняні по одній осі\nrectMode(CENTER);\nfill(200);\nrect(100, 200, 120, 80);\nellipse(100, 200, 60, 60);\n\n// Товщина та форма кінців ліній\nstrokeWeight(12);\nstrokeCap(ROUND);   line(220, 170, 320, 170);\nstrokeCap(SQUARE);  line(220, 200, 320, 200);\nstrokeCap(PROJECT); line(220, 230, 320, 230);\n\n// Дуги: кути в радіанах\nstrokeWeight(2);\nfill(255, 220, 0);\narc(420, 200, 100, 100, QUARTER_PI, TWO_PI - QUARTER_PI, PIE);   // «Пакмен»\nnoFill();\narc(530, 200, 80, 80, 0, PI);                                    // нижня половина кола\n\n// Довільна фігура: зірка\nfill(255);\nbeginShape();\nvertex(300, 280);\nvertex(318, 330);\nvertex(370, 330);\nvertex(328, 360);\nvertex(345, 395);\nvertex(300, 372);\nvertex(255, 395);\nvertex(272, 360);\nvertex(230, 330);\nvertex(282, 330);\nendShape(CLOSE);\n"}]}, {"lesson": 2, "name": "L02_Personazh", "files": [{"name": "L02_Personazh.pde", "code": "// Урок 2. Персонаж Зуг (за прикладом Д. Шиффмана)\n\nsize(200, 200);\nbackground(255);\nrectMode(CENTER);\nellipseMode(CENTER);\n\n// Тіло\nstroke(0);\nfill(150);\nrect(100, 100, 20, 100);\n\n// Голова\nfill(255);\nellipse(100, 70, 60, 60);\n\n// Очі\nfill(0);\nellipse(81, 70, 16, 32);\nellipse(119, 70, 16, 32);\n\n// Ноги\nline(90, 150, 80, 160);\nline(110, 150, 120, 160);\n"}]}, {"lesson": 3, "name": "L03_Kolir", "files": [{"name": "L03_Kolir.pde", "code": "// Урок 3. Колір: HSB-веселка та змішування RGB з прозорістю\n\nsize(600, 400);\nbackground(255);\nnoStroke();\n\n// Веселка в моделі HSB: змінюється лише відтінок (Hue)\ncolorMode(HSB, 360, 100, 100);\nfloat stripeW = width / 7.0;\nfor (int i = 0; i < 7; i++) {\n  fill(i * 45, 90, 100);          // відтінок 0°, 45°, 90°, ...\n  rect(i * stripeW, 0, stripeW, 150);\n}\n\n// Змішування світла RGB з альфа-каналом\ncolorMode(RGB, 255);\nfill(255, 0, 0, 130);  ellipse(250, 260, 160, 160);\nfill(0, 255, 0, 130);  ellipse(350, 260, 160, 160);\nfill(0, 0, 255, 130);  ellipse(300, 330, 160, 160);\n\n// Колір у змінній та шістнадцятковий запис\ncolor orange = #FF8800;\nfill(orange);\nrect(500, 330, 60, 40);\nprintln(\"Червона складова: \" + red(orange) + \", зелена: \" + green(orange));\n"}]}, {"lesson": 4, "name": "L04_Zminni", "files": [{"name": "L04_Zminni.pde", "code": "// Урок 4. Змінні керують малюнком\n// Змініть zoogX, zoogY або zoogScale — і весь персонаж зміниться.\n\nint zoogX = 100;\nint zoogY = 100;\nfloat zoogScale = 1.0;\n\nsize(200, 200);\nbackground(255);\nrectMode(CENTER);\n\n// Тіло\nfill(150);\nrect(zoogX, zoogY, 20 * zoogScale, 100 * zoogScale);\n\n// Голова\nfill(255);\nellipse(zoogX, zoogY - 30 * zoogScale, 60 * zoogScale, 60 * zoogScale);\n\n// Очі\nfill(0);\nellipse(zoogX - 19 * zoogScale, zoogY - 30 * zoogScale, 16 * zoogScale, 32 * zoogScale);\nellipse(zoogX + 19 * zoogScale, zoogY - 30 * zoogScale, 16 * zoogScale, 32 * zoogScale);\n\n// Ноги\nline(zoogX - 10 * zoogScale, zoogY + 50 * zoogScale, zoogX - 20 * zoogScale, zoogY + 60 * zoogScale);\nline(zoogX + 10 * zoogScale, zoogY + 50 * zoogScale, zoogX + 20 * zoogScale, zoogY + 60 * zoogScale);\n\n// Пастка цілочисельного ділення\nprintln(\"7 / 2 = \" + (7 / 2));\nprintln(\"7.0 / 2 = \" + (7.0 / 2));\nprintln(\"7 % 2 = \" + (7 % 2));\nprintln(\"Відстань: \" + dist(0, 0, 3, 4));\n"}]}, {"lesson": 5, "name": "L05_Animatsiya", "files": [{"name": "L05_Animatsiya.pde", "code": "// Урок 5. Анімація: рух, зростання, шлейф\n// Натисніть будь-яку клавішу, щоб увімкнути/вимкнути шлейф.\n\nfloat x = 0;          // 1. Оголосили глобальні змінні\nfloat diameter = 10;\nfloat gray = 0;\nboolean trail = false;\n\nvoid setup() {\n  size(500, 300);     // 2. Початкові налаштування\n  background(255);\n}\n\nvoid draw() {\n  if (trail) {\n    noStroke();\n    fill(255, 20);    // напівпрозоре «стирання» — плавний шлейф\n    rect(0, 0, width, height);\n  } else {\n    background(255);\n  }\n\n  stroke(0);\n  fill(gray);\n  ellipse(x, height/2, diameter, diameter);   // 3. Використали змінні\n\n  x = x + 2;          // 4. Змінили змінні\n  diameter = diameter + 0.3;\n  gray = gray + 1;\n\n  if (x > width + diameter/2) {   // повертаємося на початок\n    x = -diameter/2;\n    diameter = 10;\n    gray = 0;\n  }\n}\n\nvoid keyPressed() {\n  trail = !trail;\n}\n"}]}, {"lesson": 6, "name": "L06_Malyuvalka", "files": [{"name": "L06_Malyuvalka.pde", "code": "// Урок 6. Малювалка\n// Мишею — малювати; 1, 2, 3 — колір; c — очистити; s — зберегти PNG.\n\ncolor brushColor;\n\nvoid setup() {\n  size(800, 500);\n  background(255);\n  brushColor = color(0);\n}\n\nvoid draw() {\n  if (mousePressed) {\n    // чим швидше рухається миша, тим тонша лінія\n    float speed = dist(pmouseX, pmouseY, mouseX, mouseY);\n    float w = map(speed, 0, 50, 12, 1);\n    strokeWeight(constrain(w, 1, 12));\n    stroke(brushColor);\n    line(pmouseX, pmouseY, mouseX, mouseY);\n  }\n  drawPalette();\n}\n\n// Підказка-палітра в лівому верхньому куті\nvoid drawPalette() {\n  noStroke();\n  fill(0);           rect(10, 10, 20, 20);\n  fill(220, 30, 30); rect(35, 10, 20, 20);\n  fill(30, 90, 220); rect(60, 10, 20, 20);\n  fill(brushColor);  rect(90, 10, 20, 20);\n}\n\nvoid keyPressed() {\n  if (key == '1') brushColor = color(0);\n  if (key == '2') brushColor = color(220, 30, 30);\n  if (key == '3') brushColor = color(30, 90, 220);\n  if (key == 'c') background(255);\n  if (key == 's') saveFrame(\"malyunok-####.png\");\n}\n"}]}, {"lesson": 7, "name": "L07_Knopka", "files": [{"name": "L07_Knopka.pde", "code": "// Урок 7. Кнопка-перемикач і підсвічування при наведенні\n\nint bx = 150, by = 120, bw = 200, bh = 80;\nboolean isOn = false;\n\nvoid setup() {\n  size(500, 320);\n  textAlign(CENTER, CENTER);\n  textSize(24);\n}\n\nvoid draw() {\n  if (isOn) background(255, 240, 150);\n  else      background(40);\n\n  boolean over = mouseX > bx && mouseX < bx + bw && mouseY > by && mouseY < by + bh;\n\n  if (over) fill(255, 160, 0);   // наведення\n  else      fill(200);\n  stroke(0);\n  rect(bx, by, bw, bh, 12);\n\n  fill(0);\n  if (isOn) text(\"ВИМКНУТИ\", bx + bw/2, by + bh/2);\n  else      text(\"УВІМКНУТИ\", bx + bw/2, by + bh/2);\n}\n\nvoid mousePressed() {\n  if (mouseX > bx && mouseX < bx + bw && mouseY > by && mouseY < by + bh) {\n    isOn = !isOn;\n  }\n}\n"}]}, {"lesson": 7, "name": "L07_Vidskok", "files": [{"name": "L07_Vidskok.pde", "code": "// Урок 7. М'яч відскакує від стінок і падає під дією гравітації\n\nfloat x = 100, y = 50;\nfloat xSpeed = 3, ySpeed = 0;\nfloat gravity = 0.3;\nfloat d = 40;\n\nvoid setup() {\n  size(500, 400);\n}\n\nvoid draw() {\n  background(255);\n\n  ySpeed += gravity;     // гравітація збільшує швидкість падіння\n  x += xSpeed;\n  y += ySpeed;\n\n  // відскок від бічних стінок\n  if (x > width - d/2 || x < d/2) {\n    xSpeed *= -1;\n  }\n  // відскок від підлоги з втратою енергії\n  if (y > height - d/2) {\n    y = height - d/2;\n    ySpeed *= -0.85;\n  }\n\n  fill(255, 120, 0);\n  ellipse(x, y, d, d);\n}\n\n// Клацання — підкинути м'яч заново\nvoid mousePressed() {\n  x = mouseX;\n  y = mouseY;\n  ySpeed = -8;\n}\n"}]}, {"lesson": 8, "name": "L08_Shakhy", "files": [{"name": "L08_Shakhy.pde", "code": "// Урок 8. Шахова дошка 8×8 — вкладені цикли та остача від ділення\n\nint n = 8;\n\nvoid setup() {\n  size(400, 400);\n  noStroke();\n}\n\nvoid draw() {\n  float cell = width / (float) n;\n  for (int i = 0; i < n; i++) {        // рядки\n    for (int j = 0; j < n; j++) {      // стовпці\n      if ((i + j) % 2 == 0) fill(240, 217, 181);\n      else                  fill(181, 136, 99);\n      rect(j * cell, i * cell, cell, cell);\n    }\n  }\n}\n"}]}, {"lesson": 8, "name": "L08_Tsykly", "files": [{"name": "L08_Tsykly.pde", "code": "// Урок 8. Цикли: інтерактивні лінії, кольорова сітка, концентричні кола\n// Клавіші 1, 2, 3 перемикають режим.\n\nint mode = 1;\n\nvoid setup() {\n  size(400, 400);\n}\n\nvoid draw() {\n  background(255);\n  if (mode == 1) drawLines();\n  else if (mode == 2) drawGrid();\n  else drawCircles();\n}\n\n// Лінії, що світлішають, коли далеко від курсора\nvoid drawLines() {\n  strokeWeight(3);\n  for (int x = 0; x < width; x += 10) {\n    float d = abs(mouseX - x);\n    stroke(constrain(d, 0, 255));\n    line(x, 0, x, height);\n  }\n}\n\n// Вкладені цикли: рядки × стовпці\nvoid drawGrid() {\n  stroke(255);\n  for (int y = 0; y < height; y += 40) {\n    for (int x = 0; x < width; x += 40) {\n      fill(x * 255 / width, y * 255 / height, 150);\n      rect(x, y, 40, 40);\n    }\n  }\n}\n\n// Концентричні кола, центр — у курсора\nvoid drawCircles() {\n  noFill();\n  stroke(0);\n  strokeWeight(1);\n  for (int d = 600; d > 0; d -= 20) {\n    ellipse(mouseX, mouseY, d, d);\n  }\n}\n\nvoid keyPressed() {\n  if (key == '1') mode = 1;\n  if (key == '2') mode = 2;\n  if (key == '3') mode = 3;\n}\n"}]}, {"lesson": 9, "name": "L09_Labirynt", "files": [{"name": "L09_Labirynt.pde", "code": "// Урок 9. «10 PRINT» — генеративний лабіринт\n// Клацання мишею — новий лабіринт.\n\nint step = 20;\n\nvoid setup() {\n  size(600, 400);\n  strokeWeight(3);\n  strokeCap(ROUND);\n  drawMaze();\n}\n\nvoid draw() {\n  // малюємо лише при клацанні\n}\n\nvoid drawMaze() {\n  background(30, 40, 90);\n  stroke(255);\n  for (int y = 0; y < height; y += step) {\n    for (int x = 0; x < width; x += step) {\n      if (random(1) < 0.5) {\n        line(x, y, x + step, y + step);   // діагональ «\\»\n      } else {\n        line(x + step, y, x, y + step);   // діагональ «/»\n      }\n    }\n  }\n}\n\nvoid mousePressed() {\n  drawMaze();\n}\n"}]}, {"lesson": 9, "name": "L09_Noise", "files": [{"name": "L09_Noise.pde", "code": "// Урок 9. Шум Перліна: гірський пейзаж і плавний блукач\n\nfloat t = 0;        // «час» для блукача\nfloat offset = 0;   // зсув пейзажу — гори «пливуть»\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(200, 225, 255);\n\n  // Три шари гір: що далі, то світліші\n  drawMountains(0.005, 180, color(150, 170, 200), offset * 0.3);\n  drawMountains(0.01, 250, color(90, 120, 150), offset * 0.6 + 100);\n  drawMountains(0.02, 320, color(40, 60, 80), offset + 200);\n  offset += 1;\n\n  // Блукач: плавний рух через noise()\n  float x = noise(t) * width;\n  float y = noise(t + 1000) * height * 0.5;\n  noStroke();\n  fill(255, 200, 0);\n  ellipse(x, y, 30, 30);\n  t += 0.005;\n}\n\n// Малює шар гір; scale — «зернистість» шуму, base — висота шару\nvoid drawMountains(float scale, float base, color c, float shift) {\n  stroke(c);\n  for (int x = 0; x < width; x++) {\n    float h = noise((x + shift) * scale) * 200;\n    line(x, height, x, base - h + 100);\n  }\n}\n"}]}, {"lesson": 10, "name": "L10_Funktsii", "files": [{"name": "L10_Funktsii.pde", "code": "// Урок 10. Власна функція з параметрами: машинки\n\nvoid setup() {\n  size(400, 300);\n}\n\nvoid draw() {\n  background(255);\n  drawCar(100, 100, color(255, 0, 0));\n  drawCar(250, 200, color(0, 0, 255));\n  drawCar(mouseX, mouseY, color(0, 200, 0));\n}\n\n// Малює машину з центром у (x, y) кольору c\nvoid drawCar(float x, float y, color c) {\n  rectMode(CENTER);\n  stroke(0);\n  fill(c);\n  rect(x, y, 80, 30);              // кузов\n  fill(200, 230, 255);\n  rect(x + 10, y - 22, 40, 16);    // кабіна\n  fill(0);\n  ellipse(x - 25, y + 15, 20, 20); // колеса\n  ellipse(x + 25, y + 15, 20, 20);\n}\n"}]}, {"lesson": 10, "name": "L10_Kvity", "files": [{"name": "L10_Kvity.pde", "code": "// Урок 10. Функції, що малюють і повертають значення: клумба квітів\n// Клацання мишею — посадити нову клумбу.\n\nvoid setup() {\n  size(600, 400);\n  noLoop();          // малюємо один кадр; redraw() — ще один\n}\n\nvoid draw() {\n  background(120, 190, 90);\n  for (int i = 0; i < 12; i++) {\n    float x = random(50, width - 50);\n    float y = random(50, height - 50);\n    drawFlower(x, y, random(30, 80), randomPetalColor());\n  }\n}\n\n// Малює квітку: центр (x, y), розмір s, колір пелюсток c\nvoid drawFlower(float x, float y, float s, color c) {\n  noStroke();\n  fill(c);\n  for (int i = 0; i < 6; i++) {\n    float a = TWO_PI / 6 * i;\n    ellipse(x + cos(a) * s / 3, y + sin(a) * s / 3, s / 2, s / 2);\n  }\n  fill(255, 210, 0);\n  ellipse(x, y, s / 3, s / 3);\n}\n\n// Повертає випадковий «квітковий» колір\ncolor randomPetalColor() {\n  color[] palette = { color(255, 90, 120), color(255, 255, 255), color(160, 110, 230), color(255, 150, 40) };\n  return palette[int(random(palette.length))];\n}\n\nvoid mousePressed() {\n  redraw();\n}\n"}]}, {"lesson": 11, "name": "L11_Myachi", "files": [{"name": "L11_Myachi.pde", "code": "// Урок 11. Клас Ball: три незалежні м'ячі\n\nBall b1, b2, b3;\n\nvoid setup() {\n  size(500, 350);\n  b1 = new Ball(100, 100, 40);\n  b2 = new Ball(250, 200, 60);\n  b3 = new Ball(400, 80, 25);\n}\n\nvoid draw() {\n  background(255);\n  b1.move();  b1.bounce();  b1.display();\n  b2.move();  b2.bounce();  b2.display();\n  b3.move();  b3.bounce();  b3.display();\n}\n\nclass Ball {\n  float x, y, d;\n  float xSpeed, ySpeed;\n  color c;\n\n  Ball(float tempX, float tempY, float tempD) {\n    x = tempX;\n    y = tempY;\n    d = tempD;\n    xSpeed = random(-4, 4);\n    ySpeed = random(-4, 4);\n    c = color(random(255), random(255), random(255));\n  }\n\n  void move() {\n    x += xSpeed;\n    y += ySpeed;\n  }\n\n  // Відскок від стінок + зміна кольору\n  void bounce() {\n    if (x > width - d/2 || x < d/2) {\n      xSpeed *= -1;\n      c = color(random(255), random(255), random(255));\n    }\n    if (y > height - d/2 || y < d/2) {\n      ySpeed *= -1;\n      c = color(random(255), random(255), random(255));\n    }\n  }\n\n  void display() {\n    stroke(0);\n    fill(c);\n    ellipse(x, y, d, d);\n  }\n\n  // Чи знаходиться курсор над м'ячем?\n  boolean isUnderMouse() {\n    return dist(mouseX, mouseY, x, y) < d/2;\n  }\n}\n\n// Клацання по м'ячу зупиняє його\nvoid mousePressed() {\n  if (b1.isUnderMouse()) { b1.xSpeed = 0; b1.ySpeed = 0; }\n  if (b2.isUnderMouse()) { b2.xSpeed = 0; b2.ySpeed = 0; }\n  if (b3.isUnderMouse()) { b3.xSpeed = 0; b3.ySpeed = 0; }\n}\n"}]}, {"lesson": 11, "name": "L11_Obyekty", "files": [{"name": "L11_Obyekty.pde", "code": "// Урок 11. Об'єкти: дві машини одного класу Car (клас — у вкладці Car)\n\nCar redCar;    // 1. Оголошуємо об'єкти\nCar blueCar;\n\nvoid setup() {\n  size(400, 200);\n  // 2. Створюємо об'єкти конструктором\n  redCar  = new Car(color(255, 0, 0), 0, 60, 2);\n  blueCar = new Car(color(0, 0, 255), 0, 140, 1);\n}\n\nvoid draw() {\n  background(255);\n  // 3. Викликаємо методи\n  redCar.move();\n  redCar.display();\n  blueCar.move();\n  blueCar.display();\n}\n"}, {"name": "Car.pde", "code": "// Клас Car — «формочка» для машин\n\nclass Car {\n  // Поля (дані)\n  color c;\n  float x, y;\n  float speed;\n\n  // Конструктор\n  Car(color tempC, float tempX, float tempY, float tempSpeed) {\n    c = tempC;\n    x = tempX;\n    y = tempY;\n    speed = tempSpeed;\n  }\n\n  // Метод: рух\n  void move() {\n    x += speed;\n    if (x > width + 20) {\n      x = -20;\n    }\n  }\n\n  // Метод: малювання\n  void display() {\n    rectMode(CENTER);\n    stroke(0);\n    fill(c);\n    rect(x, y, 40, 20);\n    fill(0);\n    ellipse(x - 12, y + 10, 10, 10);\n    ellipse(x + 12, y + 10, 10, 10);\n  }\n}\n"}]}, {"lesson": 12, "name": "L12_Chastynky", "files": [{"name": "L12_Chastynky.pde", "code": "// Урок 12. Система частинок з ArrayList: фонтан за курсором\n// Клацання — «вибух» із 100 частинок.\n\nArrayList<Particle> particles = new ArrayList<Particle>();\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(20);\n  // Щокадру додаємо дві нові частинки\n  particles.add(new Particle(mouseX, mouseY));\n  particles.add(new Particle(mouseX, mouseY));\n\n  // Перебираємо з кінця, щоб безпечно видаляти\n  for (int i = particles.size() - 1; i >= 0; i--) {\n    Particle p = particles.get(i);\n    p.update();\n    p.display();\n    if (p.isDead()) {\n      particles.remove(i);\n    }\n  }\n\n  fill(255);\n  text(\"Частинок: \" + particles.size(), 10, 20);\n}\n\nvoid mousePressed() {\n  for (int i = 0; i < 100; i++) {\n    particles.add(new Particle(mouseX, mouseY));\n  }\n}\n\nclass Particle {\n  float x, y;\n  float vx, vy;\n  float life = 255;     // «тривалість життя» = прозорість\n  color c;\n\n  Particle(float startX, float startY) {\n    x = startX;\n    y = startY;\n    float angle = random(TWO_PI);\n    float speed = random(1, 4);\n    vx = cos(angle) * speed;\n    vy = sin(angle) * speed - 2;\n    c = color(random(200, 255), random(80, 200), random(50));\n  }\n\n  void update() {\n    vy += 0.1;          // гравітація\n    x += vx;\n    y += vy;\n    life -= 3;\n  }\n\n  void display() {\n    noStroke();\n    fill(c, life);\n    ellipse(x, y, 8, 8);\n  }\n\n  boolean isDead() {\n    return life <= 0;\n  }\n}\n"}]}, {"lesson": 12, "name": "L12_Slid", "files": [{"name": "L12_Slid.pde", "code": "// Урок 12. Масиви: слід миші з 50 останніх положень\n\nint num = 50;\nint[] xs = new int[num];\nint[] ys = new int[num];\n\nvoid setup() {\n  size(500, 400);\n  noStroke();\n}\n\nvoid draw() {\n  background(255);\n\n  // Зсуваємо всі значення на одну позицію вліво\n  for (int i = 0; i < num - 1; i++) {\n    xs[i] = xs[i + 1];\n    ys[i] = ys[i + 1];\n  }\n  // Нове положення миші — в кінець масиву\n  xs[num - 1] = mouseX;\n  ys[num - 1] = mouseY;\n\n  // Малюємо: старіші точки — менші та світліші\n  for (int i = 0; i < num; i++) {\n    fill(255 - i * 5, 100, i * 5);\n    ellipse(xs[i], ys[i], i, i);\n  }\n}\n"}]}, {"lesson": 13, "name": "L13_Derevo", "files": [{"name": "L13_Derevo.pde", "code": "// Урок 13. Рекурсія + трансформації: фрактальне дерево\n// Кут розгалуження керується положенням миші по X.\n\nfloat theta;\n\nvoid setup() {\n  size(600, 450);\n}\n\nvoid draw() {\n  background(255);\n  stroke(60, 40, 20);\n  theta = map(mouseX, 0, width, 0, HALF_PI);\n  translate(width/2, height);   // стовбур росте від низу по центру\n  branch(120);\n}\n\n// Малює гілку довжини len і дві менші гілки на її кінці\nvoid branch(float len) {\n  strokeWeight(max(1, len / 12));\n  line(0, 0, 0, -len);\n  translate(0, -len);\n  if (len > 4) {               // умова зупинки рекурсії\n    pushMatrix();\n    rotate(theta);\n    branch(len * 0.67);\n    popMatrix();\n\n    pushMatrix();\n    rotate(-theta);\n    branch(len * 0.67);\n    popMatrix();\n  }\n}\n"}]}, {"lesson": 13, "name": "L13_Khvylya", "files": [{"name": "L13_Khvylya.pde", "code": "// Урок 13. Синус: хвиля та маятник\n// Миша по X змінює довжину хвилі, по Y — амплітуду.\n\nfloat angle = 0;\n\nvoid setup() {\n  size(600, 400);\n}\n\nvoid draw() {\n  background(255);\n\n  float waveLen = map(mouseX, 0, width, 0.01, 0.15);\n  float amp = map(mouseY, 0, height, 10, 150);\n\n  // Хвиля з кружечків\n  noStroke();\n  fill(0, 120, 255);\n  for (int x = 0; x < width; x += 10) {\n    float y = height/2 + amp * sin(angle + x * waveLen);\n    ellipse(x, y, 10, 10);\n  }\n\n  // Маятник: кут коливається через sin()\n  float a = QUARTER_PI * sin(frameCount * 0.05);\n  float bx = 520 + 80 * sin(a);\n  float by = 20 + 80 * cos(a);\n  stroke(0);\n  line(520, 20, bx, by);\n  fill(255, 80, 80);\n  ellipse(bx, by, 20, 20);\n\n  angle += 0.05;\n}\n"}]}, {"lesson": 13, "name": "L13_Orbita", "files": [{"name": "L13_Orbita.pde", "code": "// Урок 13. Трансформації: Сонячна система (Сонце — Земля — Місяць, Марс)\n\nfloat earthAngle = 0;\nfloat moonAngle = 0;\nfloat marsAngle = 0;\n\nvoid setup() {\n  size(600, 600);\n}\n\nvoid draw() {\n  background(10, 10, 30);\n  translate(width/2, height/2);   // початок координат — у центрі\n\n  // Орбіти\n  noFill();\n  stroke(60);\n  ellipse(0, 0, 300, 300);\n  ellipse(0, 0, 480, 480);\n\n  // Сонце\n  noStroke();\n  fill(255, 200, 0);\n  ellipse(0, 0, 60, 60);\n\n  // Земля + Місяць\n  pushMatrix();                   // запам'ятали систему «Сонце»\n  rotate(earthAngle);\n  translate(150, 0);\n  fill(50, 120, 255);\n  ellipse(0, 0, 25, 25);\n  rotate(moonAngle);\n  translate(30, 0);               // Місяць — відносно Землі\n  fill(200);\n  ellipse(0, 0, 8, 8);\n  popMatrix();                    // повернулися до Сонця\n\n  // Марс\n  pushMatrix();\n  rotate(marsAngle);\n  translate(240, 0);\n  fill(220, 80, 40);\n  ellipse(0, 0, 18, 18);\n  popMatrix();\n\n  earthAngle += 0.01;\n  moonAngle += 0.05;\n  marsAngle += 0.006;\n}\n"}]}, {"lesson": 14, "name": "L14_Puantylizm", "files": [{"name": "L14_Puantylizm.pde", "code": "// Урок 14. Пікселі: пуантилізм\n// Програма створює зображення-джерело сама (градієнт і «сонце»),\n// тож працює без файлу. Щоб узяти фото: покладіть photo.jpg у папку data\n// і розкоментуйте рядок з loadImage().\n\nPImage img;\n\nvoid setup() {\n  size(600, 400);\n  img = makeSourceImage();\n  // img = loadImage(\"photo.jpg\"); img.resize(width, height);\n  background(255);\n  noStroke();\n}\n\nvoid draw() {\n  // Щокадру малюємо 50 «мазків» кольором пікселя з джерела\n  for (int i = 0; i < 50; i++) {\n    int x = int(random(img.width));\n    int y = int(random(img.height));\n    int index = x + y * img.width;   // індекс пікселя в масиві\n    color c = img.pixels[index];\n    fill(c, 150);\n    float d = map(mouseX, 0, width, 4, 24);\n    ellipse(x, y, d, d);\n  }\n}\n\n// Створює зображення попіксельно: небо, сонце, море\nPImage makeSourceImage() {\n  PImage src = createImage(width, height, RGB);\n  src.loadPixels();\n  for (int y = 0; y < src.height; y++) {\n    for (int x = 0; x < src.width; x++) {\n      int i = x + y * src.width;\n      if (dist(x, y, 420, 150) < 60) {\n        src.pixels[i] = color(255, 220, 60);                    // сонце\n      } else if (y < src.height * 0.6) {\n        src.pixels[i] = color(255, 150 + y / 4, 100 + y / 2);   // небо\n      } else {\n        src.pixels[i] = color(20, 80 + (y % 20) * 3, 160);      // море\n      }\n    }\n  }\n  src.updatePixels();\n  return src;\n}\n\nvoid keyPressed() {\n  if (key == 'c') background(255);\n  if (key == 's') saveFrame(\"puantylizm-####.png\");\n}\n"}]}, {"lesson": 14, "name": "L14_Tekst", "files": [{"name": "L14_Tekst.pde", "code": "// Урок 14. Кінетична типографіка: «хвиля» з літер\n\nString message = \"Привіт, Processing!\";\nPFont font;\n\nvoid setup() {\n  size(700, 300);\n  font = createFont(\"Arial\", 40);   // шрифт із кирилицею\n  textFont(font);\n  textAlign(LEFT, CENTER);\n}\n\nvoid draw() {\n  background(20, 30, 60);\n  float x = 40;\n  for (int i = 0; i < message.length(); i++) {\n    char letter = message.charAt(i);\n    float y = height/2 + 30 * sin(frameCount * 0.08 + i * 0.5);\n    fill(150 + 100 * sin(i * 0.4), 200, 255);\n    text(letter, x, y);\n    x += textWidth(letter);           // зсув на ширину літери\n  }\n\n  textSize(16);\n  fill(255);\n  text(\"Кадр: \" + frameCount, 10, height - 20);\n  textSize(40);\n}\n"}]}, {"lesson": 15, "name": "L15_Lovets", "files": [{"name": "L15_Lovets.pde", "code": "// Урок 15. Гра «Ловець крапель» (за ідеєю Д. Шиффмана, розд. 10)\n// Керування — мишею. Стани: 0 — меню, 1 — гра, 2 — кінець гри.\n\nint state = 0;\nCatcher catcher;\nArrayList<Drop> drops;\nTimer timer;\nint score;\nint lives;\nint best = 0;\n\nvoid setup() {\n  size(500, 600);\n  textAlign(CENTER, CENTER);\n  restart();\n}\n\nvoid restart() {\n  catcher = new Catcher(32);\n  drops = new ArrayList<Drop>();\n  timer = new Timer(1000);   // нова крапля щосекунди\n  timer.start();\n  score = 0;\n  lives = 3;\n}\n\nvoid draw() {\n  background(235, 245, 255);\n  if (state == 0)      drawMenu();\n  else if (state == 1) playGame();\n  else                 drawGameOver();\n}\n\nvoid drawMenu() {\n  fill(30, 60, 120);\n  textSize(40);\n  text(\"Ловець крапель\", width/2, height/2 - 40);\n  textSize(18);\n  text(\"Клацніть, щоб почати\", width/2, height/2 + 20);\n}\n\nvoid playGame() {\n  catcher.setLocation(mouseX, height - 60);\n  catcher.display();\n\n  if (timer.isFinished()) {\n    drops.add(new Drop(1 + score * 0.1));   // що більший рахунок, то швидше\n    timer.start();\n  }\n\n  for (int i = drops.size() - 1; i >= 0; i--) {\n    Drop d = drops.get(i);\n    d.move();\n    d.display();\n    if (catcher.intersect(d)) {\n      score++;\n      drops.remove(i);\n    } else if (d.reachedBottom()) {\n      lives--;\n      drops.remove(i);\n    }\n  }\n\n  fill(0);\n  textSize(18);\n  text(\"Рахунок: \" + score + \"    Життя: \" + lives, width/2, 20);\n\n  if (lives <= 0) {\n    best = max(best, score);\n    state = 2;\n  }\n}\n\nvoid drawGameOver() {\n  fill(180, 30, 30);\n  textSize(40);\n  text(\"Гру закінчено\", width/2, height/2 - 40);\n  fill(0);\n  textSize(20);\n  text(\"Рахунок: \" + score + \"   Рекорд: \" + best, width/2, height/2 + 10);\n  text(\"Клацніть, щоб грати ще\", width/2, height/2 + 50);\n}\n\nvoid mousePressed() {\n  if (state == 0) {\n    state = 1;\n  } else if (state == 2) {\n    restart();\n    state = 1;\n  }\n}\n"}, {"name": "Catcher.pde", "code": "// Ловець — коло, що рухається за мишею\n\nclass Catcher {\n  float r;\n  float x, y;\n\n  Catcher(float tempR) {\n    r = tempR;\n  }\n\n  void setLocation(float tempX, float tempY) {\n    x = tempX;\n    y = tempY;\n  }\n\n  void display() {\n    stroke(0);\n    fill(255, 170, 0);\n    ellipse(x, y, r * 2, r * 2);\n  }\n\n  // Зіткнення: відстань між центрами менша за суму радіусів\n  boolean intersect(Drop d) {\n    return dist(x, y, d.x, d.y) < r + d.r;\n  }\n}\n"}, {"name": "Drop.pde", "code": "// Крапля падає згори\n\nclass Drop {\n  float x, y;\n  float speed;\n  float r = 8;\n  color c = color(50, 100, 255);\n\n  Drop(float baseSpeed) {\n    x = random(r, width - r);\n    y = -r * 4;\n    speed = baseSpeed + random(1, 3);\n  }\n\n  void move() {\n    y += speed;\n  }\n\n  boolean reachedBottom() {\n    return y > height + r * 4;\n  }\n\n  // Крапля малюється стовпчиком кіл, що збільшуються донизу (як у Шиффмана)\n  void display() {\n    noStroke();\n    fill(c);\n    for (int i = 2; i < r; i++) {\n      ellipse(x, y + i * 4, i * 2, i * 2);\n    }\n  }\n}\n"}, {"name": "Timer.pde", "code": "// Таймер на основі millis()\n\nclass Timer {\n  int savedTime;\n  int totalTime;\n\n  Timer(int tempTotalTime) {\n    totalTime = tempTotalTime;\n  }\n\n  void start() {\n    savedTime = millis();\n  }\n\n  boolean isFinished() {\n    return millis() - savedTime > totalTime;\n  }\n}\n"}]}], "snippets": [[["Pryklad", "void setup() {\n  size(400, 400);\n}\nvoid draw() {\n  background(255);\n  ellipse(mouseX, mouseY, 40, 40);   // коло ходить за мишею\n}\n"]], [["Pryklad", "void setup() {\n  size(600, 400);\n  background(255);\n  strokeWeight(4);\n}\nvoid draw() {\n  // без background() — малюнок зберігається\n  line(pmouseX, pmouseY, mouseX, mouseY);\n}\n"]]]}</script>
   </main>
 </div>
 <script>
@@ -684,6 +740,23 @@ document.addEventListener('click', function (e) {
   function nextLine(lines, i) {
     for (var k = i + 1; k < lines.length; k++) { var t = lines[k].trim(); if (t) return t; }
     return null;
+  }
+
+  // Імена JavaScript, яких немає в Processing, але через які код міг би втрутитися в сторінку
+  // (наприклад, змінити журнал оцінок учителя). Такий код не запускається.
+  var FORBIDDEN = toSet('window document localStorage sessionStorage indexedDB cookie eval Function constructor prototype ' +
+    '__proto__ globalThis location fetch XMLHttpRequest WebSocket importScripts postMessage opener frames navigator ' +
+    'setTimeout setInterval defineProperty getOwnPropertyDescriptor setPrototypeOf getPrototypeOf Reflect Proxy ' +
+    'PDE ZDACHA PDE_GRADE PDE_RUBRICS PDE_GRADE_OPTS Processing __pdeGuard __pdeIdiv $p');
+  function forbidden(code) {
+    var m = mask(code), found = {}, re = /[A-Za-z_$][\w$]*/g, x;
+    while ((x = re.exec(m))) if (FORBIDDEN[x[0]]) found[x[0]] = 1;
+    var noCom = code.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+    if (/\[\s*"/.test(noCom)) found['[" "]'] = 1;
+    if (noCom.indexOf('`') >= 0) found['`'] = 1;
+    var names = Object.keys(found);
+    return names.length ? 'У коді є конструкції JavaScript, яких немає в Processing: ' + names.join(', ') +
+      '. Такий код не запускається в навчальному середовищі. Приберіть їх.' : null;
   }
 
   // Попередження (програма запускається, але вчитель Java-синтаксису їх би підкреслив)
@@ -878,8 +951,9 @@ document.addEventListener('click', function (e) {
     this.root = root;
     this.opts = opts;
     this.key = 'pde:' + opts.key;
+    this.persist = opts.persist !== false;      // false — нічого не зберігати в браузері (сторінка вчителя)
     this.initial = JSON.parse(JSON.stringify(opts.tabs));
-    var saved = store.get(this.key);
+    var saved = this.persist ? store.get(this.key) : null;
     this.state = saved && saved.tabs && saved.tabs.length ? saved : { tabs: JSON.parse(JSON.stringify(opts.tabs)), files: {} };
     if (!this.state.files) this.state.files = {};
     this.active = 0;
@@ -1267,6 +1341,7 @@ document.addEventListener('click', function (e) {
   };
 
   PDE.prototype.save = function (quiet) {
+    if (!this.persist) return;
     var ok = store.set(this.key, this.state);
     if (!quiet) this.status(ok ? 'Збережено в цьому браузері.' : 'Не вдалося зберегти в браузері (приватний режим?). Скопіюйте код: «Файл → Копіювати весь код».', !ok);
   };
@@ -1332,7 +1407,7 @@ document.addEventListener('click', function (e) {
       var fr = new FileReader();
       fr.onload = function () {
         self.state.files[file.name] = String(fr.result);
-        if (!store.set(self.key, self.state)) {
+        if (self.persist && !store.set(self.key, self.state)) {
           self.status('Файл ' + file.name + ' додано, але він завеликий, щоб зберегтися після перезавантаження сторінки.', true);
         } else self.status('Файл ' + file.name + ' додано в data. Використовуйте: loadImage("' + file.name + '")');
         self.renderFiles();
@@ -1509,6 +1584,8 @@ document.addEventListener('click', function (e) {
       var err = checkBrackets(t) || checkSemicolons(t);
       if (err) { this.showError(i, err.line, err.msg); return Promise.resolve(); }
     }
+    var bad = forbidden(this.state.tabs.map(function (t) { return t.code; }).join('\n'));
+    if (bad) { this.showError(null, null, bad); return Promise.resolve(); }
     var warns = [];
     this.state.tabs.forEach(function (t, i) { lint(t).forEach(function (w) { warns.push('[' + t.name + ', рядок ' + w.line + '] ' + w.msg); }); });
 
@@ -1664,6 +1741,182 @@ document.addEventListener('click', function (e) {
     cv.addEventListener('pointerdown', function () { cv.focus({ preventScroll: true }); });
   };
 
+
+  // ---------- Невидимий запуск для автоперевірки ----------
+  // Скетч виконується без показу: записуються виклики функцій малювання, вивід у консоль,
+  // кадри при різних положеннях миші, кліку, перетягуванні й натисканні клавіш.
+  var LOGGED = ('point line rect ellipse circle square triangle quad arc beginShape vertex endShape text image ' +
+    'background fill noFill stroke noStroke strokeWeight rectMode ellipseMode colorMode textSize textAlign textFont ' +
+    'translate rotate scale pushMatrix popMatrix push pop tint filter frameRate').split(' ');
+  var COUNTED = ('random randomSeed noise noiseSeed dist map constrain atan2 millis second minute hour ' +
+    'loadImage createFont loadPixels updatePixels get saveFrame save createImage lerpColor').split(' ');
+  var SHAPES = toSet('point line rect ellipse circle square triangle quad arc vertex text image');
+
+  function simpleArg(v) {
+    if (v == null) return v;
+    if (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean') return v;
+    if (v && typeof v.code === 'number') return String.fromCharCode(v.code);    // char
+    if (v && typeof v.width === 'number' && typeof v.height === 'number') return '[PImage ' + v.width + 'x' + v.height + ']';
+    return String(v);
+  }
+
+  function headless(tabs, opts) {
+    opts = opts || {};
+    var report = { ok: false, stage: null, error: null, errorTab: null, errorLine: null, w: 100, h: 100,
+      log: [], counts: {}, out: '', phases: {}, order: [], frames: 0, isStatic: false, K: {},
+      tabs: tabs, code: tabs.map(function (t) { return t.code; }).join('\n\n') };
+    report.masked = mask(report.code);
+    for (var i = 0; i < tabs.length; i++) {
+      var err = checkBrackets(tabs[i]) || checkSemicolons(tabs[i]);
+      if (err) { report.stage = 'syntax'; report.error = err.msg; report.errorTab = tabs[i].name; report.errorLine = err.line; return Promise.resolve(report); }
+    }
+    var bad = forbidden(report.code);
+    if (bad) { report.stage = 'forbidden'; report.error = bad; return Promise.resolve(report); }
+    return loadPjs(opts.pjs || []).then(function () { return runHidden(report, opts); },
+      function () { report.stage = 'load'; report.error = 'Не вдалося завантажити Processing.js (немає інтернету?).'; return report; });
+  }
+
+  function runHidden(report, opts) {
+    var holder = document.createElement('div');
+    holder.style.cssText = 'position:absolute;left:-20000px;top:0;width:10px;height:10px;overflow:hidden';
+    var cv = document.createElement('canvas');
+    holder.appendChild(cv);
+    document.body.appendChild(holder);
+    var frame = 0, phase = 'setup', fillKey = '255', noFillOn = false, logFull = false, perFrame = 0, lastFr = -1;
+    var p = null, oldGuard = window.__pdeGuard, oldIdiv = window.__pdeIdiv, oldLogger = window.Processing && Processing.logger;
+    var guard = 0, phaseStart = performance.now();
+    window.__pdeGuard = function () {
+      if ((++guard & 1023) === 0 && performance.now() - phaseStart > 3000) throw new Error('__pdeLoop');
+    };
+    window.__pdeIdiv = function (a, b) {
+      if (typeof a === 'number' && typeof b === 'number' && a % 1 === 0 && b % 1 === 0) {
+        if (b === 0) throw new Error('Ділення на нуль (ArithmeticException: / by zero).');
+        var q = a / b; return q < 0 ? Math.ceil(q) : Math.floor(q);
+      }
+      return a / b;
+    };
+    var outParts = [];
+    Processing.logger = {
+      println: function (m) { if (outParts.length < 2000) outParts.push(String(simpleArg(m)) + '\n'); },
+      print: function (m) { if (outParts.length < 2000) outParts.push(String(simpleArg(m))); },
+      log: function (m) { if (outParts.length < 2000) outParts.push(String(m) + '\n'); }
+    };
+    function finish() {
+      report.out = outParts.join('');
+      report.frames = frame;
+      try { if (p) p.exit(); } catch (e) {}
+      holder.remove();
+      window.__pdeGuard = oldGuard; window.__pdeIdiv = oldIdiv;
+      if (oldLogger) Processing.logger = oldLogger;
+      return report;
+    }
+    function fail(stage, e) {
+      report.stage = stage;
+      var msg = e && e.message ? e.message : String(e);
+      report.error = explain(msg);
+      return finish();
+    }
+    var code = addLoopGuards(rewriteIntDivision(report.code));
+    var sketch;
+    try { sketch = Processing.compile(code); } catch (e) { return fail('compile', e); }
+    var attach = sketch.attach;
+    sketch.attach = function (pp, scope) {
+      p = pp;
+      ['CLOSE', 'PIE', 'CHORD', 'OPEN', 'CENTER', 'CORNER', 'CORNERS', 'RADIUS', 'HSB', 'RGB', 'LEFT', 'RIGHT',
+        'TOP', 'BOTTOM', 'GRAY', 'INVERT', 'THRESHOLD', 'BLUR', 'POSTERIZE', 'ROUND', 'SQUARE', 'PROJECT'].forEach(function (k) { report.K[k] = pp[k]; });
+      var Ch = pp.Character;
+      if (Ch && Ch.prototype && !Ch.prototype.__pde && typeof Symbol !== 'undefined' && Symbol.toPrimitive) {
+        Ch.prototype[Symbol.toPrimitive] = function (hint) { return hint === 'number' ? this.code : String.fromCharCode(this.code); };
+        Ch.prototype.__pde = true;
+      }
+      pp.saveFrame = function () { report.counts.saveFrame = (report.counts.saveFrame || 0) + 1; };
+      pp.save = function () { report.counts.save = (report.counts.save || 0) + 1; };
+      pp.link = function () {};
+      // Processing.js після size() перепризначає функції малювання, тому обгортаємо через властивість:
+      // будь-яке нове призначення теж потрапляє в обгортку.
+      function hook(fn, makeWrapper) {
+        var orig = pp[fn];
+        if (typeof orig !== 'function') return;
+        var wrapped = makeWrapper(function () { return orig; });
+        try {
+          Object.defineProperty(pp, fn, { configurable: true, enumerable: true,
+            get: function () { return wrapped; },
+            set: function (v) { orig = v; } });
+        } catch (e) { pp[fn] = wrapped; }
+      }
+      LOGGED.forEach(function (fn) {
+        hook(fn, function (getOrig) {
+          return function () {
+            if (fn === 'fill') { fillKey = Array.prototype.map.call(arguments, simpleArg).join(','); noFillOn = false; }
+            else if (fn === 'noFill') noFillOn = true;
+            if (frame !== lastFr) { lastFr = frame; perFrame = 0; }
+            if (!logFull && ++perFrame <= 1500) {            // не більше 1500 записів на кадр
+              report.log.push({ f: fn, a: Array.prototype.map.call(arguments, simpleArg), fr: frame, ph: phase, fill: noFillOn ? null : fillKey });
+              if (report.log.length > 250000) logFull = true;
+            }
+            return getOrig().apply(this, arguments);
+          };
+        });
+      });
+      COUNTED.forEach(function (fn) {
+        hook(fn, function (getOrig) {
+          return function () { report.counts[fn] = (report.counts[fn] || 0) + 1; return getOrig().apply(this, arguments); };
+        });
+      });
+      pp.randomSeed(7);
+      return attach.call(this, pp, scope);
+    };
+    try { new Processing(cv, sketch); } catch (e) { return fail('runtime', e); }
+    try { p.noLoop(); } catch (e) {}
+    report.w = p.width; report.h = p.height;
+    report.isStatic = typeof p.draw !== 'function';
+    report.userFns = {};
+    ['mousePressed', 'mouseReleased', 'mouseClicked', 'mouseDragged', 'mouseMoved', 'keyPressed', 'keyReleased', 'keyTyped'].forEach(function (fn) {
+      report.userFns[fn] = typeof p[fn] === 'function';
+    });
+    var ctx = cv.getContext('2d');
+    function snap(name, from) {
+      var data = null;
+      try { data = ctx.getImageData(0, 0, cv.width, cv.height); } catch (e) {}
+      report.phases[name] = { from: from, to: frame, img: data };
+      report.order.push(name);
+    }
+    function frames(n) {
+      if (report.isStatic) return;
+      for (var i = 0; i < n; i++) { frame++; guard = 0; phaseStart = performance.now(); p.redraw(); }
+    }
+    function mouse(x, y) { p.mouseX = Math.round(x); p.mouseY = Math.round(y); }
+    function call(fn) { if (typeof p[fn] === 'function') { guard = 0; phaseStart = performance.now(); p[fn](); } }
+    var W = p.width, H = p.height;
+    try {
+      snap('setup', 0);
+      phase = 'start'; mouse(W / 2, H / 2); var f0 = frame + 1; frames(3); snap('start', f0);
+      phase = 'anim'; f0 = frame + 1; frames(opts.frames || 150); snap('anim', f0);
+      phase = 'mouseTL'; f0 = frame + 1; mouse(W * 0.25, H * 0.25); call('mouseMoved'); frames(3); snap('mouseTL', f0);
+      phase = 'mouseBR'; f0 = frame + 1; mouse(W * 0.75, H * 0.75); call('mouseMoved'); frames(3); snap('mouseBR', f0);
+      phase = 'click'; f0 = frame + 1;
+      p.mouseButton = p.LEFT; p.__mousePressed = true; call('mousePressed'); frames(1);
+      p.__mousePressed = false; call('mouseReleased'); call('mouseClicked'); frames(2); snap('click', f0);
+      phase = 'click2'; f0 = frame + 1;
+      mouse(W * 0.3, H * 0.6); p.__mousePressed = true; call('mousePressed'); frames(1);
+      p.__mousePressed = false; call('mouseReleased'); call('mouseClicked'); frames(2); snap('click2', f0);
+      phase = 'drag'; f0 = frame + 1; mouse(W * 0.2, H * 0.5); frames(1);
+      p.__mousePressed = true; call('mousePressed');
+      for (var d = 1; d <= 8; d++) { mouse(W * (0.2 + d * 0.07), H * (0.5 + 0.3 * Math.sin(d))); call('mouseDragged'); frames(1); }
+      p.__mousePressed = false; call('mouseReleased'); frames(1); snap('drag', f0);
+      (opts.keys || ['a', ' ', 'UP', 'RIGHT']).forEach(function (k) {
+        phase = 'key:' + k; f0 = frame + 1;
+        if (/^[A-Z]{2,}$/.test(k)) { p.key = new p.Character(p.CODED); p.keyCode = p[k]; }
+        else { p.key = new p.Character(k); p.keyCode = k.toUpperCase().charCodeAt(0); }
+        p.__keyPressed = true; call('keyPressed'); call('keyTyped'); frames(1);
+        p.__keyPressed = false; call('keyReleased'); frames(1);
+        snap('key:' + k, f0);
+      });
+      report.ok = true;
+    } catch (e) { return fail('runtime', e); }
+    return finish();
+  }
+
   // ---------- Публічний інтерфейс ----------
   window.PDE = {
     mount: function (elOrSel, opts) {
@@ -1672,6 +1925,11 @@ document.addEventListener('click', function (e) {
       window.PDE.main = inst;
       return inst;
     },
+    headless: headless,
+    loadPjs: loadPjs,
+    highlight: highlight,
+    mask: mask,
+    SHAPES: SHAPES,
     // для тестів
     _rewrite: function (c) { return addLoopGuards(rewriteIntDivision(c)); },
     _check: function (code) { var t = { name: 't', code: code }; return checkBrackets(t) || checkSemicolons(t); }
@@ -1692,6 +1950,770 @@ document.addEventListener('click', function (e) {
     var name = t.getAttribute('data-open-ex');
     data.examples.forEach(function (ex) { if (ex.name === name) ide.loadExample(ex); });
     document.getElementById('praktykum').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();
+/* Критерії автоматичного оцінювання практикуму кожного уроку.
+ * Кожен урок: рівень 1 — 6 балів, рівень 2 — 3 бали, рівень 3 — 3 бали (разом 12).
+ * Перевірка спирається на звіт невидимого запуску (PDE.headless): записані виклики функцій
+ * малювання, вивід у консоль, кадри при різних положеннях миші, клік, перетягування, клавіші.
+ */
+(function () {
+  'use strict';
+
+  // ---------- Помічники ----------
+  function helpers(r) {
+    var noComments = r.code.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+    var main = r.isStatic ? 0 : (r.phases.start ? r.phases.start.to : 0);
+    var SH = PDE.SHAPES;
+    var h = {
+      r: r,
+      src: noComments,
+      W: r.w, H: r.h,
+      main: main,
+      has: function (re) { return re.test(noComments); },
+      count: function (re) { var g = new RegExp(re.source, 'g' + (re.ignoreCase ? 'i' : '')); return (noComments.match(g) || []).length; },
+      // виклики функції fn (або масиву назв); where — фаза, масив фаз або номер кадру
+      calls: function (fn, where) {
+        var fns = Array.isArray(fn) ? fn : [fn];
+        return r.log.filter(function (e) {
+          if (fns.indexOf(e.f) < 0) return false;
+          if (where == null) return true;
+          if (typeof where === 'number') return e.fr === where;
+          if (Array.isArray(where)) return where.indexOf(e.ph) >= 0;
+          return e.ph === where;
+        });
+      },
+      // функцію написано в коді учня і вона справді виконувалась (бібліотека сама викликає деякі функції)
+      used: function (fn) {
+        return new RegExp('\\b' + fn + '\\s*\\(').test(noComments) &&
+          ((r.counts[fn] || 0) > 0 || r.log.some(function (e) { return e.f === fn; }));
+      },
+      // що видно в «головному» кадрі: виклики setup() і першого кадру draw()
+      scene: function (fn) {
+        return r.log.filter(function (e) { return (e.fr === 0 || e.fr === main) && (fn ? (Array.isArray(fn) ? fn.indexOf(e.f) >= 0 : e.f === fn) : SH[e.f]); });
+      },
+      lastOf: function (ph) { return r.phases[ph] ? r.phases[ph].to : 0; },
+      frame: function (fr, fn) { return r.log.filter(function (e) { return e.fr === fr && (fn ? (Array.isArray(fn) ? fn.indexOf(e.f) >= 0 : e.f === fn) : SH[e.f]); }); },
+      near: function (a, b, t) { return Math.abs(a - b) <= (t == null ? 4 : t); },
+      // колір заливки запису журналу → [r, g, b] (без урахування HSB)
+      rgb: function (fillKey) {
+        if (fillKey == null) return null;
+        var n = String(fillKey).split(',').map(Number);
+        if (n.length >= 3) return [n[0], n[1], n[2]];
+        var v = n[0];
+        if (v > 255 || v < 0) return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+        return [v, v, v];
+      },
+      isDark: function (fillKey) { var c = h.rgb(fillKey); return !!c && c[0] < 60 && c[1] < 60 && c[2] < 60; },
+      distinct: function (arr) { var o = {}; arr.forEach(function (x) { o[x] = 1; }); return Object.keys(o).length; },
+      changed: function (a, b) {
+        var A = r.phases[a] && r.phases[a].img, B = r.phases[b] && r.phases[b].img;
+        if (!A || !B || A.data.length !== B.data.length) return false;
+        for (var i = 0; i < A.data.length; i += 41) if (A.data[i] !== B.data[i]) return true;
+        return false;
+      },
+      px: function (ph, x, y) {
+        var im = r.phases[ph] && r.phases[ph].img; if (!im) return null;
+        x = Math.max(0, Math.min(im.width - 1, Math.round(x))); y = Math.max(0, Math.min(im.height - 1, Math.round(y)));
+        var i = (y * im.width + x) * 4; return [im.data[i], im.data[i + 1], im.data[i + 2]];
+      },
+      lineIs: function (e, x1, y1, x2, y2, t) {
+        var a = e.a;
+        return (h.near(a[0], x1, t) && h.near(a[1], y1, t) && h.near(a[2], x2, t) && h.near(a[3], y2, t)) ||
+               (h.near(a[0], x2, t) && h.near(a[1], y2, t) && h.near(a[2], x1, t) && h.near(a[3], y1, t));
+      },
+      // фігура біля точки (x, y): центр еліпса/кола, кут або центр прямокутника, будь-яка вершина
+      shapeNear: function (list, x, y, t) {
+        return list.some(function (e) {
+          var a = e.a;
+          for (var i = 0; i + 1 < a.length; i += 2) if (typeof a[i] === 'number' && h.near(a[i], x, t) && h.near(a[i + 1], y, t)) return true;
+          if ((e.f === 'rect' || e.f === 'square') && a.length >= 3) {
+            var w = a[2], hh = a.length > 3 ? a[3] : a[2];
+            if (h.near(a[0] + w / 2, x, t) && h.near(a[1] + hh / 2, y, t)) return true;
+          }
+          return false;
+        });
+      },
+      userFunction: function (name) { return new RegExp('\\b(void|int|float|boolean|color|String)\\s+' + name + '\\s*\\(').test(noComments); },
+      classNamed: function (name) { return new RegExp('\\bclass\\s+' + name + '\\b').test(noComments); },
+      classes: function () { var m = noComments.match(/\bclass\s+([A-Z]\w*)/g) || []; return m.map(function (s) { return s.replace(/class\s+/, ''); }); },
+      // тіло функції name (за дужками)
+      body: function (name) {
+        var m = new RegExp('\\b' + name + '\\s*\\([^)]*\\)\\s*\\{').exec(noComments); if (!m) return '';
+        var i = m.index + m[0].length, d = 1, st = i;
+        while (i < noComments.length && d) { if (noComments[i] === '{') d++; else if (noComments[i] === '}') d--; i++; }
+        return noComments.slice(st, i - 1);
+      },
+      // траєкторії: k-та фігура fn у кожному кадрі фази → масив траєкторій
+      tracks: function (fn, ph) {
+        var byFrame = {}, frames = [];
+        r.log.forEach(function (e) {
+          if (e.ph !== ph || (Array.isArray(fn) ? fn.indexOf(e.f) < 0 : e.f !== fn)) return;
+          if (!byFrame[e.fr]) { byFrame[e.fr] = []; frames.push(e.fr); }
+          byFrame[e.fr].push(e);
+        });
+        var n = frames.length ? Math.min.apply(null, frames.map(function (f) { return byFrame[f].length; })) : 0;
+        var out = [];
+        for (var k = 0; k < Math.min(n, 50); k++) out.push(frames.map(function (f) { return byFrame[f][k]; }));
+        return out;
+      },
+      // перший еліпс/коло/прямокутник у кожному кадрі фази — для перевірки руху
+      track: function (fn, ph) {
+        var seen = {}, out = [];
+        r.log.forEach(function (e) {
+          if (e.ph !== ph || (Array.isArray(fn) ? fn.indexOf(e.f) < 0 : e.f !== fn) || seen[e.fr]) return;
+          seen[e.fr] = 1; out.push(e);
+        });
+        return out;
+      }
+    };
+    return h;
+  }
+
+  function I(level, pts, text, check) { return { level: level, pts: pts, text: text, check: check }; }
+  var runs = I(1, 1, 'Програма запускається без помилок', function () { return true; });
+
+  // ---------- Критерії уроків ----------
+  var R = {};
+
+  R[1] = { items: [
+    runs,
+    I(1, 1, 'Вікно має розмір 500×500 (size(500, 500))', function (h) { return h.W === 500 && h.H === 500; }),
+    I(1, 2, 'Є діагональ з кута (0, 0) у кут (500, 500)', function (h) { return h.scene('line').some(function (e) { return h.lineIs(e, 0, 0, 500, 500, 6); }); }),
+    I(1, 2, 'Є друга діагональ з (500, 0) у (0, 500) — разом «хрест»', function (h) { return h.scene('line').some(function (e) { return h.lineIs(e, 500, 0, 0, 500, 6); }); }),
+    I(2, 1, 'Будиночок: є rect() і щонайменше ще дві лінії (дах)', function (h) { return h.scene('rect').length >= 1 && h.scene('line').length >= 4; }),
+    I(2, 1, 'Є сонце — ellipse() або circle()', function (h) { return h.scene(['ellipse', 'circle']).length >= 1; }),
+    I(2, 1, 'Малюнок складається щонайменше з 8 фігур', function (h) { return h.scene().length >= 8; }),
+    I(3, 1, 'Ініціал: разом щонайменше 12 команд line() і rect()', function (h) { return h.scene(['line', 'rect']).length >= 12; }),
+    I(3, 1, 'Використано щонайменше 3 різні види фігур', function (h) { return h.distinct(h.scene().map(function (e) { return e.f; })) >= 3; }),
+    I(3, 1, 'Фігури (крім діагоналей хреста) є в усіх чотирьох чвертях вікна', function (h) {
+      var q = {};
+      h.scene().filter(function (e) { return !(e.f === 'line' && (h.lineIs(e, 0, 0, 500, 500, 6) || h.lineIs(e, 500, 0, 0, 500, 6))); }).forEach(function (e) { for (var i = 0; i + 1 < e.a.length; i += 2) if (typeof e.a[i] === 'number') q[(e.a[i] < h.W / 2 ? 'L' : 'R') + (e.a[i + 1] < h.H / 2 ? 'T' : 'B')] = 1; });
+      return Object.keys(q).length === 4;
+    })
+  ] };
+
+  R[2] = { items: [
+    runs,
+    I(1, 1, 'Є корпус світлофора — rect()', function (h) { return h.scene('rect').length >= 1; }),
+    I(1, 2, 'Є щонайменше три кола (ellipse/circle)', function (h) { return h.scene(['ellipse', 'circle']).length >= 3; }),
+    I(1, 2, 'Три кола розташовані одне під одним (однаковий x, різні y)', function (h) {
+      var c = h.scene(['ellipse', 'circle']);
+      for (var i = 0; i < c.length; i++) {
+        var col = c.filter(function (e) { return h.near(e.a[0], c[i].a[0], 3); });
+        if (h.distinct(col.map(function (e) { return Math.round(e.a[1]); })) >= 3) return true;
+      }
+      return false;
+    }),
+    I(2, 1, 'Використано rectMode(CENTER)', function (h) { return h.calls('rectMode').some(function (e) { return e.a[0] === h.r.K.CENTER; }); }),
+    I(2, 1, 'Змінено товщину ліній strokeWeight()', function (h) { return h.calls('strokeWeight').some(function (e) { return e.a[0] !== 1; }); }),
+    I(2, 1, 'Малюнок (робот) — щонайменше 6 фігур', function (h) { return h.scene().length >= 6; }),
+    I(3, 1, 'Зірка: beginShape(), щонайменше 5 vertex() і endShape(CLOSE)', function (h) {
+      return h.calls('beginShape').length > 0 && h.calls('vertex').length >= 5 && h.calls('endShape').some(function (e) { return e.a[0] === h.r.K.CLOSE; });
+    }),
+    I(3, 1, 'Є дуга arc()', function (h) { return h.calls('arc').length > 0; }),
+    I(3, 1, '«Пакмен»: arc() у режимі PIE', function (h) { return h.calls('arc').some(function (e) { return e.a[6] === h.r.K.PIE; }); })
+  ] };
+
+  R[3] = { items: [
+    runs,
+    I(1, 1, 'Намальовано щонайменше 3 фігури', function (h) { return h.scene().length >= 3; }),
+    I(1, 2, 'Використано колір RGB: fill() з трьома числами', function (h) { return h.calls('fill').some(function (e) { return e.a.length >= 3; }); }),
+    I(1, 2, 'Щонайменше 3 різні кольори заливки', function (h) { return h.distinct(h.calls('fill').map(function (e) { return e.a.join(','); })) >= 3; }),
+    I(2, 1, 'Прозорість: щонайменше 3 заливки з альфа-каналом (4-е число менше 255)', function (h) {
+      return h.calls('fill').filter(function (e) { return e.a.length === 4 && e.a[3] < 255; }).length >= 3;
+    }),
+    I(2, 1, 'Три кола перекриваються (діаграма Венна)', function (h) {
+      var c = h.scene(['ellipse', 'circle']);
+      var pairs = 0;
+      for (var i = 0; i < c.length; i++) for (var j = i + 1; j < c.length; j++) {
+        var ri = c[i].a[2] / 2, rj = c[j].a[2] / 2;
+        if (Math.hypot(c[i].a[0] - c[j].a[0], c[i].a[1] - c[j].a[1]) < ri + rj) pairs++;
+      }
+      return c.length >= 3 && pairs >= 2;
+    }),
+    I(2, 1, 'Контур вимкнено noStroke()', function (h) { return h.used('noStroke'); }),
+    I(3, 1, 'Композиція: щонайменше 5 прямокутників', function (h) { return h.scene('rect').length >= 5; }),
+    I(3, 1, 'Щонайменше 5 різних кольорів', function (h) { return h.distinct(h.calls('fill').map(function (e) { return e.a.join(','); })) >= 5; }),
+    I(3, 1, 'Використано HSB (colorMode), шістнадцятковий колір #RRGGBB або змінну типу color', function (h) {
+      return h.calls('colorMode').some(function (e) { return e.a[0] === h.r.K.HSB; }) || /#[0-9A-Fa-f]{6}\b/.test(h.r.code) || h.has(/\bcolor\s+\w+\s*=/);
+    })
+  ] };
+
+  R[4] = { items: [
+    runs,
+    I(1, 2, 'Оголошено щонайменше 3 змінні (int або float)', function (h) { return h.count(/\b(int|float)\s+[A-Za-z_]\w*\s*[=;,]/) >= 3; }),
+    I(1, 2, 'ellipse() отримує змінні як аргументи', function (h) { return h.has(/\bellipse\s*\(\s*[A-Za-z_]/); }),
+    I(1, 1, 'Коло намальовано', function (h) { return h.scene(['ellipse', 'circle']).length >= 1; }),
+    I(2, 1, 'Є змінні charX і charY', function (h) { return h.has(/\bcharX\b/) && h.has(/\bcharY\b/); }),
+    I(2, 1, 'Щонайменше 3 фігури мають координати через charX/charY', function (h) {
+      return h.count(/\b(rect|ellipse|line|triangle|circle|quad|arc)\s*\([^;]*\bchar[XY]\b/) >= 3;
+    }),
+    I(2, 1, 'Координати частин обчислюються від змінних (charX + … або charY - …)', function (h) { return h.has(/\bchar[XY]\s*[-+]/); }),
+    I(3, 1, 'Є змінна масштабу типу float (наприклад, scale)', function (h) { return h.has(/\bfloat\s+\w*[Ss]cale\w*\s*=/) || h.has(/\bfloat\s+s\s*=/); }),
+    I(3, 1, 'Розміри множаться на змінну масштабу', function (h) { return h.has(/\*\s*\w*[Ss]cale\w*\b/) || h.has(/\*\s*s\b/); }),
+    I(3, 1, 'Фігур персонажа щонайменше 5', function (h) { return h.scene().length >= 5; })
+  ] };
+
+  // зміщення кожної фігури fn за фазу: [{dx, dy, dw}, ...]
+  function moves(h, fn, ph) {
+    return h.tracks(fn, ph || 'anim').filter(function (t) { return t.length >= 10; }).map(function (t) {
+      var a = t[1].a, b = t[t.length - 1].a;
+      return { dx: b[0] - a[0], dy: b[1] - a[1], dw: (b[2] || 0) - (a[2] || 0) };
+    });
+  }
+
+  R[5] = { items: [
+    runs,
+    I(1, 3, 'Коло рухається вниз', function (h) { return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dy > 5; }); }),
+    I(1, 2, 'Коло рухається по діагоналі: і праворуч, і вниз одночасно', function (h) {
+      return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dx > 5 && m.dy > 5; });
+    }),
+    I(2, 1, 'Коло збільшується', function (h) { return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dw > 2; }); }),
+    I(2, 1, 'Колір змінюється з часом (fill() з різними значеннями в різних кадрах)', function (h) {
+      return h.distinct(h.calls('fill', 'anim').map(function (e) { return e.a.join(','); })) >= 5;
+    }),
+    I(2, 1, 'Колір світлішає: від темного до світлого', function (h) {
+      return h.tracks('fill', 'anim').some(function (t) {
+        if (t.length < 10) return false;
+        var a = h.rgb(t[0].a.join(',')), b = h.rgb(t[t.length - 1].a.join(','));
+        return !!a && !!b && (b[0] + b[1] + b[2]) - (a[0] + a[1] + a[2]) > 60;
+      });
+    }),
+    I(3, 1, 'Колір неба (background) змінюється з часом', function (h) {
+      return h.distinct(h.calls('background', 'anim').map(function (e) { return e.a.join(','); })) >= 5;
+    }),
+    I(3, 1, 'Небо темнішає', function (h) {
+      var b = h.calls('background', 'anim'); if (b.length < 10) return false;
+      var x = h.rgb(b[0].a.join(',')), y = h.rgb(b[b.length - 1].a.join(','));
+      return !!x && !!y && (x[0] + x[1] + x[2]) - (y[0] + y[1] + y[2]) > 20;
+    }),
+    I(3, 1, 'Сцена: щонайменше 3 фігури в кадрі', function (h) { return h.frame(h.lastOf('anim')).length >= 3; })
+  ] };
+
+  R[6] = { items: [
+    runs,
+    I(1, 1, 'Використано mouseX і mouseY', function (h) { return h.has(/\bmouseX\b/) && h.has(/\bmouseY\b/); }),
+    I(1, 2, 'Курсор у лівому верхньому куті — персонаж поруч із ним', function (h) {
+      return h.shapeNear(h.frame(h.lastOf('mouseTL')), h.W * 0.25, h.H * 0.25, 40);
+    }),
+    I(1, 2, 'Курсор у правому нижньому куті — персонаж переміщується туди', function (h) {
+      return h.shapeNear(h.frame(h.lastOf('mouseBR')), h.W * 0.75, h.H * 0.75, 40);
+    }),
+    I(2, 1, 'Колір залежить від положення миші', function (h) {
+      var a = h.frame(h.lastOf('mouseTL'), 'fill').map(function (e) { return e.a.join(','); }).join('|');
+      var b = h.frame(h.lastOf('mouseBR'), 'fill').map(function (e) { return e.a.join(','); }).join('|');
+      return a !== b;
+    }),
+    I(2, 1, 'Є функція-подія mousePressed()', function (h) { return h.r.userFns.mousePressed; }),
+    I(2, 1, 'Після клацання змінюється колір фону', function (h) {
+      var a = h.frame(h.lastOf('mouseBR'), 'background').map(function (e) { return e.a.join(','); }).join('|');
+      var b = h.frame(h.lastOf('click'), 'background').map(function (e) { return e.a.join(','); }).join('|');
+      return a !== b;
+    }),
+    I(3, 1, 'Малювання неперервною лінією line(pmouseX, pmouseY, mouseX, mouseY)', function (h) { return h.has(/line\s*\(\s*pmouseX/); }),
+    I(3, 1, 'Симетрія: використано width - mouseX', function (h) { return h.has(/width\s*-\s*mouseX/); }),
+    I(3, 1, 'Під час перетягування миші малюються лінії', function (h) { return h.calls('line', 'drag').length >= 6; })
+  ] };
+
+  function fillAt(h, ph, x, y) {
+    var list = h.frame(h.lastOf(ph), 'rect').filter(function (e) { return h.near(e.a[0], x, 3) && h.near(e.a[1], y, 3); });
+    return list.length ? list[list.length - 1].fill : undefined;
+  }
+  R[7] = { frames: 300, items: [
+    runs,
+    I(1, 1, 'Використано умову if', function (h) { return h.has(/\bif\s*\(/); }),
+    I(1, 1, 'Намальовано щонайменше 4 прямокутники (квадрати)', function (h) { return h.frame(h.lastOf('mouseTL'), 'rect').length >= 4; }),
+    I(1, 2, 'Курсор у лівому верхньому квадраті — цей квадрат чорний', function (h) { return h.isDark(fillAt(h, 'mouseTL', 0, 0)); }),
+    I(1, 1, 'Курсор у правому нижньому квадраті — він чорний, а лівий верхній уже ні', function (h) {
+      return h.isDark(fillAt(h, 'mouseBR', h.W / 2, h.H / 2)) && fillAt(h, 'mouseBR', 0, 0) !== undefined && !h.isDark(fillAt(h, 'mouseBR', 0, 0));
+    }),
+    I(2, 1, 'М\'яч відскакує: напрямок руху змінюється', function (h) {
+      var t = h.track(['ellipse', 'circle'], 'anim'); var flips = 0;
+      for (var i = 2; i < t.length; i++) {
+        var d1x = t[i - 1].a[0] - t[i - 2].a[0], d2x = t[i].a[0] - t[i - 1].a[0];
+        var d1y = t[i - 1].a[1] - t[i - 2].a[1], d2y = t[i].a[1] - t[i - 1].a[1];
+        if (d1x * d2x < 0 || d1y * d2y < 0) flips++;
+      }
+      return flips >= 1;
+    }),
+    I(2, 1, 'Колір м\'яча змінюється під час гри', function (h) {
+      return h.distinct(h.track(['ellipse', 'circle'], 'anim').map(function (e) { return e.fill; })) >= 2;
+    }),
+    I(2, 1, 'Швидкість змінює знак (speed *= -1 або speed = -speed)', function (h) { return h.has(/\*=\s*-\s*1\b/) || h.has(/=\s*-\s*\w*[Ss]peed/); }),
+    I(3, 1, 'Ракетка рухається за мишею', function (h) {
+      var a = h.frame(h.lastOf('mouseTL'), 'rect').map(function (e) { return Math.round(e.a[0]); }).join(',');
+      var b = h.frame(h.lastOf('mouseBR'), 'rect').map(function (e) { return Math.round(e.a[0]); }).join(',');
+      return h.has(/rect\s*\([^;]*mouseX/) && a !== b;
+    }),
+    I(3, 1, 'Є напис для кінця гри (text())', function (h) { return h.has(/\btext\s*\(\s*"/); }),
+    I(3, 1, 'Використано логічний оператор && або ||', function (h) { return h.has(/&&|\|\|/); })
+  ] };
+
+  R[8] = { items: [
+    runs,
+    I(1, 1, 'Використано цикл for', function (h) { return h.has(/\bfor\s*\(/); }),
+    I(1, 2, 'У кадрі щонайменше 10 кіл', function (h) { return h.scene(['ellipse', 'circle']).length >= 10; }),
+    I(1, 2, '10 кіл стоять в один рядок (однаковий y)', function (h) {
+      var c = h.scene(['ellipse', 'circle']); var by = {};
+      c.forEach(function (e) { var k = Math.round(e.a[1]); by[k] = (by[k] || 0) + 1; });
+      return Object.keys(by).some(function (k) { return by[k] >= 10; });
+    }),
+    I(2, 1, 'Вкладені цикли (цикл усередині циклу)', function (h) { return h.has(/\bfor\s*\([^)]*\)\s*\{[^}]*\bfor\s*\(/); }),
+    I(2, 1, 'Шахівниця: щонайменше 64 прямокутники', function (h) { return h.scene(['rect', 'square']).length >= 64; }),
+    I(2, 1, 'Чергування кольорів через остачу %', function (h) { return h.has(/%\s*2/); }),
+    I(3, 1, 'Використано dist()', function (h) { return h.used('dist'); }),
+    I(3, 1, 'Кола різного розміру', function (h) { return h.distinct(h.frame(h.lastOf('mouseTL'), ['ellipse', 'circle']).map(function (e) { return Math.round(e.a[2]); })) >= 3; }),
+    I(3, 1, 'Розміри кіл змінюються, коли рухається миша', function (h) {
+      var a = h.frame(h.lastOf('mouseTL'), ['ellipse', 'circle']).map(function (e) { return Math.round(e.a[2]); }).join(',');
+      var b = h.frame(h.lastOf('mouseBR'), ['ellipse', 'circle']).map(function (e) { return Math.round(e.a[2]); }).join(',');
+      return a !== b;
+    })
+  ] };
+
+  R[9] = { items: [
+    runs,
+    I(1, 1, 'Використано random()', function (h) { return h.used('random'); }),
+    I(1, 1, 'Ціле випадкове число: int(random(...))', function (h) { return h.has(/\bint\s*\(\s*random\s*\(/); }),
+    I(1, 1, 'Є функція-подія mousePressed()', function (h) { return h.r.userFns.mousePressed; }),
+    I(1, 2, 'Після клацання кубик показано крапками: від 1 до 6 кружечків', function (h) {
+      var n = h.frame(h.lastOf('click'), ['ellipse', 'circle']).length; return n >= 1 && n <= 6;
+    }),
+    I(2, 1, 'Зоряне небо: щонайменше 200 зірок у кадрі', function (h) { return h.frame(h.lastOf('anim'), ['point', 'ellipse', 'circle']).length >= 200; }),
+    I(2, 1, 'Зірки створено в циклі', function (h) { return h.has(/\bfor\s*\(/); }),
+    I(2, 1, 'Зірки мерехтять: яскравість змінюється між кадрами', function (h) {
+      var f1 = h.frame(h.lastOf('start'), ['fill', 'stroke']).map(function (e) { return e.a.join(','); }).join('|');
+      var f2 = h.frame(h.lastOf('anim'), ['fill', 'stroke']).map(function (e) { return e.a.join(','); }).join('|');
+      return f1 !== f2 && f1.length > 0;
+    }),
+    I(3, 1, 'Використано noise()', function (h) { return h.used('noise'); }),
+    I(3, 1, 'Використано randomSeed() для повторюваного результату', function (h) { return h.has(/randomSeed\s*\(/); }),
+    I(3, 1, 'Клавіша s зберігає постер (saveFrame())', function (h) { return h.has(/key\s*==\s*'s'/) && h.has(/saveFrame\s*\(/); })
+  ], keys: ['s', 'a', ' '] };
+
+  R[10] = { items: [
+    runs,
+    I(1, 1, 'Оголошено функцію drawFlower з параметрами', function (h) { return h.has(/void\s+drawFlower\s*\(\s*(float|int)\s+\w+\s*,/); }),
+    I(1, 2, 'drawFlower() викликається щонайменше 5 разів (або в циклі)', function (h) {
+      return h.count(/\bdrawFlower\s*\(/) - 1 >= 5 || h.has(/\bfor\s*\([^)]*\)\s*\{[^}]*drawFlower\s*\(/);
+    }),
+    I(1, 2, 'На клумбі щонайменше 5 квіток (багато пелюсток у кадрі)', function (h) { return h.scene(['ellipse', 'circle']).length >= 30; }),
+    I(2, 1, 'Є функції move(), bounce() і display()', function (h) { return h.userFunction('move') && h.userFunction('bounce') && h.userFunction('display'); }),
+    I(2, 1, 'draw() викликає move(), bounce() і display()', function (h) { var b = h.body('void\\s+draw'); return /\bmove\s*\(\s*\)/.test(b) && /\bbounce\s*\(\s*\)/.test(b) && /\bdisplay\s*\(\s*\)/.test(b); }),
+    I(2, 1, 'Є анімація', function (h) { return h.changed('start', 'anim'); }),
+    I(3, 1, 'Функція персонажа має 4 параметри', function (h) { return h.has(/void\s+\w+\s*\(\s*\w+\s+\w+\s*,\s*\w+\s+\w+\s*,\s*\w+\s+\w+\s*,\s*\w+\s+\w+\s*\)/); }),
+    I(3, 1, 'Один із параметрів — boolean (настрій)', function (h) { return h.has(/void\s+\w+\s*\([^)]*\bboolean\s+\w+/); }),
+    I(3, 1, 'Натовп: функцію персонажа викликано в циклі', function (h) {
+      var m = h.src.match(/void\s+(\w+)\s*\([^)]*\bboolean\s+\w+[^)]*\)/); if (!m) return false;
+      return new RegExp('\\bfor\\s*\\([^)]*\\)\\s*\\{[^}]*\\b' + m[1] + '\\s*\\(').test(h.src);
+    })
+  ] };
+
+  R[11] = { items: [
+    runs,
+    I(1, 1, 'Є клас Car', function (h) { return h.classNamed('Car'); }),
+    I(1, 2, 'Створено щонайменше 3 машини (new Car)', function (h) { return h.count(/\bnew\s+Car\s*\(/) >= 3; }),
+    I(1, 2, 'Машини їдуть: щонайменше 3 прямокутники, що рухаються', function (h) {
+      return h.frame(h.lastOf('anim'), 'rect').length >= 3 && h.changed('start', 'anim');
+    }),
+    I(2, 1, 'Є клас Ball', function (h) { return h.classNamed('Ball'); }),
+    I(2, 1, 'У Ball є конструктор і методи move(), bounce(), display()', function (h) {
+      return h.has(/\bBall\s*\([^)]*\)\s*\{/) && h.has(/void\s+move\s*\(/) && h.has(/void\s+bounce\s*\(/) && h.has(/void\s+display\s*\(/);
+    }),
+    I(2, 1, 'Створено щонайменше 3 м\'ячі', function (h) { return h.count(/\bnew\s+Ball\s*\(/) >= 3 || (h.has(/new\s+Ball\s*\[/) && h.has(/\bnew\s+Ball\s*\(/)); }),
+    I(3, 1, 'Є клас персонажа (третій клас)', function (h) { return h.classes().filter(function (c) { return c !== 'Car' && c !== 'Ball'; }).length >= 1; }),
+    I(3, 1, 'У класі персонажа є методи display(), move() і jiggle()', function (h) { return h.has(/void\s+jiggle\s*\(/) && h.has(/void\s+display\s*\(/); }),
+    I(3, 1, 'Метод isUnderMouse() повертає boolean', function (h) { return h.has(/boolean\s+isUnderMouse\s*\(/); })
+  ] };
+
+  R[12] = { items: [
+    runs,
+    I(1, 1, 'Є масив щонайменше з 10 чисел', function (h) {
+      var m = h.src.match(/\b(int|float)\s*\[\s*\]\s*\w+\s*=\s*\{([^}]*)\}/); return !!m && m[2].split(',').length >= 10;
+    }),
+    I(1, 1, 'Масив перебирається циклом до .length', function (h) { return h.has(/\.length\b/) && h.has(/\bfor\s*\(/); }),
+    I(1, 2, 'Діаграма: щонайменше 10 стовпчиків', function (h) { return h.scene('rect').length >= 10; }),
+    I(1, 1, 'Стовпчики різної висоти', function (h) { return h.distinct(h.scene('rect').map(function (e) { return Math.round(e.a[3]); })) >= 3; }),
+    I(2, 1, 'Є клас Snowflake', function (h) { return h.classNamed('Snowflake'); }),
+    I(2, 1, 'Масив або список сніжинок (Snowflake[] чи ArrayList<Snowflake>)', function (h) { return h.has(/Snowflake\s*\[\s*\]/) || h.has(/ArrayList\s*<\s*Snowflake\s*>/); }),
+    I(2, 1, 'У кадрі щонайменше 100 сніжинок', function (h) { return h.frame(h.lastOf('anim')).length >= 100; }),
+    I(3, 1, 'Використано ArrayList', function (h) { return h.has(/ArrayList\s*</); }),
+    I(3, 1, 'Клацання додає частинки', function (h) { return h.frame(h.lastOf('click')).length > h.frame(h.lastOf('mouseBR')).length + 20; }),
+    I(3, 1, 'Згаслі частинки видаляються remove()', function (h) { return h.has(/\.remove\s*\(/); })
+  ] };
+
+  R[13] = { items: [
+    runs,
+    I(1, 1, 'Використано translate() і rotate()', function (h) { return h.used('translate') && h.used('rotate'); }),
+    I(1, 1, 'Обертання огорнуто pushMatrix()/popMatrix()', function (h) { return h.used('pushMatrix') && h.used('popMatrix'); }),
+    I(1, 2, 'Кут обертання змінюється з часом', function (h) { return h.distinct(h.calls('rotate', 'anim').map(function (e) { return e.a[0].toFixed(3); })) >= 10; }),
+    I(1, 1, 'Швидкість обертання залежить від mouseX', function (h) {
+      function speed(ph) { var t = h.track('rotate', ph); if (t.length < 2) return 0; return t[t.length - 1].a[0] - t[t.length - 2].a[0]; }
+      return Math.abs(speed('mouseTL') - speed('mouseBR')) > 1e-4;
+    }),
+    I(2, 1, 'Годинник: використано second(), minute() або hour()', function (h) { return h.used('second') || h.used('minute') || h.used('hour'); }),
+    I(2, 1, 'Три стрілки — щонайменше 3 лінії', function (h) { return h.frame(h.lastOf('start'), 'line').length >= 3 || h.scene('line').length >= 3; }),
+    I(2, 1, 'Кути стрілок обчислено через sin()/cos() або rotate()', function (h) { return h.has(/\b(sin|cos)\s*\(/) || (h.has(/\brotate\s*\(/) && h.has(/\b(second|minute|hour)\s*\(/)); }),
+    I(3, 1, 'Мандала: щонайменше 12 поворотів у кадрі', function (h) { return h.frame(h.lastOf('anim'), 'rotate').length >= 12; }),
+    I(3, 1, 'Пелюстки розставлено циклом (TWO_PI / 12 або радіани)', function (h) { return h.has(/TWO_PI\s*\/\s*\w+/) || h.has(/radians\s*\(/); }),
+    I(3, 1, 'Пульсація через sin(): розміри змінюються з часом', function (h) {
+      return h.has(/\bsin\s*\(/) && h.changed('start', 'anim');
+    })
+  ] };
+
+  R[14] = { items: [
+    runs,
+    I(1, 1, 'Виведено текст text()', function (h) { return h.scene('text').some(function (e) { return String(e.a[0]).trim().length > 0; }); }),
+    I(1, 1, 'Текст вирівняно по центру вікна', function (h) {
+      return h.calls('textAlign').some(function (e) { return e.a[0] === h.r.K.CENTER; }) && h.scene('text').some(function (e) { return h.near(e.a[1], h.W / 2, 3); });
+    }),
+    I(1, 2, 'Задано шрифт або розмір (createFont/textFont/textSize)', function (h) { return h.has(/\b(textSize|textFont|createFont)\s*\(/); }),
+    I(1, 1, 'Колір тексту залежить від положення миші', function (h) {
+      var a = h.frame(h.lastOf('mouseTL'), 'fill').map(function (e) { return e.a.join(','); }).join('|');
+      var b = h.frame(h.lastOf('mouseBR'), 'fill').map(function (e) { return e.a.join(','); }).join('|');
+      return a !== b;
+    }),
+    I(2, 1, 'Завантажено зображення loadImage()', function (h) { return h.has(/loadImage\s*\(/); }),
+    I(2, 1, 'Застосовано фільтр filter()', function (h) { return h.has(/\bfilter\s*\(/); }),
+    I(2, 1, 'Фільтри перемикаються клавішами', function (h) { return h.has(/key\s*==\s*'[1-4]'/); }),
+    I(3, 1, 'Робота з пікселями: loadPixels(), pixels[], updatePixels()', function (h) { return h.has(/loadPixels\s*\(/) && h.has(/pixels\s*\[/) && h.has(/updatePixels\s*\(/); }),
+    I(3, 1, 'Яскравість залежить від відстані dist() до миші', function (h) { return h.has(/\bdist\s*\(/); }),
+    I(3, 1, 'Використано складові кольору red()/green()/blue() або brightness()', function (h) { return h.has(/\b(red|green|blue|brightness)\s*\(/); })
+  ], keys: ['1', '2', '3', '4'] };
+
+  R[15] = { items: [
+    runs,
+    I(1, 1, 'Змінено інтервал появи крапель (не 1000 мс)', function (h) { var m = h.src.match(/new\s+Timer\s*\(\s*(\d+)\s*\)/); return !!m && +m[1] !== 1000; }),
+    I(1, 2, 'Змінено кількість життів (не 3)', function (h) { var m = h.src.match(/\blives\s*=\s*(\d+)\s*;/); return !!m && +m[1] !== 3; }),
+    I(1, 2, 'Змінено швидкість падіння крапель', function (h) { return !h.has(/speed\s*=\s*baseSpeed\s*\+\s*random\s*\(\s*1\s*,\s*3\s*\)/) && h.has(/speed\s*=/); }),
+    I(2, 1, 'Є змінна рівня (level)', function (h) { return h.has(/\bint\s+level\b/); }),
+    I(2, 1, 'На екрані з\'являється напис «Рівень»', function (h) { return /text\s*\(\s*"Рівень/.test(h.r.code); }),
+    I(2, 1, 'Швидкість залежить від рівня', function (h) { return h.has(/new\s+Drop\s*\([^)]*level/) || h.has(/speed[^;]*\blevel\b/); }),
+    I(3, 1, 'Новий клас перешкоди (наприклад, Stone)', function (h) {
+      return h.classes().filter(function (c) { return ['Drop', 'Catcher', 'Timer'].indexOf(c) < 0; }).length >= 1;
+    }),
+    I(3, 1, 'Окремий список для перешкод (ще один ArrayList)', function (h) { return h.count(/ArrayList\s*<\s*\w+\s*>\s+\w+/) >= 2; }),
+    I(3, 1, 'Перешкода віднімає життя (lives-- використано щонайменше двічі)', function (h) { return h.count(/\blives\s*(--|-=)/) >= 2; })
+  ] };
+
+  R[16] = { items: [
+    runs,
+    I(1, 1, 'Щонайменше 80 непорожніх рядків коду', function (h) { return h.r.code.split('\n').filter(function (l) { return l.trim(); }).length >= 80; }),
+    I(1, 1, 'Є щонайменше один власний клас', function (h) { return h.classes().length >= 1; }),
+    I(1, 1, 'Є власна функція з параметрами', function (h) {
+      return /\b(void|int|float|boolean)\s+(?!setup|draw)\w+\s*\(\s*(int|float|boolean|String|color|\w+)\s+\w+/.test(h.src);
+    }),
+    I(1, 1, 'Використано цикл', function (h) { return h.has(/\b(for|while)\s*\(/); }),
+    I(1, 1, 'Використано умову', function (h) { return h.has(/\bif\s*\(/); }),
+    I(2, 1, 'Є взаємодія: миша або клавіатура', function (h) {
+      return h.has(/\b(mouseX|mouseY|mousePressed|keyPressed|key)\b/);
+    }),
+    I(2, 1, 'Є анімація або реакція на дії', function (h) { return h.changed('start', 'anim') || h.changed('mouseTL', 'mouseBR') || h.changed('click2', 'drag'); }),
+    I(2, 1, 'Використано масив або ArrayList', function (h) { return h.has(/\[\s*\]|ArrayList\s*</); }),
+    I(3, 1, 'Код прокоментовано (щонайменше 10 рядків коментарів)', function (h) { return (h.r.code.match(/\/\/|\/\*/g) || []).length >= 10; }),
+    I(3, 1, 'Розміри через width/height, а не лише «чарівні числа»', function (h) { return h.count(/\b(width|height)\b/) >= 3; }),
+    I(3, 1, 'Код структуровано: щонайменше 2 класи або 4 власні функції', function (h) {
+      var fns = (h.src.match(/\b(void|int|float|boolean)\s+(?!setup\b|draw\b)\w+\s*\(/g) || []).length;
+      return h.classes().length >= 2 || fns >= 4;
+    })
+  ] };
+
+  // ---------- Оцінювання ----------
+  function normalize(tabs) { return tabs.map(function (t) { return t.code.replace(/\s+/g, ''); }).join('|'); }
+
+  window.PDE_RUBRICS = R;
+  window.PDE_GRADE = function (lesson, report, starterTabs) {
+    var rub = R[lesson];
+    var res = { lesson: lesson, items: [], score: 0, max: 12, grade: 1, note: '' };
+    if (!rub) { res.note = 'Для цього уроку немає критеріїв.'; return res; }
+    var unchanged = starterTabs && normalize(report.tabs) === normalize(starterTabs);
+    var h = report.ok ? helpers(report) : null;
+    rub.items.forEach(function (it) {
+      var ok = false;
+      if (h && !unchanged) { try { ok = !!it.check(h); } catch (e) { ok = false; } }
+      res.items.push({ level: it.level, pts: it.pts, text: it.text, ok: ok });
+      if (ok) res.score += it.pts;
+    });
+    if (report.stage === 'forbidden') res.note = report.error;
+    else if (!report.ok) res.note = 'Програма не запускається: ' + (report.error || 'помилка') + (report.errorLine ? ' (вкладка ' + report.errorTab + ', рядок ' + report.errorLine + ')' : '') + '. Виправте помилку — тоді критерії перевірять.';
+    else if (unchanged) res.note = 'Код ще не змінено: це початковий код практикуму. Виконайте завдання.';
+    res.grade = Math.max(1, res.score);
+    return res;
+  };
+  window.PDE_GRADE_OPTS = function (lesson) { var r = R[lesson] || {}; return { frames: r.frames, keys: r.keys }; };
+})();
+
+/* Здача робіт на перевірку й автоматичне оцінювання.
+ * Учень: перевіряє свій скетч за критеріями уроку і отримує посилання для вчителя.
+ * Робота (ім'я, клас, урок, код усіх вкладок) запакована в саме посилання — сервер не потрібен.
+ * Вчитель: відкриває посилання, сторінка заново запускає й оцінює код (оцінку не можна підробити),
+ * а результат потрапляє в журнал у браузері вчителя.
+ */
+(function () {
+  'use strict';
+  var PREFIX = 'pde1';
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  var store = {
+    get: function (k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+
+  // ---------- Пакування роботи в посилання ----------
+  function b64url(bytes) {
+    var s = '';
+    for (var i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function unb64url(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    var bin = atob(str), out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function streamBytes(bytes, stream) {
+    var s = new Blob([bytes]).stream().pipeThrough(stream);
+    return new Response(s).arrayBuffer().then(function (b) { return new Uint8Array(b); });
+  }
+  function encode(payload) {
+    var bytes = new TextEncoder().encode(JSON.stringify(payload));
+    if (typeof CompressionStream === 'function') {
+      return streamBytes(bytes, new CompressionStream('deflate-raw'))
+        .then(function (z) { return PREFIX + 'z' + b64url(z); })
+        .catch(function () { return PREFIX + 'u' + b64url(bytes); });
+    }
+    return Promise.resolve(PREFIX + 'u' + b64url(bytes));
+  }
+  // з будь-якого тексту (посилання, код, повідомлення з месенджера) дістає код роботи
+  function findToken(text) {
+    var m = String(text || '').match(/pde1[zu][A-Za-z0-9_-]{10,}/);
+    return m ? m[0] : null;
+  }
+  function decode(token) {
+    token = findToken(token);
+    if (!token) return Promise.reject(new Error('Не знайдено код роботи. Вставте повне посилання, яке надіслав учень.'));
+    var kind = token[4], bytes;
+    try { bytes = unb64url(token.slice(5)); } catch (e) { return Promise.reject(new Error('Посилання пошкоджене (можливо, його обрізав месенджер).')); }
+    var p = kind === 'z'
+      ? (typeof DecompressionStream === 'function' ? streamBytes(bytes, new DecompressionStream('deflate-raw'))
+        : Promise.reject(new Error('Цей браузер не вміє розпаковувати роботи. Відкрийте посилання в Chrome, Edge, Firefox або Safari 16.4+.')))
+      : Promise.resolve(bytes);
+    return p.then(function (b) {
+      var data = JSON.parse(new TextDecoder().decode(b));
+      if (!data || !data.tabs || !data.lesson) throw new Error('Це не робота з курсу.');
+      data.token = token;
+      return data;
+    }, function (e) { throw new Error(e && /браузер/.test(e.message) ? e.message : 'Посилання пошкоджене (можливо, його обрізав месенджер). Попросіть учня надіслати код роботи.'); });
+  }
+  function hashToken(t) { var h = 0; for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+
+  // ---------- Автоперевірка ----------
+  function grade(lesson, tabs, starter, pjs) {
+    var opts = PDE_GRADE_OPTS(lesson); opts.pjs = pjs;
+    return PDE.headless(tabs, opts).then(function (report) { return PDE_GRADE(lesson, report, starter); });
+  }
+  var LEVELS = { 1: 'Рівень 1 — до 6 балів', 2: 'Рівень 2 — до 9 балів', 3: 'Рівень 3 — до 12 балів' };
+  function levelWord(g) { return g >= 10 ? 'високий' : g >= 7 ? 'достатній' : g >= 4 ? 'середній' : 'початковий'; }
+  function resultHtml(res) {
+    var html = '<div class="zd-grade"><span class="n">' + res.grade + '</span><span class="of">з 12</span>' +
+      '<span class="lvl">' + levelWord(res.grade) + ' рівень</span></div>';
+    if (res.note) html += '<p class="zd-note">' + esc(res.note) + '</p>';
+    [1, 2, 3].forEach(function (lv) {
+      var items = res.items.filter(function (i) { return i.level === lv; });
+      html += '<h4>' + LEVELS[lv] + '</h4><ul class="zd-list">' + items.map(function (i) {
+        return '<li class="' + (i.ok ? 'ok' : 'no') + '"><span class="mark" aria-hidden="true">' + (i.ok ? '✓' : '✗') + '</span>' +
+          '<span class="t">' + esc(i.text) + '</span><span class="p">' + (i.ok ? '+' : '') + (i.ok ? i.pts : 0) + ' / ' + i.pts + '</span></li>';
+      }).join('') + '</ul>';
+    });
+    return html;
+  }
+  function criteriaHtml(lesson) {
+    var r = (window.PDE_RUBRICS || {})[lesson];
+    if (!r) return '';
+    return [1, 2, 3].map(function (lv) {
+      return '<h4>' + LEVELS[lv] + '</h4><ul class="zd-list plain">' + r.items.filter(function (i) { return i.level === lv; })
+        .map(function (i) { return '<li><span class="t">' + esc(i.text) + '</span><span class="p">' + i.pts + ' б.</span></li>'; }).join('') + '</ul>';
+    }).join('');
+  }
+  function copyText(text, onDone, fallbackEl) {
+    function fb() { if (fallbackEl) { fallbackEl.focus(); fallbackEl.select(); } onDone(false); }
+    try { navigator.clipboard.writeText(text).then(function () { onDone(true); }, fb); } catch (e) { fb(); }
+  }
+
+  // ---------- Блок «Здати роботу» на сторінці уроку ----------
+  function mountSubmit(el, o) {
+    var who = store.get('zd-student') || {};
+    el.innerHTML =
+      '<p>Здається робота з редактора практикуму вище — один скетч з усіма вкладками. Автоперевірка запускає ваш скетч, ' +
+      'рухає «мишею», клацає, натискає клавіші й перевіряє критерії нижче. Завдання рівнів 2 і 3 додавайте в той самий скетч. ' +
+      'Перевіряти можна скільки завгодно разів.</p>' +
+      '<details class="zd-crit"><summary>Критерії автоперевірки уроку</summary>' + criteriaHtml(o.lesson) + '</details>' +
+      '<div class="zd-form">' +
+      '<label for="zd-name">Прізвище та ім\'я<input id="zd-name" type="text" autocomplete="name" placeholder="Коваль Олена" value="' + esc(who.name) + '"></label>' +
+      '<label for="zd-class">Клас<input id="zd-class" type="text" placeholder="9-Б" value="' + esc(who.cls) + '"></label>' +
+      '</div>' +
+      '<div class="zd-actions"><button type="button" class="zd-btn primary" id="zd-check">Перевірити роботу</button>' +
+      '<button type="button" class="zd-btn" id="zd-link" disabled>Отримати посилання для вчителя</button></div>' +
+      '<div class="zd-result" id="zd-result" aria-live="polite"></div>' +
+      '<div class="zd-share" id="zd-share" hidden></div>';
+    var nameEl = el.querySelector('#zd-name'), clsEl = el.querySelector('#zd-class');
+    var resEl = el.querySelector('#zd-result'), shareEl = el.querySelector('#zd-share');
+    var linkBtn = el.querySelector('#zd-link'), checkBtn = el.querySelector('#zd-check');
+    var last = null;
+    function remember() { store.set('zd-student', { name: nameEl.value.trim(), cls: clsEl.value.trim() }); }
+    nameEl.addEventListener('change', remember); clsEl.addEventListener('change', remember);
+    function currentTabs() {
+      var ide = o.ide();
+      ide.state.tabs[ide.active].code = ide.input.value;
+      return ide.state.tabs.map(function (t) { return { name: t.name, code: t.code }; });
+    }
+    checkBtn.addEventListener('click', function () {
+      var tabs = currentTabs();
+      checkBtn.disabled = true; linkBtn.disabled = true; shareEl.hidden = true;
+      resEl.innerHTML = '<p class="zd-wait">Перевіряю: запускаю скетч, рухаю мишею, клацаю…</p>';
+      grade(o.lesson, tabs, o.starter, o.pjs).then(function (res) {
+        last = { tabs: tabs, res: res };
+        resEl.innerHTML = resultHtml(res);
+        linkBtn.disabled = false;
+      }, function (e) {
+        resEl.innerHTML = '<p class="zd-note">Не вдалося перевірити: ' + esc(e && e.message || e) + '</p>';
+      }).then(function () { checkBtn.disabled = false; });
+    });
+    linkBtn.addEventListener('click', function () {
+      if (!last) return;
+      var name = nameEl.value.trim(), cls = clsEl.value.trim();
+      if (!name) { nameEl.focus(); resEl.insertAdjacentHTML('afterbegin', '<p class="zd-note">Вкажіть прізвище та ім\'я, щоб учитель знав, чия це робота.</p>'); return; }
+      remember();
+      var payload = { v: 1, lesson: o.lesson, name: name, cls: cls, at: new Date().toISOString(), seen: last.res.grade,
+        tabs: last.tabs.map(function (t) { return [t.name, t.code]; }) };
+      encode(payload).then(function (token) {
+        var url = o.courseUrl() + '#' + token;
+        shareEl.hidden = false;
+        shareEl.innerHTML = '<h4>Посилання для вчителя</h4>' +
+          '<p>Скопіюйте й надішліть учителеві (Classroom, месенджер, пошта). Учитель відкриє роботу, програма перевірить її ще раз і поставить оцінку в журнал.</p>' +
+          '<div class="zd-linkrow"><input id="zd-url" type="text" readonly value="' + esc(url) + '" aria-label="Посилання на роботу">' +
+          '<button type="button" class="zd-btn primary" id="zd-copy">Копіювати посилання</button></div>' +
+          '<p class="zd-small">Посилання містить ваш код і оцінку ' + last.res.grade + ' з 12. Якщо ви зміните код, перевірте роботу й отримайте нове посилання. ' +
+          'Якщо месенджер обріже довге посилання, надішліть <button type="button" class="zd-linkbtn" id="zd-copycode">код роботи</button> — учитель вставить його на сторінці перевірки.</p>';
+        var urlEl = shareEl.querySelector('#zd-url');
+        shareEl.querySelector('#zd-copy').addEventListener('click', function () {
+          var b = this; copyText(url, function (ok) { b.textContent = ok ? 'Скопійовано ✓' : 'Виділено — натисніть Ctrl+C'; }, urlEl);
+        });
+        shareEl.querySelector('#zd-copycode').addEventListener('click', function () {
+          var b = this; copyText(token, function (ok) { b.textContent = ok ? 'код скопійовано ✓' : 'код роботи'; if (!ok) { urlEl.value = token; urlEl.select(); } }, null);
+        });
+        urlEl.addEventListener('focus', function () { urlEl.select(); });
+      });
+    });
+  }
+
+  // ---------- Сторінка вчителя «Перевірка робіт» ----------
+  var JKEY = 'zd-journal';
+  function journal() { return store.get(JKEY) || []; }
+  function fmtDate(iso) { try { var d = new Date(iso); return d.toLocaleDateString('uk-UA') + ' ' + d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return iso; } }
+
+  function mountTeacher(el, o) {
+    el.innerHTML =
+      '<div class="zd-paste"><label for="pv-input">Посилання або код роботи учня</label>' +
+      '<textarea id="pv-input" rows="3" placeholder="Вставте сюди посилання, яке надіслав учень"></textarea>' +
+      '<div class="zd-actions"><button type="button" class="zd-btn primary" id="pv-go">Перевірити роботу</button></div></div>' +
+      '<div id="pv-out" aria-live="polite"></div>' +
+      '<section class="zd-journal"><h2>Журнал перевірених робіт</h2>' +
+      '<p class="zd-small">Журнал зберігається лише в цьому браузері. Щоб перенести оцінки в електронний журнал або таблицю, скопіюйте його й вставте в Excel чи Google Таблиці.</p>' +
+      '<div class="zd-filters"><label for="pv-fclass">Клас <select id="pv-fclass"></select></label>' +
+      '<label for="pv-flesson">Урок <select id="pv-flesson"></select></label>' +
+      '<button type="button" class="zd-btn" id="pv-copyj">Копіювати журнал для Excel</button>' +
+      '<button type="button" class="zd-btn" id="pv-clear">Очистити журнал</button></div>' +
+      '<div class="tbl" id="pv-table"></div></section>';
+    var input = el.querySelector('#pv-input'), out = el.querySelector('#pv-out');
+    var fClass = el.querySelector('#pv-fclass'), fLesson = el.querySelector('#pv-flesson');
+
+    function addToJournal(d, res) {
+      var j = journal(), id = hashToken(d.token);
+      var row = { id: id, at: d.at, checked: new Date().toISOString(), name: d.name, cls: d.cls || '', lesson: d.lesson, grade: res.grade, token: d.token };
+      j = j.filter(function (r) { return r.id !== id; });
+      j.unshift(row);
+      if (!store.set(JKEY, j)) {                       // місце закінчилось — зберігаємо без кодів старих робіт
+        j.forEach(function (r, i) { if (i > 20) delete r.token; });
+        store.set(JKEY, j);
+      }
+      renderJournal();
+    }
+    function check(text) {
+      out.innerHTML = '<p class="zd-wait">Розпаковую роботу й перевіряю…</p>';
+      decode(text).then(function (d) {
+        var lesson = +d.lesson;
+        var tabs = d.tabs.map(function (t) { return { name: t[0], code: t[1] }; });
+        return grade(lesson, tabs, (o.starters || {})[lesson], o.pjs).then(function (res) {
+          var lessonLink = 'urok-' + String(lesson).padStart(2, '0') + '.html';
+          out.innerHTML = '<article class="zd-card">' +
+            '<div class="zd-head"><div><h2>' + esc(d.name) + (d.cls ? ' <span class="cls">' + esc(d.cls) + '</span>' : '') + '</h2>' +
+            '<p><a href="' + lessonLink + '">' + esc(o.lessonTitles[lesson] || ('Урок ' + lesson)) + '</a> · надіслано ' + esc(fmtDate(d.at)) + '</p></div></div>' +
+            resultHtml(res) +
+            (d.seen != null && d.seen !== res.grade ? '<p class="zd-note">Учень бачив оцінку ' + esc(d.seen) + ', повторна перевірка дала ' + res.grade + '. Зараховано оцінку повторної перевірки.</p>' : '') +
+            '<p class="zd-small">Робота додана до журналу нижче. Код учня відкрито в середовищі: його можна запустити ▶ і переглянути вкладки.</p>' +
+            '</article>';
+          addToJournal(d, res);
+          if (o.onWork) o.onWork(tabs, d);
+        });
+      }).catch(function (e) { out.innerHTML = '<p class="zd-note">' + esc(e.message || e) + '</p>'; });
+    }
+    el.querySelector('#pv-go').addEventListener('click', function () { check(input.value); });
+
+    function renderJournal() {
+      var j = journal();
+      var classes = Object.keys(j.reduce(function (o, r) { o[r.cls || '—'] = 1; return o; }, {})).sort();
+      var lessons = Object.keys(j.reduce(function (o, r) { o[r.lesson] = 1; return o; }, {})).map(Number).sort(function (a, b) { return a - b; });
+      var fc = fClass.value, fl = fLesson.value;
+      fClass.innerHTML = '<option value="">усі</option>' + classes.map(function (c) { return '<option' + (c === fc ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('');
+      fLesson.innerHTML = '<option value="">усі</option>' + lessons.map(function (l) { return '<option value="' + l + '"' + (String(l) === fl ? ' selected' : '') + '>' + l + '</option>'; }).join('');
+      var rows = j.filter(function (r) { return (!fClass.value || (r.cls || '—') === fClass.value) && (!fLesson.value || String(r.lesson) === fLesson.value); });
+      var t = el.querySelector('#pv-table');
+      if (!rows.length) { t.innerHTML = '<p class="zd-small">Поки що порожньо. Перевірте першу роботу — вона з\'явиться тут.</p>'; return; }
+      t.innerHTML = '<table><thead><tr><th>Учень</th><th>Клас</th><th>Урок</th><th>Оцінка</th><th>Надіслано</th><th></th></tr></thead><tbody>' +
+        rows.map(function (r) {
+          return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.cls) + '</td><td>' + r.lesson + '</td><td class="g">' + r.grade + '</td><td>' + esc(fmtDate(r.at)) + '</td>' +
+            '<td class="act">' + (r.token ? '<button type="button" class="zd-linkbtn" data-open="' + r.id + '">відкрити</button> ' : '') +
+            '<button type="button" class="zd-linkbtn" data-del="' + r.id + '" aria-label="Видалити рядок">×</button></td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    el.querySelector('#pv-table').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var j = journal();
+      if (b.dataset.open) { var r = j.filter(function (x) { return x.id === b.dataset.open; })[0]; if (r) { input.value = r.token; check(r.token); el.scrollIntoView({ behavior: 'smooth' }); } }
+      if (b.dataset.del) { store.set(JKEY, j.filter(function (x) { return x.id !== b.dataset.del; })); renderJournal(); }
+    });
+    fClass.addEventListener('change', renderJournal); fLesson.addEventListener('change', renderJournal);
+    el.querySelector('#pv-copyj').addEventListener('click', function () {
+      var b = this, j = journal().filter(function (r) { return (!fClass.value || (r.cls || '—') === fClass.value) && (!fLesson.value || String(r.lesson) === fLesson.value); });
+      var tsv = ['Учень\tКлас\tУрок\tОцінка\tНадіслано'].concat(j.map(function (r) { return [r.name, r.cls, r.lesson, r.grade, fmtDate(r.at)].join('\t'); })).join('\n');
+      copyText(tsv, function (ok) { b.textContent = ok ? 'Скопійовано ✓ — вставте в таблицю' : 'Не вдалося скопіювати'; setTimeout(function () { b.textContent = 'Копіювати журнал для Excel'; }, 2500); }, null);
+    });
+    var clearBtn = el.querySelector('#pv-clear'), armed = false;
+    clearBtn.addEventListener('click', function () {
+      if (!armed) { armed = true; clearBtn.textContent = 'Точно очистити? Натисніть ще раз'; setTimeout(function () { armed = false; clearBtn.textContent = 'Очистити журнал'; }, 4000); return; }
+      store.set(JKEY, []); armed = false; clearBtn.textContent = 'Очистити журнал'; renderJournal();
+    });
+    renderJournal();
+    var fromHash = findToken(location.hash);
+    if (fromHash) { input.value = location.href; check(fromHash); }
+  }
+
+  window.ZDACHA = { mountSubmit: mountSubmit, mountTeacher: mountTeacher, encode: encode, decode: decode, findToken: findToken, grade: grade };
+})();
+
+(function () {
+  var data = JSON.parse(document.getElementById('pde-data').textContent);
+  ZDACHA.mountSubmit(document.getElementById('zd'), {
+    lesson: 6,
+    ide: function () { return PDE.main; },
+    starter: data.tabs,
+    pjs: ['ide/processing.min.js', 'https://cdn.jsdelivr.net/npm/processing-js@1.6.6/processing.min.js'],
+    courseUrl: function () {
+  if (location.protocol !== 'file:' && /claude|anthropic/.test(location.hostname)) return 'https://claude.ai/artifact/BiVZocBGjHd7pJpyGaUJbR';
+  return new URL('../index.html', location.href).href.split('#')[0];
+}
   });
 })();
 </script>
