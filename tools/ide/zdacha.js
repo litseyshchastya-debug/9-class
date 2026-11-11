@@ -68,13 +68,13 @@
     var opts = PDE_GRADE_OPTS(lesson); opts.pjs = pjs;
     return PDE.headless(tabs, opts).then(function (report) { return PDE_GRADE(lesson, report, starter); });
   }
-  var LEVELS = { 1: 'Рівень 1 — до 6 балів', 2: 'Рівень 2 — до 9 балів', 3: 'Рівень 3 — до 12 балів' };
+  var LEVELS = { 0: 'Початковий рівень — 1–3 бали', 1: 'Середній рівень — 4–6 балів', 2: 'Достатній рівень — 7–9 балів', 3: 'Високий рівень — 10–12 балів' };
   function levelWord(g) { return g >= 10 ? 'високий' : g >= 7 ? 'достатній' : g >= 4 ? 'середній' : 'початковий'; }
   function resultHtml(res) {
     var html = '<div class="zd-grade"><span class="n">' + res.grade + '</span><span class="of">з 12</span>' +
       '<span class="lvl">' + levelWord(res.grade) + ' рівень</span></div>';
     if (res.note) html += '<p class="zd-note">' + esc(res.note) + '</p>';
-    [1, 2, 3].forEach(function (lv) {
+    [0, 1, 2, 3].forEach(function (lv) {
       var items = res.items.filter(function (i) { return i.level === lv; });
       html += '<h4>' + LEVELS[lv] + '</h4><ul class="zd-list">' + items.map(function (i) {
         return '<li class="' + (i.ok ? 'ok' : 'no') + '"><span class="mark" aria-hidden="true">' + (i.ok ? '✓' : '✗') + '</span>' +
@@ -86,7 +86,7 @@
   function criteriaHtml(lesson) {
     var r = (window.PDE_RUBRICS || {})[lesson];
     if (!r) return '';
-    return [1, 2, 3].map(function (lv) {
+    return [0, 1, 2, 3].map(function (lv) {
       return '<h4>' + LEVELS[lv] + '</h4><ul class="zd-list plain">' + r.items.filter(function (i) { return i.level === lv; })
         .map(function (i) { return '<li><span class="t">' + esc(i.text) + '</span><span class="p">' + i.pts + ' б.</span></li>'; }).join('') + '</ul>';
     }).join('');
@@ -101,7 +101,7 @@
     var who = store.get('zd-student') || {};
     el.innerHTML =
       '<p>Здається робота з редактора практикуму вище — один скетч з усіма вкладками. Автоперевірка запускає ваш скетч, ' +
-      'рухає «мишею», клацає, натискає клавіші й перевіряє критерії нижче. Завдання рівнів 2 і 3 додавайте в той самий скетч. ' +
+      'рухає «мишею», клацає, натискає клавіші й перевіряє критерії нижче. Завдання вищих рівнів додавайте в той самий скетч. ' +
       'Перевіряти можна скільки завгодно разів.</p>' +
       '<details class="zd-crit"><summary>Критерії автоперевірки уроку</summary>' + criteriaHtml(o.lesson) + '</details>' +
       '<div class="zd-form">' +

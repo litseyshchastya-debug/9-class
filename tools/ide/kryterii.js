@@ -1,5 +1,6 @@
 /* Критерії автоматичного оцінювання практикуму кожного уроку.
- * Кожен урок: рівень 1 — 6 балів, рівень 2 — 3 бали, рівень 3 — 3 бали (разом 12).
+ * Рівні навчальних досягнень: 0 — початковий, 1 — середній, 2 — достатній, 3 — високий;
+ * на кожен рівень — 3 бали, разом 12.
  * Перевірка спирається на звіт невидимого запуску (PDE.headless): записані виклики функцій
  * малювання, вивід у консоль, кадри при різних положеннях миші, клік, перетягування, клавіші.
  */
@@ -117,16 +118,16 @@
   }
 
   function I(level, pts, text, check) { return { level: level, pts: pts, text: text, check: check }; }
-  var runs = I(1, 1, 'Програма запускається без помилок', function () { return true; });
+  var runs = I(0, 1, 'Програма запускається без помилок', function () { return true; });
 
   // ---------- Критерії уроків ----------
   var R = {};
 
   R[1] = { items: [
     runs,
-    I(1, 1, 'Вікно має розмір 500×500 (size(500, 500))', function (h) { return h.W === 500 && h.H === 500; }),
-    I(1, 2, 'Є діагональ з кута (0, 0) у кут (500, 500)', function (h) { return h.scene('line').some(function (e) { return h.lineIs(e, 0, 0, 500, 500, 6); }); }),
-    I(1, 2, 'Є друга діагональ з (500, 0) у (0, 500) — разом «хрест»', function (h) { return h.scene('line').some(function (e) { return h.lineIs(e, 500, 0, 0, 500, 6); }); }),
+    I(0, 1, 'Вікно має розмір 500×500 (size(500, 500))', function (h) { return h.W === 500 && h.H === 500; }),
+    I(0, 1, 'Є діагональ з кута (0, 0) у кут (500, 500)', function (h) { return h.scene('line').some(function (e) { return h.lineIs(e, 0, 0, 500, 500, 6); }); }),
+    I(1, 3, 'Є друга діагональ з (500, 0) у (0, 500) — разом «хрест»', function (h) { return h.scene('line').some(function (e) { return h.lineIs(e, 500, 0, 0, 500, 6); }); }),
     I(2, 1, 'Будиночок: є rect() і щонайменше ще дві лінії (дах)', function (h) { return h.scene('rect').length >= 1 && h.scene('line').length >= 4; }),
     I(2, 1, 'Є сонце — ellipse() або circle()', function (h) { return h.scene(['ellipse', 'circle']).length >= 1; }),
     I(2, 1, 'Малюнок складається щонайменше з 8 фігур', function (h) { return h.scene().length >= 8; }),
@@ -141,9 +142,9 @@
 
   R[2] = { items: [
     runs,
-    I(1, 1, 'Є корпус світлофора — rect()', function (h) { return h.scene('rect').length >= 1; }),
-    I(1, 2, 'Є щонайменше три кола (ellipse/circle)', function (h) { return h.scene(['ellipse', 'circle']).length >= 3; }),
-    I(1, 2, 'Три кола розташовані одне під одним (однаковий x, різні y)', function (h) {
+    I(0, 1, 'Є корпус світлофора — rect()', function (h) { return h.scene('rect').length >= 1; }),
+    I(0, 1, 'Є щонайменше три кола (ellipse/circle)', function (h) { return h.scene(['ellipse', 'circle']).length >= 3; }),
+    I(1, 3, 'Три кола розташовані одне під одним (однаковий x, різні y)', function (h) {
       var c = h.scene(['ellipse', 'circle']);
       for (var i = 0; i < c.length; i++) {
         var col = c.filter(function (e) { return h.near(e.a[0], c[i].a[0], 3); });
@@ -163,9 +164,9 @@
 
   R[3] = { items: [
     runs,
-    I(1, 1, 'Намальовано щонайменше 3 фігури', function (h) { return h.scene().length >= 3; }),
-    I(1, 2, 'Використано колір RGB: fill() з трьома числами', function (h) { return h.calls('fill').some(function (e) { return e.a.length >= 3; }); }),
-    I(1, 2, 'Щонайменше 3 різні кольори заливки', function (h) { return h.distinct(h.calls('fill').map(function (e) { return e.a.join(','); })) >= 3; }),
+    I(0, 1, 'Намальовано щонайменше 3 фігури', function (h) { return h.scene().length >= 3; }),
+    I(0, 1, 'Використано колір RGB: fill() з трьома числами', function (h) { return h.calls('fill').some(function (e) { return e.a.length >= 3; }); }),
+    I(1, 3, 'Щонайменше 3 різні кольори заливки', function (h) { return h.distinct(h.calls('fill').map(function (e) { return e.a.join(','); })) >= 3; }),
     I(2, 1, 'Прозорість: щонайменше 3 заливки з альфа-каналом (4-е число менше 255)', function (h) {
       return h.calls('fill').filter(function (e) { return e.a.length === 4 && e.a[3] < 255; }).length >= 3;
     }),
@@ -188,9 +189,9 @@
 
   R[4] = { items: [
     runs,
-    I(1, 2, 'Оголошено щонайменше 3 змінні (int або float)', function (h) { return h.count(/\b(int|float)\s+[A-Za-z_]\w*\s*[=;,]/) >= 3; }),
-    I(1, 2, 'ellipse() отримує змінні як аргументи', function (h) { return h.has(/\bellipse\s*\(\s*[A-Za-z_]/); }),
-    I(1, 1, 'Коло намальовано', function (h) { return h.scene(['ellipse', 'circle']).length >= 1; }),
+    I(0, 1, 'Оголошено щонайменше 3 змінні (int або float)', function (h) { return h.count(/\b(int|float)\s+[A-Za-z_]\w*\s*[=;,]/) >= 3; }),
+    I(1, 3, 'ellipse() отримує змінні як аргументи', function (h) { return h.has(/\bellipse\s*\(\s*[A-Za-z_]/); }),
+    I(0, 1, 'Коло намальовано', function (h) { return h.scene(['ellipse', 'circle']).length >= 1; }),
     I(2, 1, 'Є змінні charX і charY', function (h) { return h.has(/\bcharX\b/) && h.has(/\bcharY\b/); }),
     I(2, 1, 'Щонайменше 3 фігури мають координати через charX/charY', function (h) {
       return h.count(/\b(rect|ellipse|line|triangle|circle|quad|arc)\s*\([^;]*\bchar[XY]\b/) >= 3;
@@ -211,8 +212,8 @@
 
   R[5] = { items: [
     runs,
-    I(1, 3, 'Коло рухається вниз', function (h) { return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dy > 5; }); }),
-    I(1, 2, 'Коло рухається по діагоналі: і праворуч, і вниз одночасно', function (h) {
+    I(0, 2, 'Коло рухається вниз', function (h) { return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dy > 5; }); }),
+    I(1, 3, 'Коло рухається по діагоналі: і праворуч, і вниз одночасно', function (h) {
       return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dx > 5 && m.dy > 5; });
     }),
     I(2, 1, 'Коло збільшується', function (h) { return moves(h, ['ellipse', 'circle']).some(function (m) { return m.dw > 2; }); }),
@@ -239,12 +240,13 @@
 
   R[6] = { items: [
     runs,
-    I(1, 1, 'Використано mouseX і mouseY', function (h) { return h.has(/\bmouseX\b/) && h.has(/\bmouseY\b/); }),
-    I(1, 2, 'Курсор у лівому верхньому куті — персонаж поруч із ним', function (h) {
+    I(0, 1, 'Використано mouseX і mouseY', function (h) { return h.has(/\bmouseX\b/) && h.has(/\bmouseY\b/); }),
+    I(0, 1, 'Курсор у лівому верхньому куті — персонаж поруч із ним', function (h) {
       return h.shapeNear(h.frame(h.lastOf('mouseTL')), h.W * 0.25, h.H * 0.25, 40);
     }),
-    I(1, 2, 'Курсор у правому нижньому куті — персонаж переміщується туди', function (h) {
-      return h.shapeNear(h.frame(h.lastOf('mouseBR')), h.W * 0.75, h.H * 0.75, 40);
+    I(1, 3, 'Увесь персонаж (щонайменше 2 фігури) переміщується за курсором у правий нижній кут', function (h) {
+      var fr = h.frame(h.lastOf('mouseBR'));
+      return fr.filter(function (e) { return h.shapeNear([e], h.W * 0.75, h.H * 0.75, 70); }).length >= 2;
     }),
     I(2, 1, 'Колір залежить від положення миші', function (h) {
       var a = h.frame(h.lastOf('mouseTL'), 'fill').map(function (e) { return e.a.join(','); }).join('|');
@@ -268,8 +270,8 @@
   }
   R[7] = { frames: 300, items: [
     runs,
-    I(1, 1, 'Використано умову if', function (h) { return h.has(/\bif\s*\(/); }),
-    I(1, 1, 'Намальовано щонайменше 4 прямокутники (квадрати)', function (h) { return h.frame(h.lastOf('mouseTL'), 'rect').length >= 4; }),
+    I(0, 1, 'Використано умову if', function (h) { return h.has(/\bif\s*\(/); }),
+    I(0, 1, 'Намальовано щонайменше 4 прямокутники (квадрати)', function (h) { return h.frame(h.lastOf('mouseTL'), 'rect').length >= 4; }),
     I(1, 2, 'Курсор у лівому верхньому квадраті — цей квадрат чорний', function (h) { return h.isDark(fillAt(h, 'mouseTL', 0, 0)); }),
     I(1, 1, 'Курсор у правому нижньому квадраті — він чорний, а лівий верхній уже ні', function (h) {
       return h.isDark(fillAt(h, 'mouseBR', h.W / 2, h.H / 2)) && fillAt(h, 'mouseBR', 0, 0) !== undefined && !h.isDark(fillAt(h, 'mouseBR', 0, 0));
@@ -293,14 +295,14 @@
       return h.has(/rect\s*\([^;]*mouseX/) && a !== b;
     }),
     I(3, 1, 'Є напис для кінця гри (text())', function (h) { return h.has(/\btext\s*\(\s*"/); }),
-    I(3, 1, 'Використано логічний оператор && або ||', function (h) { return h.has(/&&|\|\|/); })
+    I(3, 1, 'Напис з\'являється лише за умови програшу (text() усередині if)', function (h) { return h.has(/\bif\s*\([^{;]*\)\s*\{?[^;{}]*\btext\s*\(/); })
   ] };
 
   R[8] = { items: [
     runs,
-    I(1, 1, 'Використано цикл for', function (h) { return h.has(/\bfor\s*\(/); }),
-    I(1, 2, 'У кадрі щонайменше 10 кіл', function (h) { return h.scene(['ellipse', 'circle']).length >= 10; }),
-    I(1, 2, '10 кіл стоять в один рядок (однаковий y)', function (h) {
+    I(0, 1, 'Використано цикл for', function (h) { return h.has(/\bfor\s*\(/); }),
+    I(0, 1, 'У кадрі щонайменше 5 кіл', function (h) { return h.scene(['ellipse', 'circle']).length >= 5; }),
+    I(1, 3, '10 кіл стоять в один рядок (однаковий y) — гірлянда', function (h) {
       var c = h.scene(['ellipse', 'circle']); var by = {};
       c.forEach(function (e) { var k = Math.round(e.a[1]); by[k] = (by[k] || 0) + 1; });
       return Object.keys(by).some(function (k) { return by[k] >= 10; });
@@ -319,14 +321,14 @@
 
   R[9] = { items: [
     runs,
-    I(1, 1, 'Використано random()', function (h) { return h.used('random'); }),
-    I(1, 1, 'Ціле випадкове число: int(random(...))', function (h) { return h.has(/\bint\s*\(\s*random\s*\(/); }),
-    I(1, 1, 'Є функція-подія mousePressed()', function (h) { return h.r.userFns.mousePressed; }),
+    I(0, 1, 'Використано random()', function (h) { return h.used('random'); }),
+    I(0, 1, 'Ціле випадкове число: int(random(...))', function (h) { return h.has(/\bint\s*\(\s*random\s*\(/); }),
+    I(1, 1, 'Нове число — після клацання: є функція-подія mousePressed()', function (h) { return h.r.userFns.mousePressed; }),
     I(1, 2, 'Після клацання кубик показано крапками: від 1 до 6 кружечків', function (h) {
       var n = h.frame(h.lastOf('click'), ['ellipse', 'circle']).length; return n >= 1 && n <= 6;
     }),
     I(2, 1, 'Зоряне небо: щонайменше 200 зірок у кадрі', function (h) { return h.frame(h.lastOf('anim'), ['point', 'ellipse', 'circle']).length >= 200; }),
-    I(2, 1, 'Зірки створено в циклі', function (h) { return h.has(/\bfor\s*\(/); }),
+    I(2, 1, 'Зірки розкидано випадково по всьому вікну: random(width), random(height)', function (h) { return h.has(/random\s*\(\s*width\s*\)/) && h.has(/random\s*\(\s*height\s*\)/); }),
     I(2, 1, 'Зірки мерехтять: яскравість змінюється між кадрами', function (h) {
       var f1 = h.frame(h.lastOf('start'), ['fill', 'stroke']).map(function (e) { return e.a.join(','); }).join('|');
       var f2 = h.frame(h.lastOf('anim'), ['fill', 'stroke']).map(function (e) { return e.a.join(','); }).join('|');
@@ -339,11 +341,14 @@
 
   R[10] = { items: [
     runs,
-    I(1, 1, 'Оголошено функцію drawFlower з параметрами', function (h) { return h.has(/void\s+drawFlower\s*\(\s*(float|int)\s+\w+\s*,/); }),
-    I(1, 2, 'drawFlower() викликається щонайменше 5 разів (або в циклі)', function (h) {
-      return h.count(/\bdrawFlower\s*\(/) - 1 >= 5 || h.has(/\bfor\s*\([^)]*\)\s*\{[^}]*drawFlower\s*\(/);
+    I(0, 1, 'Оголошено функцію drawFlower з параметрами', function (h) { return h.has(/void\s+drawFlower\s*\(\s*(float|int)\s+\w+\s*,/); }),
+    I(0, 1, 'drawFlower() викликається щонайменше 3 рази (або в циклі)', function (h) {
+      return h.count(/\bdrawFlower\s*\(/) - 1 >= 3 || h.has(/\bfor\s*\([^)]*\)\s*\{[^}]*drawFlower\s*\(/);
     }),
-    I(1, 2, 'На клумбі щонайменше 5 квіток (багато пелюсток у кадрі)', function (h) { return h.scene(['ellipse', 'circle']).length >= 30; }),
+    I(1, 1, 'На клумбі щонайменше 5 квіток (багато пелюсток у кадрі)', function (h) { return h.scene(['ellipse', 'circle']).length >= 30; }),
+    I(1, 2, 'Квітки різного розміру', function (h) {
+      return h.distinct(h.scene(['ellipse', 'circle']).map(function (e) { return Math.round(e.a[2]); })) >= 6;
+    }),
     I(2, 1, 'Є функції move(), bounce() і display()', function (h) { return h.userFunction('move') && h.userFunction('bounce') && h.userFunction('display'); }),
     I(2, 1, 'draw() викликає move(), bounce() і display()', function (h) { var b = h.body('void\\s+draw'); return /\bmove\s*\(\s*\)/.test(b) && /\bbounce\s*\(\s*\)/.test(b) && /\bdisplay\s*\(\s*\)/.test(b); }),
     I(2, 1, 'Є анімація', function (h) { return h.changed('start', 'anim'); }),
@@ -357,9 +362,9 @@
 
   R[11] = { items: [
     runs,
-    I(1, 1, 'Є клас Car', function (h) { return h.classNamed('Car'); }),
-    I(1, 2, 'Створено щонайменше 3 машини (new Car)', function (h) { return h.count(/\bnew\s+Car\s*\(/) >= 3; }),
-    I(1, 2, 'Машини їдуть: щонайменше 3 прямокутники, що рухаються', function (h) {
+    I(0, 1, 'Є клас Car', function (h) { return h.classNamed('Car'); }),
+    I(0, 1, 'Створено щонайменше 3 машини (new Car)', function (h) { return h.count(/\bnew\s+Car\s*\(/) >= 3; }),
+    I(1, 3, 'Машини їдуть: щонайменше 3 прямокутники, що рухаються', function (h) {
       return h.frame(h.lastOf('anim'), 'rect').length >= 3 && h.changed('start', 'anim');
     }),
     I(2, 1, 'Є клас Ball', function (h) { return h.classNamed('Ball'); }),
@@ -374,10 +379,10 @@
 
   R[12] = { items: [
     runs,
-    I(1, 1, 'Є масив щонайменше з 10 чисел', function (h) {
+    I(0, 1, 'Є масив щонайменше з 10 чисел', function (h) {
       var m = h.src.match(/\b(int|float)\s*\[\s*\]\s*\w+\s*=\s*\{([^}]*)\}/); return !!m && m[2].split(',').length >= 10;
     }),
-    I(1, 1, 'Масив перебирається циклом до .length', function (h) { return h.has(/\.length\b/) && h.has(/\bfor\s*\(/); }),
+    I(0, 1, 'Масив перебирається циклом до .length', function (h) { return h.has(/\.length\b/) && h.has(/\bfor\s*\(/); }),
     I(1, 2, 'Діаграма: щонайменше 10 стовпчиків', function (h) { return h.scene('rect').length >= 10; }),
     I(1, 1, 'Стовпчики різної висоти', function (h) { return h.distinct(h.scene('rect').map(function (e) { return Math.round(e.a[3]); })) >= 3; }),
     I(2, 1, 'Є клас Snowflake', function (h) { return h.classNamed('Snowflake'); }),
@@ -390,8 +395,8 @@
 
   R[13] = { items: [
     runs,
-    I(1, 1, 'Використано translate() і rotate()', function (h) { return h.used('translate') && h.used('rotate'); }),
-    I(1, 1, 'Обертання огорнуто pushMatrix()/popMatrix()', function (h) { return h.used('pushMatrix') && h.used('popMatrix'); }),
+    I(0, 1, 'Використано translate() і rotate()', function (h) { return h.used('translate') && h.used('rotate'); }),
+    I(0, 1, 'Обертання огорнуто pushMatrix()/popMatrix()', function (h) { return h.used('pushMatrix') && h.used('popMatrix'); }),
     I(1, 2, 'Кут обертання змінюється з часом', function (h) { return h.distinct(h.calls('rotate', 'anim').map(function (e) { return e.a[0].toFixed(3); })) >= 10; }),
     I(1, 1, 'Швидкість обертання залежить від mouseX', function (h) {
       function speed(ph) { var t = h.track('rotate', ph); if (t.length < 2) return 0; return t[t.length - 1].a[0] - t[t.length - 2].a[0]; }
@@ -409,8 +414,8 @@
 
   R[14] = { items: [
     runs,
-    I(1, 1, 'Виведено текст text()', function (h) { return h.scene('text').some(function (e) { return String(e.a[0]).trim().length > 0; }); }),
-    I(1, 1, 'Текст вирівняно по центру вікна', function (h) {
+    I(0, 1, 'Виведено текст text()', function (h) { return h.scene('text').some(function (e) { return String(e.a[0]).trim().length > 0; }); }),
+    I(0, 1, 'Текст вирівняно по центру вікна', function (h) {
       return h.calls('textAlign').some(function (e) { return e.a[0] === h.r.K.CENTER; }) && h.scene('text').some(function (e) { return h.near(e.a[1], h.W / 2, 3); });
     }),
     I(1, 2, 'Задано шрифт або розмір (createFont/textFont/textSize)', function (h) { return h.has(/\b(textSize|textFont|createFont)\s*\(/); }),
@@ -429,9 +434,9 @@
 
   R[15] = { items: [
     runs,
-    I(1, 1, 'Змінено інтервал появи крапель (не 1000 мс)', function (h) { var m = h.src.match(/new\s+Timer\s*\(\s*(\d+)\s*\)/); return !!m && +m[1] !== 1000; }),
-    I(1, 2, 'Змінено кількість життів (не 3)', function (h) { var m = h.src.match(/\blives\s*=\s*(\d+)\s*;/); return !!m && +m[1] !== 3; }),
-    I(1, 2, 'Змінено швидкість падіння крапель', function (h) { return !h.has(/speed\s*=\s*baseSpeed\s*\+\s*random\s*\(\s*1\s*,\s*3\s*\)/) && h.has(/speed\s*=/); }),
+    I(0, 1, 'Змінено інтервал появи крапель (не 1000 мс)', function (h) { var m = h.src.match(/new\s+Timer\s*\(\s*(\d+)\s*\)/); return !!m && +m[1] !== 1000; }),
+    I(0, 1, 'Змінено кількість життів (не 3)', function (h) { var m = h.src.match(/\blives\s*=\s*(\d+)\s*;/); return !!m && +m[1] !== 3; }),
+    I(1, 3, 'Змінено швидкість падіння крапель', function (h) { return !h.has(/speed\s*=\s*baseSpeed\s*\+\s*random\s*\(\s*1\s*,\s*3\s*\)/) && h.has(/speed\s*=/); }),
     I(2, 1, 'Є змінна рівня (level)', function (h) { return h.has(/\bint\s+level\b/); }),
     I(2, 1, 'На екрані з\'являється напис «Рівень»', function (h) { return /text\s*\(\s*"Рівень/.test(h.r.code); }),
     I(2, 1, 'Швидкість залежить від рівня', function (h) { return h.has(/new\s+Drop\s*\([^)]*level/) || h.has(/speed[^;]*\blevel\b/); }),
@@ -444,10 +449,10 @@
 
   R[16] = { items: [
     runs,
-    I(1, 1, 'Щонайменше 80 непорожніх рядків коду', function (h) { return h.r.code.split('\n').filter(function (l) { return l.trim(); }).length >= 80; }),
-    I(1, 1, 'Є щонайменше один власний клас', function (h) { return h.classes().length >= 1; }),
+    I(0, 1, 'Щонайменше 80 непорожніх рядків коду', function (h) { return h.r.code.split('\n').filter(function (l) { return l.trim(); }).length >= 80; }),
+    I(0, 1, 'Є щонайменше один власний клас', function (h) { return h.classes().length >= 1; }),
     I(1, 1, 'Є власна функція з параметрами', function (h) {
-      return /\b(void|int|float|boolean)\s+(?!setup|draw)\w+\s*\(\s*(int|float|boolean|String|color|\w+)\s+\w+/.test(h.src);
+      return /\b(void|int|float|boolean)\s+(?!setup\b|draw\b)\w+\s*\(\s*(int|float|boolean|String|color|\w+)\s+\w+/.test(h.src);
     }),
     I(1, 1, 'Використано цикл', function (h) { return h.has(/\b(for|while)\s*\(/); }),
     I(1, 1, 'Використано умову', function (h) { return h.has(/\bif\s*\(/); }),
