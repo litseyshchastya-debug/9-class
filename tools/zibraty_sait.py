@@ -193,6 +193,13 @@ for f in sorted((ROOT / "uroky").glob("*.md")):
                     "label": "16–17" if n == 16 else str(n)})
 
 
+def _fill_quizzes():
+    for l in lessons:
+        q = parse_quiz(l["md"])
+        if q:
+            QUIZZES[l["n"]] = q
+
+
 def sketches_for(n):
     res = []
     for d in sorted((ROOT / "skechi").glob(f"L{n:02d}_*")):
@@ -207,7 +214,7 @@ def sketches_for(n):
 CSS = read(TOOLS / "stil.css")
 PDE_CSS = read(TOOLS / "ide" / "pde.css")
 PDE_JS = read(TOOLS / "ide" / "pde.js")
-GRADE_JS = read(TOOLS / "ide" / "kryterii.js") + "\n" + read(TOOLS / "ide" / "zdacha.js")
+GRADE_JS = read(TOOLS / "ide" / "kryterii.js") + "\n" + read(TOOLS / "ide" / "kviz.js") + "\n" + read(TOOLS / "ide" / "zdacha.js")
 PJS_LIST = "['ide/processing.min.js', '" + PJS_CDN + "']"
 COURSE_URL_JS = """function () {
   if (location.protocol !== 'file:' && /claude|anthropic/.test(location.hostname)) return '""" + PUBLIC_URL + """';
@@ -221,6 +228,47 @@ REDIRECT_JS = """(function () {
   if (m) location.replace('storinky/perevirka.html#' + m[0]);
 })();
 """
+
+
+# ---------- Тест «Перевір себе» ----------
+QUIZ_RE = re.compile(r"^## Перевір себе\n(.*?)(?=^## |\Z)", re.S | re.M)
+
+
+def inline_md(text):
+    out = markdown.markdown(text.strip())
+    out = re.sub(r"^<p>|</p>$", "", out).replace("\\|", "|")
+    return out
+
+
+def parse_quiz(md):
+    """Розділ «Перевір себе» → вступ і питання {q, options, expl} та ключ правильних відповідей."""
+    m = QUIZ_RE.search(md)
+    if not m:
+        return None
+    body = m.group(1)
+    intro = body.split("\n1. ")[0].strip()
+    questions, key = [], []
+    for block in re.split(r"^\d+\. ", body[len(body.split("\n1. ")[0]):].strip(), flags=re.M):
+        if not block.strip():
+            continue
+        lines = block.strip().split("\n")
+        q = {"q": inline_md(lines[0]), "options": [], "expl": ""}
+        for ln in lines[1:]:
+            ln = ln.strip()
+            om = re.match(r"- \[( |x)\] (.*)", ln)
+            if om:
+                if om.group(1) == "x":
+                    key.append(len(q["options"]))
+                q["options"].append(inline_md(om.group(2)))
+            elif ln.startswith(">"):
+                q["expl"] = inline_md(ln[1:])
+        assert len(q["options"]) >= 2, lines[0]
+        questions.append(q)
+    assert len(key) == len(questions), "у кожного питання має бути рівно одна правильна відповідь [x]"
+    return {"intro": inline_md(intro), "questions": questions, "key": key}
+
+
+QUIZZES = {}
 
 
 def starter_tabs(n):
@@ -349,6 +397,7 @@ def switch(n, current):
     items = [("lesson", f"urok-{n:02d}.html", "Урок")]
     if n in THEORY:
         items.append(("theory", f"teoriya-{n:02d}.html", "Детальна теорія"))
+    items.append(("test", f"urok-{n:02d}.html#test" if current != "lesson" else "#test", "Тест"))
     items.append(("practice", f"urok-{n:02d}.html#praktykum" if current != "lesson" else "#praktykum", "Практикум"))
     items.append(("submit", f"urok-{n:02d}.html#zdacha" if current != "lesson" else "#zdacha", "Здати роботу"))
     links = "".join(
@@ -426,7 +475,12 @@ def lesson_page(l, prev, nxt):
         nx = f'<a class="next" href="{root}test/processing_test.html" target="_blank" rel="noopener"><small>Далі →</small>Підсумковий тест</a>'
 
     snippets = []
-    doc_html = md_to_html(l["md"], root, snippets)
+    quiz = QUIZZES.get(l["n"])
+    md = QUIZ_RE.sub("QUIZBLOCK\n\n", l["md"]) if quiz else l["md"]
+    doc_html = md_to_html(md, root, snippets)
+    if quiz:
+        doc_html = doc_html.replace("<p>QUIZBLOCK</p>",
+                                    f'<h2 id="test">Перевір себе</h2><p>{quiz["intro"]}</p><div class="kv" id="kviz"></div>')
     tabs = starter_tabs(l["n"])
     ide_html, ide_js = ide_block(f"urok-{l['n']:02d}", tabs, IDE_INTRO)
     zd_html = ('<section class="zd-section" id="zdacha"><h2>Здати роботу на перевірку</h2>'
@@ -434,8 +488,11 @@ def lesson_page(l, prev, nxt):
     ide_js += "\n" + GRADE_JS + """
 (function () {
   var data = JSON.parse(document.getElementById('pde-data').textContent);
+  var kv = document.getElementById('kviz-data') ? JSON.parse(document.getElementById('kviz-data').textContent) : null;
+  if (kv) KVIZ.mount(document.getElementById('kviz'), kv);
   ZDACHA.mountSubmit(document.getElementById('zd'), {
     lesson: """ + str(l["n"]) + """,
+    quiz: kv ? { id: kv.id, key: kv.key } : null,
     ide: function () { return PDE.main; },
     starter: data.tabs,
     pjs: """ + PJS_LIST + """,
@@ -449,7 +506,8 @@ def lesson_page(l, prev, nxt):
                     "типові помилки і приклади, які можна одразу запустити.</p>" if l["n"] in THEORY else "")
                  + f'<article><div class="doc">{doc_html}</div>{ide_html}{zd_html}{sk_html}</article>'
                  f'<nav class="pager" aria-label="Попередній і наступний урок">{p}{nx}</nav>'
-                 + ide_data(f"urok-{l['n']:02d}", tabs, snippets))
+                 + ide_data(f"urok-{l['n']:02d}", tabs, snippets)
+                 + (json_script("kviz-data", {"id": f"urok-{l['n']:02d}", "questions": quiz["questions"], "key": quiz["key"]}) if quiz else ""))
     title = f'{"Уроки" if l["n"] == 16 else "Урок"} {l["label"]}. {l["short"]}'
     return full_page(head(title, f"{COURSE}: {l['title']}", PDE_CSS), body(root, f"urok-{l['n']}", main_html, ide_js))
 
@@ -469,6 +527,7 @@ def teacher_page():
     pjs: """ + PJS_LIST + """,
     starters: extra.starters,
     lessonTitles: extra.titles,
+    quizKeys: extra.quizKeys,
     onWork: function (tabs, d) {
       var ide = PDE.main;
       ide.stop(true);
@@ -486,7 +545,8 @@ def teacher_page():
                  "Перевірена робота потрапляє в журнал нижче.</p></div>"
                  '<div id="pv"></div>'
                  f"{ide_html}</article>"
-                 + json_script("zd-data", {"starters": starters, "titles": titles})
+                 + json_script("zd-data", {"starters": starters, "titles": titles,
+                                           "quizKeys": {n: q["key"] for n, q in QUIZZES.items()}})
                  + ide_data("perevirka", [("Robota", "// Тут з'явиться код учня, коли ви перевірите роботу.\n")]))
     return full_page(head("Перевірка робіт", "Автоматична перевірка робіт учнів і журнал оцінок", PDE_CSS),
                      body(root, "perevirka", main_html, ide_js))
@@ -549,6 +609,7 @@ def index_parts():
             body(root, "home", main_html, REDIRECT_JS + read(TOOLS / "polotno.js")))
 
 
+_fill_quizzes()
 OUT.mkdir(exist_ok=True)
 for i, l in enumerate(lessons):
     prev = lessons[i - 1] if i > 0 else None

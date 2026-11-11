@@ -91,6 +91,19 @@
         .map(function (i) { return '<li><span class="t">' + esc(i.text) + '</span><span class="p">' + i.pts + ' б.</span></li>'; }).join('') + '</ul>';
     }).join('');
   }
+  // Додаткова оцінка — тест «Перевір себе» (перша спроба)
+  function quizScore(key, quiz) {
+    if (!key || !quiz || !Array.isArray(quiz.a)) return null;
+    var a = quiz.a.map(function (x) { return typeof x === 'number' ? x : null; });
+    return KVIZ.score(key, a);
+  }
+  function quizHtml(q, attempts, forTeacher) {
+    if (!q) return '<p class="zd-note">' + (forTeacher ? 'Тест «Перевір себе» учень не проходив.'
+      : 'Тест «Перевір себе» ще не пройдено. Пройдіть його (розділ «Перевір себе» вище) — оцінка за тест додасться до роботи як додаткова.') + '</p>';
+    return '<h4>Додаткова оцінка — тест «Перевір себе»</h4><div class="zd-grade"><span class="n">' + q.grade + '</span><span class="of">з 12</span>' +
+      '<span class="lvl">' + q.right + ' з ' + q.total + ' правильних · перша спроба' + (attempts > 1 ? ' (усього спроб: ' + attempts + ')' : '') + '</span></div>';
+  }
+
   function copyText(text, onDone, fallbackEl) {
     function fb() { if (fallbackEl) { fallbackEl.focus(); fallbackEl.select(); } onDone(false); }
     try { navigator.clipboard.writeText(text).then(function () { onDone(true); }, fb); } catch (e) { fb(); }
@@ -129,7 +142,8 @@
       resEl.innerHTML = '<p class="zd-wait">Перевіряю: запускаю скетч, рухаю мишею, клацаю…</p>';
       grade(o.lesson, tabs, o.starter, o.pjs).then(function (res) {
         last = { tabs: tabs, res: res };
-        resEl.innerHTML = resultHtml(res);
+        var qa = o.quiz ? KVIZ.firstAttempt(o.quiz.id) : null;
+        resEl.innerHTML = resultHtml(res) + (o.quiz ? quizHtml(quizScore(o.quiz.key, qa), qa && qa.n, false) : '');
         linkBtn.disabled = false;
       }, function (e) {
         resEl.innerHTML = '<p class="zd-note">Не вдалося перевірити: ' + esc(e && e.message || e) + '</p>';
@@ -141,6 +155,7 @@
       if (!name) { nameEl.focus(); resEl.insertAdjacentHTML('afterbegin', '<p class="zd-note">Вкажіть прізвище та ім\'я, щоб учитель знав, чия це робота.</p>'); return; }
       remember();
       var payload = { v: 1, lesson: o.lesson, name: name, cls: cls, at: new Date().toISOString(), seen: last.res.grade,
+        quiz: o.quiz ? KVIZ.firstAttempt(o.quiz.id) : null,
         tabs: last.tabs.map(function (t) { return [t.name, t.code]; }) };
       encode(payload).then(function (token) {
         var url = o.courseUrl() + '#' + token;
@@ -149,7 +164,7 @@
           '<p>Скопіюйте й надішліть учителеві (Classroom, месенджер, пошта). Учитель відкриє роботу, програма перевірить її ще раз і поставить оцінку в журнал.</p>' +
           '<div class="zd-linkrow"><input id="zd-url" type="text" readonly value="' + esc(url) + '" aria-label="Посилання на роботу">' +
           '<button type="button" class="zd-btn primary" id="zd-copy">Копіювати посилання</button></div>' +
-          '<p class="zd-small">Посилання містить ваш код і оцінку ' + last.res.grade + ' з 12. Якщо ви зміните код, перевірте роботу й отримайте нове посилання. ' +
+          '<p class="zd-small">Посилання містить ваш код, оцінку за практику ' + last.res.grade + ' з 12' + (payload.quiz ? ' і відповіді тесту «Перевір себе»' : '') + '. Якщо ви зміните код, перевірте роботу й отримайте нове посилання. ' +
           'Якщо месенджер обріже довге посилання, надішліть <button type="button" class="zd-linkbtn" id="zd-copycode">код роботи</button> — учитель вставить його на сторінці перевірки.</p>';
         var urlEl = shareEl.querySelector('#zd-url');
         shareEl.querySelector('#zd-copy').addEventListener('click', function () {
@@ -184,9 +199,10 @@
     var input = el.querySelector('#pv-input'), out = el.querySelector('#pv-out');
     var fClass = el.querySelector('#pv-fclass'), fLesson = el.querySelector('#pv-flesson');
 
-    function addToJournal(d, res) {
+    function addToJournal(d, res, qs) {
       var j = journal(), id = hashToken(d.token);
-      var row = { id: id, at: d.at, checked: new Date().toISOString(), name: d.name, cls: d.cls || '', lesson: d.lesson, grade: res.grade, token: d.token };
+      var row = { id: id, at: d.at, checked: new Date().toISOString(), name: d.name, cls: d.cls || '', lesson: d.lesson, grade: res.grade,
+        test: qs ? qs.grade : null, token: d.token };
       j = j.filter(function (r) { return r.id !== id; });
       j.unshift(row);
       if (!store.set(JKEY, j)) {                       // місце закінчилось — зберігаємо без кодів старих робіт
@@ -201,15 +217,16 @@
         var lesson = +d.lesson;
         var tabs = d.tabs.map(function (t) { return { name: t[0], code: t[1] }; });
         return grade(lesson, tabs, (o.starters || {})[lesson], o.pjs).then(function (res) {
+          var qs = quizScore((o.quizKeys || {})[lesson], d.quiz);
           var lessonLink = 'urok-' + String(lesson).padStart(2, '0') + '.html';
           out.innerHTML = '<article class="zd-card">' +
             '<div class="zd-head"><div><h2>' + esc(d.name) + (d.cls ? ' <span class="cls">' + esc(d.cls) + '</span>' : '') + '</h2>' +
             '<p><a href="' + lessonLink + '">' + esc(o.lessonTitles[lesson] || ('Урок ' + lesson)) + '</a> · надіслано ' + esc(fmtDate(d.at)) + '</p></div></div>' +
-            resultHtml(res) +
+            resultHtml(res) + quizHtml(qs, d.quiz && d.quiz.n, true) +
             (d.seen != null && d.seen !== res.grade ? '<p class="zd-note">Учень бачив оцінку ' + esc(d.seen) + ', повторна перевірка дала ' + res.grade + '. Зараховано оцінку повторної перевірки.</p>' : '') +
             '<p class="zd-small">Робота додана до журналу нижче. Код учня відкрито в середовищі: його можна запустити ▶ і переглянути вкладки.</p>' +
             '</article>';
-          addToJournal(d, res);
+          addToJournal(d, res, qs);
           if (o.onWork) o.onWork(tabs, d);
         });
       }).catch(function (e) { out.innerHTML = '<p class="zd-note">' + esc(e.message || e) + '</p>'; });
@@ -226,9 +243,9 @@
       var rows = j.filter(function (r) { return (!fClass.value || (r.cls || '—') === fClass.value) && (!fLesson.value || String(r.lesson) === fLesson.value); });
       var t = el.querySelector('#pv-table');
       if (!rows.length) { t.innerHTML = '<p class="zd-small">Поки що порожньо. Перевірте першу роботу — вона з\'явиться тут.</p>'; return; }
-      t.innerHTML = '<table><thead><tr><th>Учень</th><th>Клас</th><th>Урок</th><th>Оцінка</th><th>Надіслано</th><th></th></tr></thead><tbody>' +
+      t.innerHTML = '<table><thead><tr><th>Учень</th><th>Клас</th><th>Урок</th><th>Практика</th><th>Тест</th><th>Надіслано</th><th></th></tr></thead><tbody>' +
         rows.map(function (r) {
-          return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.cls) + '</td><td>' + r.lesson + '</td><td class="g">' + r.grade + '</td><td>' + esc(fmtDate(r.at)) + '</td>' +
+          return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.cls) + '</td><td>' + r.lesson + '</td><td class="g">' + r.grade + '</td><td class="g">' + (r.test != null ? r.test : '—') + '</td><td>' + esc(fmtDate(r.at)) + '</td>' +
             '<td class="act">' + (r.token ? '<button type="button" class="zd-linkbtn" data-open="' + r.id + '">відкрити</button> ' : '') +
             '<button type="button" class="zd-linkbtn" data-del="' + r.id + '" aria-label="Видалити рядок">×</button></td></tr>';
         }).join('') + '</tbody></table>';
@@ -242,7 +259,7 @@
     fClass.addEventListener('change', renderJournal); fLesson.addEventListener('change', renderJournal);
     el.querySelector('#pv-copyj').addEventListener('click', function () {
       var b = this, j = journal().filter(function (r) { return (!fClass.value || (r.cls || '—') === fClass.value) && (!fLesson.value || String(r.lesson) === fLesson.value); });
-      var tsv = ['Учень\tКлас\tУрок\tОцінка\tНадіслано'].concat(j.map(function (r) { return [r.name, r.cls, r.lesson, r.grade, fmtDate(r.at)].join('\t'); })).join('\n');
+      var tsv = ['Учень\tКлас\tУрок\tПрактика\tТест\tНадіслано'].concat(j.map(function (r) { return [r.name, r.cls, r.lesson, r.grade, r.test != null ? r.test : '', fmtDate(r.at)].join('\t'); })).join('\n');
       copyText(tsv, function (ok) { b.textContent = ok ? 'Скопійовано ✓ — вставте в таблицю' : 'Не вдалося скопіювати'; setTimeout(function () { b.textContent = 'Копіювати журнал для Excel'; }, 2500); }, null);
     });
     var clearBtn = el.querySelector('#pv-clear'), armed = false;
